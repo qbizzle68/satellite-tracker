@@ -1,17 +1,23 @@
 package com.qbizzle.Math;
 
+import java.util.function.BiFunction;
+
 public class Vector implements Cloneable {
+//public class Vector implements Cloneable {
     private double[] m_data = new double[3];
 
+    // constructors
     public Vector() {
-        this(0, 0, 0);
+        this(0.0, 0.0, 0.0);
     }
     public Vector(double x) {
-        this(x, 0, 0);
+        this(x, 0.0, 0.0);
     }
     public Vector(double x, double y) {
-        this(x, y, 0);
+        this(x, y, 0.0);
     }
+
+//    public Vector(double x, double y, double z) {
     public Vector(double x, double y, double z) {
         m_data[0] = x;
         m_data[1] = y;
@@ -25,9 +31,9 @@ public class Vector implements Cloneable {
     public boolean equals(Object ob) {
         if (ob instanceof Vector) {
             Vector rhs = (Vector) ob;
-            return ((rhs.m_data[0] == this.m_data[0])
-                    && (rhs.m_data[1] == this.m_data[1])
-                    && (rhs.m_data[2] == this.m_data[2]));
+            return (this.m_data[0] == rhs.m_data[0]
+                    && this.m_data[1] == rhs.m_data[1]
+                    && this.m_data[2] == rhs.m_data[2]);
         }
         throw new IllegalArgumentException("Object not of type 'Vector'");
     }
