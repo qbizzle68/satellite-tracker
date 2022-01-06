@@ -57,6 +57,12 @@ public class Vector implements Cloneable {
                 this.m_data[2] + rhs.m_data[2]
         );
     }
+    public Vector plusEquals(Vector rhs) {
+        this.m_data[0] += rhs.m_data[0];
+        this.m_data[1] += rhs.m_data[1];
+        this.m_data[2] += rhs.m_data[2];
+        return (Vector)this.clone();
+    }
 
     // synonymous to unary '-' operator.
     public Vector minus() {
@@ -75,6 +81,12 @@ public class Vector implements Cloneable {
                 this.m_data[2] - rhs.m_data[2]
         );
     }
+    public Vector minusEquals(Vector rhs) {
+        this.m_data[0] -= rhs.m_data[0];
+        this.m_data[1] -= rhs.m_data[1];
+        this.m_data[2] -= rhs.m_data[2];
+        return (Vector)this.clone();
+    }
 
     // returns a vector scaled by lambda.
     public Vector scale(double lambda) {
@@ -83,6 +95,12 @@ public class Vector implements Cloneable {
                 this.m_data[1] * lambda,
                 this.m_data[2] * lambda
         );
+    }
+    public Vector scaleEquals(double lambda) {
+        this.m_data[0] *= lambda;
+        this.m_data[1] *= lambda;
+        this.m_data[2] *= lambda;
+        return (Vector)this.clone();
     }
 
     // sets the current values of the vector equal to rhs, then returns a cloned vector of 'this'.
