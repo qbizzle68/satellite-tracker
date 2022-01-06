@@ -14,7 +14,7 @@ public class Main {
         Vector v2 = new Vector(653.23352, 2524.525643, 23425.534562);
         State state = new State(v1, v2);
         state.scaleVelocity(0.1);
-        System.out.println(state.toString());
+        System.out.println(state);
     }
 }
 
