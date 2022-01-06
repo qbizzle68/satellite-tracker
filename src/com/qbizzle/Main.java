@@ -13,8 +13,8 @@ public class Main {
         Vector v1 = new Vector(21345.1342, 65345.673275, 134525.62341);
         Vector v2 = new Vector(653.23352, 2524.525643, 23425.534562);
         State state = new State(v1, v2);
-        state.scaleVelocity(0.1);
-        System.out.println(state);
+        state.scaleVelocity(10.0);
+        System.out.println(state.toString());
     }
 }
 
@@ -68,21 +68,24 @@ class State implements Cloneable {
         m_velocity = (Vector)velocity.clone();
     }
 
-    // TODO: add methods to Vector equivalent to += and -= and *= to simplify and speed up code.
     public void addPosition(Vector dPosition) {
-        m_position = m_position.plus(dPosition);
+        m_position.plusEquals(dPosition);
+//        m_position = m_position.plus(dPosition);
 //        return (Vector)m_position.clone();
     }
     public void addVelocity(Vector dVelocity) {
-        m_velocity = m_velocity.plus(dVelocity);
+        m_velocity.plusEquals(dVelocity);
+//        m_velocity = m_velocity.plus(dVelocity);
 //        return (Vector)m_velocity.clone();
     }
     public void scalePosition(double lambda) {
-        m_position = m_position.scale(lambda);
+        m_position.scaleEquals(lambda);
+//        m_position = m_position.scale(lambda);
 //        return (Vector)m_position.clone();
     }
     public void scaleVelocity(double lambda) {
-        m_velocity = m_velocity.scale(lambda);
+        m_velocity.scaleEquals(lambda);
+//        m_velocity = m_velocity.scale(lambda);
 //        return (Vector)m_velocity.clone();
     }
 }
