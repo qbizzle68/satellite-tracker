@@ -142,4 +142,14 @@ public class Vector implements Cloneable {
     public double z() {
         return m_data[2];
     }
+    // sets a given part of vector
+    public void setX(double x) {
+        m_data[0] = x;
+    }
+    public void setY(double y) {
+        m_data[1] = y;
+    }
+    public void setZ(double z) {
+        m_data[2] = z;
+    }
 }
