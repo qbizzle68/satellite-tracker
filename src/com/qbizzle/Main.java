@@ -2,6 +2,9 @@ package com.qbizzle;
 
 import java.util.Scanner;
 import com.qbizzle.Math.Vector;
+import com.qbizzle.Orbit.TLE;
+import com.qbizzle.*;
+import com.qbizzle.Orbit.BadTLEFormatException;
 import com.sun.jdi.InternalException;
 
 public class Main {
@@ -10,11 +13,23 @@ public class Main {
     final double GRAV_PARAMETER = 6.6743e-11; // m3*kg-1*s-2
 
     public static void main(String[] args) {
-        Vector v1 = new Vector(21345.1342, 65345.673275, 134525.62341);
-        Vector v2 = new Vector(653.23352, 2524.525643, 23425.534562);
-        State state = new State(v1, v2);
-        state.scaleVelocity(10.0);
-        System.out.println(state.toString());
+        String strZaryaTLE = "ISS (ZARYA)\n" +
+                "1 25544U 98067A   08264.51782528 -.00002182  00000-0 -11606-4 0  2927\n" +
+                "2 25544  51.6416 247.4627 0006703 130.5360 325.0288 15.72125391563537";
+        String strTempSat1 = "TEMPSAT 1               \n" +
+                "1 01512U 65065E   22008.55939465  .00000014  00000+0  71959-5 0  9999\n" +
+                "2 01512  89.9018 220.0525 0071548 118.8571 305.9026 13.33444015744062";
+        TLE zaryaTLE, tempSatTLE;
+        try {
+            zaryaTLE = new TLE(strZaryaTLE);
+            tempSatTLE = new TLE(strTempSat1);
+        } catch (BadTLEFormatException ex) {
+            System.out.println(ex.toString());
+            throw new InternalError();
+        }
+//        zaryaTLE.print();
+        tempSatTLE.print();
+
     }
 }
 
@@ -22,6 +37,7 @@ class State implements Cloneable {
     private Vector m_position;
     private Vector m_velocity;
 
+//    constructors
     public State() {
         this(new Vector(), new Vector());
     }
@@ -30,6 +46,7 @@ class State implements Cloneable {
         m_velocity = velocity;
     }
 
+//    overloaded methods
     public String toString() {
         return "Position: " + m_position.toString() + ", Velocity: " + m_velocity.toString();
     }
@@ -54,13 +71,14 @@ class State implements Cloneable {
         }
     }
 
+//    getter methods
     public Vector getPosition() {
         return (Vector)m_position.clone();
     }
     public Vector getVelocity() {
         return (Vector)m_velocity.clone();
     }
-
+//    setter methods
     public void setPosition(Vector position) {
         m_position = (Vector)position.clone();
     }
@@ -68,43 +86,24 @@ class State implements Cloneable {
         m_velocity = (Vector)velocity.clone();
     }
 
+//    updating Vector methods
     public void addPosition(Vector dPosition) {
         m_position.plusEquals(dPosition);
-//        m_position = m_position.plus(dPosition);
-//        return (Vector)m_position.clone();
     }
     public void addVelocity(Vector dVelocity) {
         m_velocity.plusEquals(dVelocity);
-//        m_velocity = m_velocity.plus(dVelocity);
-//        return (Vector)m_velocity.clone();
     }
     public void scalePosition(double lambda) {
         m_position.scaleEquals(lambda);
-//        m_position = m_position.scale(lambda);
-//        return (Vector)m_position.clone();
     }
     public void scaleVelocity(double lambda) {
         m_velocity.scaleEquals(lambda);
-//        m_velocity = m_velocity.scale(lambda);
-//        return (Vector)m_velocity.clone();
     }
 }
 
-//
-//class Orbit {
-//    // units are meters, and radians where applicable except for inclination (degrees)
-//    public double semiMajorAxis, eccentricity, lan, aop, inclination, trueAnomaly;
-//
-//    public Orbit(double sma, double ecc, double lan, double aop, double inc, double trueAnom) {
-//        semiMajorAxis = sma;
-//        eccentricity = ecc;
-//        this.lan = lan;
-//        this.aop = aop;
-//        inclination = inc;
-//        trueAnomaly = trueAnom;
-//    }
-//}
-//
+
+
+
 //class Body {
 //
 //}
