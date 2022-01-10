@@ -41,6 +41,26 @@ public class COE {
         m_semiMajorAxis = (Math.pow(angMomentum.mag(), 2) * (1 - Math.pow(m_eccentricity, 2))) / OrbitalMath.MU;
     }
 
+//    accessor methods
+    public double SMA() {
+        return m_semiMajorAxis;
+    }
+    public double Eccentricity() {
+        return m_eccentricity;
+    }
+    public double LAN() {
+        return m_lan;
+    }
+    public double AOP() {
+        return m_aop;
+    }
+    public double Inclination() {
+        return m_inclination;
+    }
+    public double TrueAnomaly() {
+        return m_trueAnomaly;
+    }
+
     private Vector eccentricVector(Vector p, Vector v) {
         Vector rtn = v.scale(p.dot(v));
         rtn = p.scale(Math.pow(v.mag(), 2) - (OrbitalMath.MU / p.mag())).minus(rtn);
