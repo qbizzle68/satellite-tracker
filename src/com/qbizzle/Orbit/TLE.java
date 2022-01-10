@@ -1,5 +1,6 @@
 package com.qbizzle.Orbit;
-import java.util.Date;
+import com.qbizzle.Orbit.COE;
+import com.qbizzle.Orbit.OrbitalMath;
 
 public class TLE {
     String m_satelliteName;
@@ -7,13 +8,10 @@ public class TLE {
     private int m_catalogNumber, m_epochYear, m_ephemeris, m_setNumber;
     private char m_classification;
     String m_cosparID;
-//    private Date m_date;
     private double m_epoch, m_meanMotionDot, m_meanMotionDDot, m_BStar;
 //    line 2
-//    private COE m_orbit;
     private double m_inclination, m_lan, m_eccentricity, m_argumentOfPerigee, m_meanAnomaly, m_meanMotion;
     private int m_revNumber;
-
 
     public TLE(String tle) throws BadTLEFormatException {
         if (checkLines(tle)) {
@@ -21,28 +19,85 @@ public class TLE {
             else System.out.println("TLE String parse failed.");
         }
     }
+//    TODO: make a constructor with a File argument and read TLE from it.
 
-    public void print() {
-        System.out.println("Satellite name: " + m_satelliteName);
-        System.out.println("Line 1:");
-        System.out.println("Catalog number: " + m_catalogNumber);
-        System.out.println("Classification: " + m_classification);
-        System.out.println("COSPAR ID: " + m_cosparID);
-        System.out.println("Epoch year: " + m_epochYear);
-        System.out.println("Epoch day: " + m_epoch);
-        System.out.println("Mu Dot: " + m_meanMotionDot);
-        System.out.println("Mu DDot: " + m_meanMotionDDot);
-        System.out.println("B*: " + m_BStar);
-        System.out.println("Ephemeris: " + m_ephemeris);
-        System.out.println("Set number: " + m_setNumber);
-        System.out.println("Line 2:");
-        System.out.println("Inclination: " + m_inclination);
-        System.out.println("LAN: " + m_lan);
-        System.out.println("Eccentricity: " + m_eccentricity);
-        System.out.println("Argument of Perigee: " + m_argumentOfPerigee);
-        System.out.println("Mean Anomaly: " + m_meanAnomaly);
-        System.out.println("Mean Motion: " + m_meanMotion);
-        System.out.println("Revolution number: " + m_revNumber);
+    public String toString() {
+        return "Satellite name: " + m_satelliteName
+            + "Line 1:"
+            + "Catalog number: " + m_catalogNumber
+            + "Classification: " + m_classification
+            + "COSPAR ID: " + m_cosparID
+            + "Epoch year: " + m_epochYear
+            + "Epoch day: " + m_epoch
+            + "Mu Dot: " + m_meanMotionDot
+            + "Mu DDot: " + m_meanMotionDDot
+            + "B*: " + m_BStar
+            + "Ephemeris: " + m_ephemeris
+            + "Set number: " + m_setNumber
+            + "Line 2:"
+            + "Inclination: " + m_inclination
+            + "LAN: " + m_lan
+            + "Eccentricity: " + m_eccentricity
+            + "Argument of Perigee: " + m_argumentOfPerigee
+            + "Mean Anomaly: " + m_meanAnomaly
+            + "Mean Motion: " + m_meanMotion
+            + "Revolution number: " + m_revNumber;
+    }
+
+    //    accessor methods
+    public String Name() {
+        return m_satelliteName;
+    }
+    public char Classification() {
+        return m_classification;
+    }
+    public int CatalogNumber() {
+        return m_catalogNumber;
+    }
+    public String CosparID() {
+        return m_cosparID;
+    }
+    public int EpochYear() {
+        return m_epochYear;
+    }
+    public double EpochDay() {
+        return m_epoch;
+    }
+    public double Inclination() {
+        return m_inclination;
+    }
+    public double LAN() {
+        return m_lan;
+    }
+    public double Eccentricity() {
+        return m_eccentricity;
+    }
+    public double AOP() {
+        return m_argumentOfPerigee;
+    }
+    public double MeanAnomaly() {
+        return m_meanAnomaly;
+    }
+    public double MeanMotion() {
+        return m_meanMotion;
+    }
+    public double MeanMotionDot() {
+        return m_meanMotionDot;
+    }
+    public double MeanMotionDDot() {
+        return m_meanMotionDDot;
+    }
+    public double BStar() {
+        return m_BStar;
+    }
+    public int Ephemeris() {
+        return m_ephemeris;
+    }
+    public int TLESetNumber() {
+        return m_setNumber;
+    }
+    public int RevolutionNumber() {
+        return m_revNumber;
     }
 
 //    TODO: use regex to check format of these lines later. for reference: https://ai-solutions.com/_help_Files/two-line_element_set_file.htm
