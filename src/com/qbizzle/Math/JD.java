@@ -7,7 +7,7 @@ public class JD {
 
 //    only works if the date is after January 1, 1970
 //    TODO: learn how to access individual elements of the date, then calculate the Julian Date appropriately.
-//    TODO: does not accomidate for timezone offset, is calculator for GMT.
+//    TODO: does not accommodate for timezone offset, is calculator for GMT.
     public JD(Date date) {
         double elapsedTimeSec = date.getTime() / 1000.0;
         double unixJulianDate = 2440587.5;
@@ -31,5 +31,9 @@ public class JD {
     }
     public double Fraction() {
         return m_julianDate - (int) m_julianDate;
+    }
+
+    public double Difference(JD jd) {
+        return m_julianDate - jd.m_julianDate;
     }
 }
