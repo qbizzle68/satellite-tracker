@@ -3,11 +3,11 @@ import com.qbizzle.Orbit.COE;
 import com.qbizzle.Orbit.OrbitalMath;
 
 public class TLE {
-    String m_satelliteName;
+    private String m_satelliteName;
 //    line 1
     private int m_catalogNumber, m_epochYear, m_ephemeris, m_setNumber;
     private char m_classification;
-    String m_cosparID;
+    private String m_cosparID;
     private double m_epoch, m_meanMotionDot, m_meanMotionDDot, m_BStar;
 //    line 2
     private double m_inclination, m_lan, m_eccentricity, m_argumentOfPerigee, m_meanAnomaly, m_meanMotion;
