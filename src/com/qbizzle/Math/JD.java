@@ -11,7 +11,7 @@ public class JD {
     public static final double HOURSPERDAY = 24.0;
 
     public JD(GregorianCalendar gcal) {
-        this(
+        m_julianDate = GetDate(
                 gcal.get(Calendar.MONTH),
                 gcal.get(Calendar.DATE),
                 gcal.get(Calendar.YEAR),
@@ -19,6 +19,14 @@ public class JD {
                 gcal.get(Calendar.MINUTE),
                 gcal.get(Calendar.SECOND)
         );
+//        this(
+//                gcal.get(Calendar.MONTH),
+//                gcal.get(Calendar.DATE),
+//                gcal.get(Calendar.YEAR),
+//                gcal.get(Calendar.HOUR_OF_DAY),
+//                gcal.get(Calendar.MINUTE),
+//                gcal.get(Calendar.SECOND)
+//        );
     }
     public JD(Date date) {
         String[] strTokens = date.toString().split("[\s]");
@@ -58,11 +66,6 @@ public class JD {
                 (int)(partialDay * 86400.0)
         );
     }
-    private JD(int m, int d, int y, int h, int min, int s) {
-        int julianNumber = (1461 * (y + 4800 + (m - 14)/12))/4 + (367 * (m - 2 - 12 * ((m - 14)/12)))/12 - (3 * ((y + 4900 + (m - 14)/12)/100))/4 + d - 32075;
-        m_julianDate = julianNumber + ((h - 12) / 24.0) + (min / 1440.0) + (s / 86400.0);
-    }
-//    possibly make this argument milliseconds since UNIX epoch
     public JD(double julianDate) {
         m_julianDate = julianDate;
     }
@@ -84,6 +87,9 @@ public class JD {
 
     public double Difference(JD jd) {
         return m_julianDate - jd.m_julianDate;
+    }
+    public double Future(JD jd) {
+        return m_julianDate + jd.m_julianDate;
     }
 
     private static int MonthTable(String str) {
