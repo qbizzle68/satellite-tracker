@@ -8,6 +8,11 @@ public class StateVectors implements Cloneable {
         m_position = position;
         m_velocity = velocity;
     }
+    public StateVectors(TLE tle) {
+        StateVectors tmp = FutureState.GetState(tle, 0);
+        m_position = tmp.m_position;
+        m_velocity = tmp.m_velocity;
+    }
 
 //    method overloading
     public String toString() {
