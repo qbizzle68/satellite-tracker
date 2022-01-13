@@ -1,8 +1,9 @@
 package com.qbizzle.Orbit;
 
 public class OrbitalMath {
-    public static final double MU = 3.986004418e14;
-    public static final double G = 6.67408e-11;
+    public static final double ER = 6378.1363e3; // KM
+    public static final double MU = 3.986004418e14; // m3/s2
+    public static final double G = 6.67408e-11; // m3/kgs2
     public static double newtonEpsilon = 0.0000001;
     public static final double RAD2DEG = 180.0 / Math.PI;
     public static final double DEG2RAD = Math.PI / 180.0;
