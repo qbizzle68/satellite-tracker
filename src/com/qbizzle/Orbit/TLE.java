@@ -39,7 +39,7 @@ public class TLE {
         }
     }
 
-    /** Creates a string with all of the elements represented in name value pairs.
+    /** Creates a string with all the elements represented in name value pairs.
      * @return String to display the element values of the TLE.
      */
     public String toString() {
