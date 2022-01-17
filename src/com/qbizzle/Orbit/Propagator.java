@@ -10,12 +10,28 @@ package com.qbizzle.Orbit;
 ////    }
 //}
 
+import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 
 public class Propagator extends SGPConstants {
-    private double SGPKeplerEpsilon = 0.0000001;
+    private static double SGPKeplerEpsilon = 0.0000001;
+//    private static TLE mtle;
+//    private static COE mcoe;
+//
+//    public static StateVectors SGP4(TLE tle, double dt, double step) {
+//        double remainingDT = dt;
+//        mtle = tle; // THIS IS ASSIGNING ADDRESS, UNDO BEFORE ENDING METHOD
+//        mcoe = new COE(tle);
+//        while (remainingDT > 0) {
+//
+//        }
+//        mtle = null;
+//        mcoe = null;
+//    }
+//
+//    private static StateVectors xsgp4Algorithm(TLE tle,
 
-    private StateVectors SGP(TLE tle, double dt, double step) {
+    public static StateVectors SGP(TLE tle, double dt, double step) {
         double a1 = Math.pow(CKE / tle.MeanMotion(), 2.0/3.0);
         double del1 = (3 * CK2) / (2 * a1 * a1);
         del1 = del1 * (3 * Math.pow(Math.cos(tle.Inclination()),2) - 1) / Math.pow(1 - tle.Eccentricity()*tle.Eccentricity(), 1.5);
@@ -87,7 +103,11 @@ public class Propagator extends SGPConstants {
         );
     }
 
-    private double SGPKepler(double EWi, double ayNSL, double axNSL, double U) {
+//    private static StateVectors xsgpAlgorithm(TLE tle, StateVectors state, double dt) {
+//
+//    }
+
+    private static double SGPKepler(double EWi, double ayNSL, double axNSL, double U) {
         double DEWi = (U - ayNSL*Math.cos(EWi) + axNSL*Math.sin(EWi) - EWi) /
                 (-ayNSL*Math.sin(EWi) - axNSL*Math.cos(EWi) + 1);
         if (Math.abs(DEWi) < SGPKeplerEpsilon) return EWi + DEWi;
