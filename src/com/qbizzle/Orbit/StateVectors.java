@@ -1,4 +1,4 @@
-/**
+/** @file
  * This file contains the StateVectors class which acts as a container for two Vector
  * objects, one for the position and on for the velocity of a satellite at a given epoch.
  * The class can construct itself into a set of state vectors in a future position as well,
@@ -9,36 +9,37 @@
  */
 
 package com.qbizzle.Orbit;
+import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 
+/** Container class for holding the position and velocity vectors of a satellite at a given epoch.
+ */
 public class StateVectors implements Cloneable {
     private Vector m_position, m_velocity;
 
-    /**
-     * Constructs the object directly from a known state
-     * @param position known position of the satellite in geocentric-equitorial reference frame
-     * @param velocity known position of the satellite in geocentric-equitorial reference frame
+    /** Constructs the object directly from a known state.
+     * @param position Known position of the satellite in geocentric-equitorial reference frame.
+     * @param velocity Known velocity of the satellite in geocentric-equitorial reference frame.
      */
     public StateVectors(Vector position, Vector velocity) {
         m_position = position;
         m_velocity = velocity;
     }
 
-    /**
-     * Constructs a set of state vectors using the methodology in the "Keplerian-Orbit-Elements-to-
-     * Cartesian-State-Vectors.pdf" file
-     * @param coe set of orbital elements used to convert to state vectors
+    /** Constructs a set of state vectors using the methodology in the "Keplerian-Orbit-Elements-to-
+     * Cartesian-State-Vectors.pdf" file.
+     * @param coe Set of orbital elements used to convert to state vectors.
      */
     public StateVectors(COE coe) {
         this(coe, 0.0);
     }
 
-    /**
-     * Constructs a set of state vectors in the past/future iwth a conic orbit model, i.e. the
-     * orbital elements remain constatnt with time (no perturbations such as earth oblateness,
+    /** Constructs a set of state vectors in the past/future with a conic orbit model. The
+     * orbital elements remain constant with time (no perturbations such as earth oblateness,
      * drag and deep space third body gravitational effects).
-     * @param coe a set of orbital elements that describes the satellites orbit
-     * @param dt the number of solar days in the past (negative) or future (positive).
+     * @param coe A set of orbital elements that describes the satellites orbit.
+     * @param dt The number of solar days relative to known epoch.
+     * @note A negative value of @p dt constructs a state @em before the current epoch.
      */
     public StateVectors(COE coe, double dt) {
         double Mt = OrbitalMath.True2Mean( Math.toRadians(coe.ta), coe.ecc )
@@ -68,8 +69,7 @@ public class StateVectors implements Cloneable {
         );
     }
 
-    /**
-     * Constructs a set of state vectors by interpreting the TLE into orbital elements and
+    /** Constructs a set of state vectors by interpreting the TLE into orbital elements and
      * converting from orbital elements to state vectors.
      * @param tle a recent TLE to retrieve orbital elements from.
      */
@@ -77,22 +77,33 @@ public class StateVectors implements Cloneable {
         this( new COE(tle) );
     }
 
-    /**
-     * Constructs the object by interpreting the TLE into orbital elements and integrating
-     * the changes over the time dt, then converting to state vectors
-     * @param tle a recent TLE to retrieve orbital elements and derivative terms from.
-     * @param dt the future or past(negative) time to integrate over
+    /** Constructs the object by interpreting the TLE into orbital elements and integrating
+     * the changes over the time dt, then converting to state vectors.
+     * @param tle A recent TLE to retrieve orbital elements and derivative terms from.
+     * @param dt The amount of time in solar days to integrate over.
+     * @note A negative value of @p dt constructs a state @em before the current epoch.
      */
     public StateVectors(TLE tle, double dt) {
         this( new COE(tle, dt) );
     }
 
-    /**
-     * methods overloading the Cloneable extension
+    /// @name Overloaded methods.
+    /// Methods that are inherited from Java Cloneable class.
+///@{
+
+    /** Returns a string representation of the state vectors. Syntax is of the form
+     * 'Position: [rx, ry, rz], Velocity: [vx, vy, vz].
+     * @return A string representation of the vector.
      */
     public String toString() {
-        return "Position: " + m_position.toString() + ", Velocity " + m_velocity.toString();
+        return "Position: " + m_position.toString() + ", Velocity: " + m_velocity.toString();
     }
+
+    /** Indicates whether a State is 'equal to' this instance.
+     * @param ob State to compare this State to.
+     * @return True if this object is the same as @p ob argument, false otherwise.
+     * @throws IllegalArgumentException is thrown if @p ob argument is not of type StateVector.
+     */
     public boolean equals(Object ob) {
         if (ob instanceof StateVectors) {
             StateVectors state = (StateVectors) ob;
@@ -100,6 +111,13 @@ public class StateVectors implements Cloneable {
         }
         else throw new IllegalArgumentException("Object not of type 'StateVectors'");
     }
+
+    /** Creates and returns a copy of this object.
+     * A deep copy of the vectors are made before returning.
+     * @return A clone of this instance.
+     * @warning This method returns a Java Object, so explicit casting may be necessary
+     * to avoid errors.
+     */
     public Object clone() {
         try {
             StateVectors rtn = (StateVectors)super.clone();
@@ -111,19 +129,40 @@ public class StateVectors implements Cloneable {
         }
     }
 
-    /**
-     * accessor methods for state vectors
+///@}
+
+    /// @name Accessor methods.
+    /// Methods to access the state vectors.
+///@{
+
+    /** Gets the position state vector.
+     * @return A Vector with the satellites position.
      */
     public Vector Position() {
         return m_position;
     }
+
+    /** Gets the velocity state vector.
+     * @return A Vector with the satellites velocity.
+     */
     public Vector Velocity() {
         return m_velocity;
     }
 
-//    this method is just to take the place of a rotation matrix to keep calling methods
-//    less messy. this should not be needed when a sufficient rotation library is finished
-//    angle parameters need to be in radians
+///@}
+
+    /** Method used to place hold for the absence of a rotation matrix. This method effectively
+     * rotates the vector @p xOrbitFrame from an orbital reference frame with orbital elements
+     * @p lan, @p inc and @p aop, to an inertial geocentric-equitorial reference frame. In more
+     * complex terms it's equal to rotating the vector @p xOrbitFrame by the matrix R(-lan)*R(-inc)*R(-aop).
+     * @param xOrbitFrame Vector that is to be rotated from one frame to another.
+     * @param lan Longitude of ascending node in @em radians.
+     * @param inc Inclination of the orbit in @em radians.
+     * @param aop Argument of apoapsis in @em radians.
+     * @return The rotated Vector.
+     * @note This method takes the orbital elements in radians so-as to not need to convert them itself.
+     * @todo Create a rotation library in order to replace this entire method with a rotation matrix.
+     */
     private Vector rotateToInertialFrame(Vector xOrbitFrame, double lan, double inc, double aop) {
         double xXTerm1 = xOrbitFrame.x()
                 * (Math.cos(aop) * Math.cos(lan) - Math.sin(aop) * Math.cos(inc) * Math.sin(lan));
