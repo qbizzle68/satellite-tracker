@@ -1,6 +1,6 @@
 /** @file
  * This file contains a Julian Date class to help facilitate with differentiating time.
- * Since any date (day, month, year) can be quickly converted to a Julian Date the largest
+ * Since any date (day, month, year) can be quickly converted to a Julian Date, the largest
  * unit of time that needs to be handled should be a solar day (86,400.0 seconds), with hours,
  * minutes and seconds being quickly converted to a fractional portion of a day. This allows
  * any two moments in time to be converted to Julian Dates, then computing the difference (or
