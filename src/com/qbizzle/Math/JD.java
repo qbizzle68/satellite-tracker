@@ -23,15 +23,14 @@ import java.util.*;
  */
 public class JD {
     private final double m_julianDate;
-    /*
-     * static final rates of various time quantities per day
-     */
     /// Number of seconds in a solar day.
     public static final double SECONDSPERDAY = 86400.0;
     /// Number of minutes in a solar day.
     public static final double MINUTESPERDAY = 1440.0;
     /// Number of hours in a solar day.
     public static final double HOURSPERDAY = 24.0;
+    /// Julian Date number of the J2000 epoch of 1/1/2000 12:00:00.
+    public static final double J2000 = 2451545.0;
 
     /** Constructs the Julian Date from the Java GregorianCalendar object.
      * @param GregCal GregorianCalendar instance that represents the Julian Date.
@@ -81,27 +80,23 @@ public class JD {
         m_julianDate = julianDate;
     }
 
-    /** Converts values of a Gregorian Date into a Julian Date.
+    /** Construct the Julian Date from Gregorian Date components.
      * @param mon Month number of the year, starting with 1.
      * @param day Day of the month.
      * @param yr Year relative to 1 AD.
      * @param hr Hour of the day in 24 hour notation.
      * @param min Minute of the hour.
-     * @param sec Seconds, can include additional fractions of a second.
-     * @return The number of days since 12:00:00 1/1/4713 BCE.
-     * @note The algorithm used for converting dates can be found
-     *     <a href="https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_Day_Number">
-     *     here</a>.
+     * @param sec Seconds, can include additional fractions of a second (hence the double type).
+     * @note Parameter values that are out of their normal range may not behave as expected.
      */
-    public static double GetDate(int mon, int day, int yr, int hr, int min, double sec) {
-        int julianNumber = (1461 * (yr + 4800 + (mon - 14)/12))/4 + (367 * (mon - 2 - 12 * ((mon - 14)/12)))/12 - (3 * ((yr + 4900 + (mon - 14)/12)/100))/4 + day - 32075;
-        return julianNumber + ((hr - 12) / 24.0) + (min / 1440.0) + (sec / 86400.0);
+    public JD(int mon, int day, int yr, int hr, int min, double sec) {
+        m_julianDate = GetDate(mon, day, yr, hr, min, sec);
     }
 
-    /** @name Getter methods.
-     * Methods to retrieve values associated with the current Julian Date.
-     */
-    /**@{*/
+    /// @name Getter methods.
+    /// Methods to retrieve values associated with the current Julian Date.
+///@{*/
+
     /** Getter method for retrieving the Julian Date value.
      * @return The Julian Date value associated with this instance.
      */
@@ -125,12 +120,13 @@ public class JD {
     public double Fraction() {
         return m_julianDate - (int) m_julianDate;
     }
-    /**@}*/
 
-    /** @name Computation methods.
-     * Methods used to compute values between or to create new Julian Dates.
-     */
-    /**@{*/
+///@}*/
+
+    /// @name Computation methods.
+    /// Methods used to compute values between or to create new Julian Dates.
+///@{*/
+
     /** Computes the difference between two Julian Dates in solar days.
      * @param jd The Julian Date in which to find the difference.
      * @return The number of solar days between the two dates.
@@ -150,7 +146,8 @@ public class JD {
     public JD Future(double days) {
         return new JD(m_julianDate + days);
     }
-    /**@}*/
+
+///@}*/
 
     /** Get the month number of the abreviated string.
      * A helper method to convert the string abreviation from the Java Date class to the
@@ -174,5 +171,22 @@ public class JD {
             case "Dec" -> 12;
             default -> 1;
         };
+    }
+
+    /** Converts values of a Gregorian Date into a Julian Date.
+     * @param mon Month number of the year, starting with 1.
+     * @param day Day of the month.
+     * @param yr Year relative to 1 AD.
+     * @param hr Hour of the day in 24 hour notation.
+     * @param min Minute of the hour.
+     * @param sec Seconds, can include additional fractions of a second.
+     * @return The number of days since 12:00:00 1/1/4713 BCE.
+     * @note The algorithm used for converting dates can be found
+     *     <a href="https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_Day_Number">
+     *     here</a>.
+     */
+    private static double GetDate(int mon, int day, int yr, int hr, int min, double sec) {
+        int julianNumber = (1461 * (yr + 4800 + (mon - 14)/12))/4 + (367 * (mon - 2 - 12 * ((mon - 14)/12)))/12 - (3 * ((yr + 4900 + (mon - 14)/12)/100))/4 + day - 32075;
+        return (double)julianNumber + ((hr - 12) / 24.0) + (min / 1440.0) + (sec / 86400.0);
     }
 }
