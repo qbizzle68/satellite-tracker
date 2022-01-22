@@ -1,4 +1,4 @@
-package test;
+package test.math;
 
 import com.qbizzle.Math.JD;
 import com.qbizzle.Orbit.BadTLEFormatException;

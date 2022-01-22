@@ -1,4 +1,4 @@
-package test;
+package test.math;
 
 import com.qbizzle.Math.Vector;
 import org.junit.Test;
