@@ -62,8 +62,7 @@ public class Vector implements Cloneable {
      * @throws IllegalArgumentException if @p ob argument is not of type Vector.
      */
     public boolean equals(Object ob) {
-        if (ob instanceof Vector) {
-            Vector rhs = (Vector) ob;
+        if (ob instanceof Vector rhs) {
             return (this.m_data[0] == rhs.m_data[0]
                     && this.m_data[1] == rhs.m_data[1]
                     && this.m_data[2] == rhs.m_data[2]);
@@ -84,7 +83,7 @@ public class Vector implements Cloneable {
             return tmp;
         }
         catch (CloneNotSupportedException ex) {
-//            this cant be reached, so just please the IDE
+//            this can't be reached, so just please the IDE
             throw new InternalError(ex.toString());
         }
     }
