@@ -23,6 +23,17 @@ public class OrbitalMath {
     /** Constant to convert degrees to radians. */
     public static final double DEG2RAD = Math.PI / 180.0;
 
+    /** Acts as a wrapper around the native atan2 method, but converts the output
+     * to the interval (0, 2π).
+     * @param y The y coordinate.
+     * @param x The z coordinate.
+     * @return The arc tangent of y/x.
+     */
+    public static double atan2(double y, double x) {
+        double theta = Math.atan2(x, y);
+        return (theta < 0) ? theta + 2*Math.PI : theta;
+    }
+
 //     \f$n = \sqrt{\frac{\mu}{a^3}}\f$.
     /** Converts mean motion to semi-major axis.
      * The conversion is done using Kepler's 2nd law.
@@ -77,9 +88,9 @@ public class OrbitalMath {
      * @return The true anomaly in @em radians.
      */
     public static double Eccentric2True(double eccentricAnomaly, double eccentricity) {
-        return 2 * Math.atan2(
-                Math.sqrt(1 + eccentricity) * Math.sin(eccentricAnomaly / 2.0),
-                Math.sqrt(1 - eccentricity) * Math.cos(eccentricAnomaly / 2.0)
+        return atan2(
+                Math.sqrt(1 - Math.pow(eccentricity,2)) * Math.sin(eccentricAnomaly),
+                Math.cos(eccentricAnomaly) - eccentricity
         );
     }
 
@@ -102,7 +113,11 @@ public class OrbitalMath {
      * @return The eccentric anomaly in @em radians.
      */
     public static double True2Eccentric(double trueAnomaly, double eccentricity) {
-        return Math.acos( (eccentricity + Math.cos(trueAnomaly)) / (1 + eccentricity * Math.cos(trueAnomaly)) );
+//        return Math.acos( (eccentricity + Math.cos(trueAnomaly)) / (1 + eccentricity * Math.cos(trueAnomaly)) );
+        return atan2(
+                Math.sqrt(1 - Math.pow(eccentricity, 2)) * Math.sin(trueAnomaly),
+                Math.cos(trueAnomaly) + eccentricity
+        );
     }
 
     /** Converts eccentric anomaly to mean anomaly using Kepler's equation.
