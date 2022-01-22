@@ -32,21 +32,22 @@ public class JD {
     /// Julian Date number of the J2000 epoch of 1/1/2000 12:00:00.
     public static final double J2000 = 2451545.0;
 
-    /** Constructs the Julian Date from the Java GregorianCalendar object.
-     * @param GregCal GregorianCalendar instance that represents the Julian Date.
-     */
-//    This is ideal if the GregorianCalendar can handle error checking of the inputs.
-//    If not we may as well implement our own constructor similar to the GetDate method.
-    public JD(GregorianCalendar GregCal) {
-        m_julianDate = GetDate(
-                GregCal.get(Calendar.MONTH),
-                GregCal.get(Calendar.DATE),
-                GregCal.get(Calendar.YEAR),
-                GregCal.get(Calendar.HOUR_OF_DAY),
-                GregCal.get(Calendar.MINUTE),
-                GregCal.get(Calendar.SECOND)
-        );
-    }
+    // This feels like a waste, removing
+//    /** Constructs the Julian Date from the Java GregorianCalendar object.
+//     * @param GregCal GregorianCalendar instance that represents the Julian Date.
+//     */
+////    This is ideal if the GregorianCalendar can handle error checking of the inputs.
+////    If not we may as well implement our own constructor similar to the GetDate method.
+//    public JD(GregorianCalendar GregCal) {
+//        m_julianDate = GetDate(
+//                GregCal.get(Calendar.MONTH),
+//                GregCal.get(Calendar.DATE),
+//                GregCal.get(Calendar.YEAR),
+//                GregCal.get(Calendar.HOUR_OF_DAY),
+//                GregCal.get(Calendar.MINUTE),
+//                GregCal.get(Calendar.SECOND)
+//        );
+//    }
 
     /** Constructs the Julian Date from the Java Date object.
      * @param date Date object that the Julian Day is meant to represent. Ideal
@@ -70,7 +71,7 @@ public class JD {
      *            a Julian Date.
      */
     public JD(TLE tle) {
-        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0) + tle.EpochDay();
+        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0) + tle.EpochDay() - 0.5;
     }
 
     /** Constructs the Julian Date directly from a known Julian Date number
