@@ -257,6 +257,8 @@ public class TLE {
         m_classification = line1Tokens[1].charAt(5);
         m_cosparID = line1Tokens[2];
         m_epochYear = Integer.parseInt(line1Tokens[3].substring(0, 2));
+        if (m_epochYear >= 57) m_epochYear += 1900;
+        else m_epochYear += 2000;
         m_epoch = Double.parseDouble(line1Tokens[3].substring(2));
         m_meanMotionDot = Double.parseDouble(line1Tokens[4]);
         String strDDot;
