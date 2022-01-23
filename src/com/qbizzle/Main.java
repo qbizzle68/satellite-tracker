@@ -1,9 +1,9 @@
 package com.qbizzle;
 
 import com.qbizzle.Math.JD;
-import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
 import static java.lang.Math.toRadians;
@@ -12,7 +12,7 @@ public class Main {
 
     Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 //        double siderealTime = ST(new JD(new Date()), -6.0);
 ////        int hour = (int) siderealTime;
 ////        siderealTime -= hour;
@@ -38,7 +38,8 @@ public class Main {
 //        Vector issPos = Rotate(state.Position(), -offsetAngle);
 //        System.out.println(issPos.toString());
 
-        System.out.println(OrbitalMath.Mean2Eccentric(0.7853981634, 0.0123));
+//        System.out.println(OrbitalMath.Mean2Eccentric(0.7853981634, 0.0123));
+
     }
 
     // time zone should be relative to GMT (CST = -6.0)
