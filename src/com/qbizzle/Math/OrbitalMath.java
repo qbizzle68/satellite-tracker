@@ -30,7 +30,7 @@ public class OrbitalMath {
      * @return The arc tangent of y/x.
      */
     public static double atan2(double y, double x) {
-        double theta = Math.atan2(x, y);
+        double theta = Math.atan2(y, x);
         return (theta < 0) ? theta + 2*Math.PI : theta;
     }
 
