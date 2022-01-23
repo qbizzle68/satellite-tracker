@@ -2,3 +2,5 @@ Keplerian-Orbit-Elements-to-Cartesian-State-Vectors.pdf
 Doxyfile
 doc/
 strip-package.py
+out/
+!*/Main.class
