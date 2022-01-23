@@ -79,7 +79,8 @@ public class COE {
      */
     public COE(TLE tle, double dt) {
         inc = tle.Inclination();
-        double a0 = Math.pow( OrbitalMath.MU / Math.pow(tle.MeanMotion(), 2), 1.0/3.0 );
+        double nconvert = tle.MeanMotion() * 2 * Math.PI / 86400.0;
+        double a0 = Math.pow( OrbitalMath.MU / Math.pow(nconvert, 2), 1.0/3.0 );
         double dM = (tle.MeanMotion() * dt
                 + tle.MeanMotionDot() * dt * dt
                 + tle.MeanMotionDDot() * dt * dt * dt) * 2 * Math.PI;
