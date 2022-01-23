@@ -248,6 +248,7 @@ public class TLE {
      */
     private boolean parseString(String tle) {
         String[] lines = tle.split("[\n]");
+        for (int i = 0; i < 3; i++) lines[i] = lines[i].trim();
         String[] line1Tokens = lines[1].split("[\s]+");
         String[] line2Tokens = lines[2].split("[\s]+");
 
@@ -285,8 +286,8 @@ public class TLE {
         m_eccentricity = Double.parseDouble('.' + line2Tokens[4]);
         m_argumentOfPerigee = Double.parseDouble(line2Tokens[5]);
         m_meanAnomaly = Double.parseDouble(line2Tokens[6]);
-        m_meanMotion = Double.parseDouble(line2Tokens[7].substring(0, 11));
-        m_revNumber = Integer.parseInt(line2Tokens[7].substring(11, line2Tokens[7].length()-1));
+        m_meanMotion = Double.parseDouble(line2Tokens[7].substring(0, line2Tokens[7].length()-6));
+        m_revNumber = Integer.parseInt(line2Tokens[7].substring(line2Tokens[7].length()-6, line2Tokens[7].length()-1));
 
         return true;
     }
