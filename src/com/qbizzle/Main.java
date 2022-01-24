@@ -3,6 +3,9 @@ package com.qbizzle;
 import com.qbizzle.Math.JD;
 import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
+import com.qbizzle.Orbit.BadTLEFormatException;
+import com.qbizzle.Orbit.COE;
+import com.qbizzle.Orbit.TLE;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
@@ -13,7 +16,7 @@ public class Main {
 
     Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, BadTLEFormatException {
 //        double siderealTime = ST(new JD(new Date()), -6.0);
 ////        int hour = (int) siderealTime;
 ////        siderealTime -= hour;
@@ -39,15 +42,28 @@ public class Main {
 //        Vector issPos = Rotate(state.Position(), -offsetAngle);
 //        System.out.println(issPos.toString());
 
-        Vector rvec = new Vector(8750000,5100000,0);
-        Vector vvec = new Vector(-3000, 5200, 5900);
-        double r = rvec.mag();
-        double v = vvec.mag();
-        double mu = OrbitalMath.MU;
+        String strLEOTLE = "ISS (ZARYA)             \n" +
+                "1 25544U 98067A   22022.91470718  .00005958  00000+0  11386-3 0  9993\n" +
+                "2 25544  51.6445 336.0056 0006830  51.7508  17.5213 15.49594026322655";
+        COE coe = new COE(new TLE(strLEOTLE));
+        System.out.println("sma: " + coe.sma);
+        System.out.println("ecc: " + coe.ecc);
+        System.out.println("inc: " + coe.inc);
+        System.out.println("lan: " + coe.lan);
+        System.out.println("aop: " + coe.aop);
+        System.out.println("ta: " + coe.ta);
+        System.out.println("ta-rad: " + Math.toRadians(coe.ta));
+        System.out.println("ma: " + OrbitalMath.True2Mean(Math.toRadians(coe.ta), coe.ecc));
+        System.out.println("ea: " + OrbitalMath.True2Eccentric(Math.toRadians(coe.ta), coe.ecc));
+        System.out.println("ea: " + OrbitalMath.Mean2Eccentric(1.126815678, .000683));
+        System.out.println("ta: " + OrbitalMath.Mean2True(1.126815678, .000683));
+        System.out.println("pos: " + toIJK(new Vector(2910730.115,6138964.276,0), Math.toRadians(coe.aop), Math.toRadians(coe.inc), Math.toRadians(coe.lan)).toString());
+        System.out.println("vel: " + toIJK(new Vector(-6920.006959,3286.284615,0), Math.toRadians(coe.aop), Math.toRadians(coe.inc), Math.toRadians(coe.lan)).toString());
 
-        Vector evec = (rvec.scale((v*v)-(mu/r)).minus(vvec.scale(rvec.dot(vvec)))).scale(1 / mu);
-        System.out.println("Eccenctric vector: " + evec.toString());
-        System.out.println("|e|: " + evec.mag());
+        Vector vexp = new Vector(-1222362.021127256, 4678181.947355996, 4772805.981926173);
+        Vector vact = new Vector(-1225493.0931284525, 4676792.423899453, 4769592.7817697795);
+        double alpha = Math.acos(vexp.dot(vact) / (vexp.mag() * vact.mag()));
+        System.out.println(Math.toDegrees(alpha));
     }
 
     // time zone should be relative to GMT (CST = -6.0)
@@ -62,6 +78,16 @@ public class Main {
         double v1 = vec.x() * Math.cos(phiRad) - vec.y() * Math.sin(phiRad);
         double v2 = vec.x() * Math.sin(phiRad) + vec.y() * Math.cos(phiRad);
         return new Vector(v1, v2, vec.z());
+    }
+
+    public static Vector toIJK(Vector vec, double aop, double inc, double lan) {
+        double v1 = vec.x() * (Math.cos(aop)*Math.cos(lan) - Math.sin(aop)*Math.cos(inc)*Math.sin(lan))
+                - vec.y() * (Math.sin(aop)*Math.cos(lan) + Math.cos(aop)*Math.cos(inc)*Math.sin(lan));
+        double v2 = vec.x() * (Math.cos(aop)*Math.sin(lan) + Math.sin(aop)*Math.cos(inc)*Math.cos(lan))
+                + vec.y() * (Math.cos(aop)*Math.cos(inc)*Math.cos(lan) - Math.sin(aop)*Math.sin(lan));
+        double v3 = vec.x() * (Math.sin(aop)*Math.sin(inc))
+                + vec.y() * (Math.cos(aop)*Math.sin(inc));
+        return new Vector(v1, v2, v3);
     }
 
 }
