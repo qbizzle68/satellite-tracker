@@ -81,10 +81,10 @@ public class COE {
         inc = tle.Inclination();
         double nconvert = tle.MeanMotion() * 2 * Math.PI / 86400.0;
         double a0 = Math.pow( OrbitalMath.MU / Math.pow(nconvert, 2), 1.0/3.0 );
-        double dM = (tle.MeanMotion() * dt
+        double dM = (tle.MeanMotion() * dt // these are in rev / day
                 + tle.MeanMotionDot() * dt * dt
                 + tle.MeanMotionDDot() * dt * dt * dt) * 2 * Math.PI;
-        double M1 = Math.toRadians(tle.MeanAnomaly()) + dM; // mean anomaly at t1 in rad
+        double M1 = (2 * Math.PI * (tle.MeanAnomaly() / 360.0) + dM) % (2 * Math.PI);// mean anomaly at t1 in rad
         ta = Math.toDegrees( OrbitalMath.Mean2True(M1, tle.Eccentricity()) ); // true anomaly at t1 in deg
         double n0 = tle.MeanMotion();
         double n0dot = tle.MeanMotionDot() * 2;
@@ -111,18 +111,18 @@ public class COE {
     public COE(Vector position, Vector velocity) {
 //        compute intermediate vectors used to calculate elements
         Vector angMomentum = position.cross(velocity);
-        Vector lineOfNodes = angMomentum.cross(new Vector(0, 0, 1.0)).norm(); // pointing towards the ascending node
+        Vector lineOfNodes = (new Vector(0, 0, 1.0)).cross(angMomentum).norm();
         Vector eccVector = eccentricVector(position, velocity);
 //        set elements from vectors
         ecc = eccVector.mag();
-        inc = Math.acos(angMomentum.z() / angMomentum.mag());
-        lan = Math.acos(lineOfNodes.x() / lineOfNodes.mag());
+        inc = Math.toDegrees( Math.acos(angMomentum.z() / angMomentum.mag()) );
+        lan = Math.toDegrees( Math.acos(lineOfNodes.x() / lineOfNodes.mag()) );
         if (lineOfNodes.y() < 0) lan = 360 - lan;
-        aop = Math.acos(lineOfNodes.dot(eccVector) / (lineOfNodes.mag() * eccVector.mag()));
+        aop = Math.toDegrees( Math.acos(lineOfNodes.dot(eccVector) / (lineOfNodes.mag() * eccVector.mag())) );
         if (eccVector.z() < 0) aop = 360 - aop;
-        ta = Math.acos(eccVector.dot(position) / (eccVector.mag() * position.mag()));
+        ta = Math.toDegrees( Math.acos(eccVector.dot(position) / (eccVector.mag() * position.mag())) );
         if (position.dot(velocity) < 0) ta = 360 - ta;
-        sma = (Math.pow(angMomentum.mag(), 2) * (1 - Math.pow(ecc, 2))) / OrbitalMath.MU;
+        sma = Math.pow(angMomentum.mag(), 2) / ((1 - Math.pow(ecc, 2)) * OrbitalMath.MU);
     }
 
     /** Computes the eccentric vector of an orbit from known state vectors.

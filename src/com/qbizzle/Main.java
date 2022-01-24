@@ -39,8 +39,15 @@ public class Main {
 //        Vector issPos = Rotate(state.Position(), -offsetAngle);
 //        System.out.println(issPos.toString());
 
-        System.out.println(Math.toDegrees(OrbitalMath.Mean2True(0.126785, 0.0006830)) - 2*Math.PI);
+        Vector rvec = new Vector(8750000,5100000,0);
+        Vector vvec = new Vector(-3000, 5200, 5900);
+        double r = rvec.mag();
+        double v = vvec.mag();
+        double mu = OrbitalMath.MU;
 
+        Vector evec = (rvec.scale((v*v)-(mu/r)).minus(vvec.scale(rvec.dot(vvec)))).scale(1 / mu);
+        System.out.println("Eccenctric vector: " + evec.toString());
+        System.out.println("|e|: " + evec.mag());
     }
 
     // time zone should be relative to GMT (CST = -6.0)
