@@ -1,6 +1,7 @@
 package com.qbizzle;
 
 import com.qbizzle.Math.JD;
+import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +39,7 @@ public class Main {
 //        Vector issPos = Rotate(state.Position(), -offsetAngle);
 //        System.out.println(issPos.toString());
 
-//        System.out.println(OrbitalMath.Mean2Eccentric(0.7853981634, 0.0123));
+        System.out.println(Math.toDegrees(OrbitalMath.Mean2True(0.126785, 0.0006830)) - 2*Math.PI);
 
     }
 
