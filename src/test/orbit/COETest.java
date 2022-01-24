@@ -1,13 +1,13 @@
 package test.orbit;
 
+import com.qbizzle.Math.Vector;
 import com.qbizzle.Orbit.BadTLEFormatException;
 import com.qbizzle.Orbit.COE;
 import com.qbizzle.Orbit.TLE;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class COETest {
     private final String strLEOTLE = "ISS (ZARYA)             \n" +
@@ -39,7 +39,21 @@ class COETest {
                 () -> assertEquals(336.0056, Math.round(coe.lan*10e4)/10e4, "LAN"),
                 () -> assertEquals(51.7508, Math.round(coe.aop*10e4)/10e4, "AOP"),
                 () -> assertEquals(51.6445, coe.inc, "Inclination"),
-                () -> assertEquals(56.77810642, Math.round(coe.ta*10e8)/10e8, "True anomaly"));
+                () -> assertEquals(64.665196717, Math.round(coe.ta*10e8)/10e8, "True anomaly"));
+    }
+
+    @Test
+    @DisplayName("State vectors constructor test")
+    public void stateVectorsConstructorTest() {
+        Vector r = new Vector(8750000, 5100000, 0);
+        Vector v = new Vector(-3000, 5200, 5900);
+        COE coe = new COE(r, v);
+        assertAll(() -> assertEquals(50686357.45, Math.round(coe.sma*100)/100.0, "SMA"),
+                () -> assertEquals(0.8002, Math.round(coe.ecc*10000)/10000.0, "ecc"),
+                () -> assertEquals(30.2361, Math.round(coe.lan*10000)/10000.0, "lan"),
+                () -> assertEquals(359.59, Math.round(coe.aop*100)/100.0, "aop"),
+                () -> assertEquals(44.5029, Math.round(coe.inc*10000)/10000.0, "inc"),
+                () -> assertEquals(0.41, Math.round(coe.ta*100)/100.0, "ta"));
     }
 
 }
