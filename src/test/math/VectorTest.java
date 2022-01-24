@@ -5,8 +5,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class VectorTest {
 
@@ -170,10 +169,35 @@ public class VectorTest {
     @DisplayName("Setter method tests")
     public void setterMethodTests() {
         Vector cpy = (Vector)threeConstructor.clone();
-        cpy.setX(3.3);
-        cpy.setY(5.5);
-        cpy.setZ(7.7);
+        cpy.set(0, 3.3);
+        cpy.set(1, 5.5);
+        cpy.set(2, 7.7);
         assertEquals(cpy, new Vector(3.3, 5.5, 7.7));
+    }
+
+    @org.junit.jupiter.api.Test
+    @DisplayName("Getter method tests")
+    public void getterMethodTests() {
+        Vector vec = (Vector)threeConstructor.clone();
+        assertEquals(new Vector(vec.get(0), vec.get(1), vec.get(2)), vec);
+    }
+
+    @Test
+    @DisplayName("Setter out of bounds exception")
+    public void setterOutOfBoundsException() {
+        assertThrows(ArrayIndexOutOfBoundsException.class,
+                () -> threeConstructor.set(3, 4.4));
+        assertThrows(ArrayIndexOutOfBoundsException.class,
+                () -> threeConstructor.set(-1, 4.4));
+    }
+
+    @org.junit.jupiter.api.Test
+    @DisplayName("Getter out of bounds exception")
+    public void getterOutOfBoundsException() {
+        assertThrows(ArrayIndexOutOfBoundsException.class,
+                () -> threeConstructor.get(4));
+        assertThrows(ArrayIndexOutOfBoundsException.class,
+                () -> threeConstructor.get(-1));
     }
 
 }
