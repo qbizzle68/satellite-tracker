@@ -243,8 +243,8 @@ public class Vector implements Cloneable {
 
 ///@}
 
-    /// @name Getter methods.
-    /// Methods to retrieve the component values of a Vector.
+    /// @name Getter/setter methods.
+    /// Methods to retrieve or set the component values of a Vector.
 ///@{
 
     /** Gets the x-component of the Vector.
@@ -268,32 +268,22 @@ public class Vector implements Cloneable {
         return m_data[2];
     }
 
-///@}
-
-    /// @name Setter methods.
-    /// Methods to set the components of a Vector.
-///@{
-
-    /** Sets the x-component of the Vector.
-     * @param x Value to assign to the x-component.
+    /** Gets the ith-component of the Vector.
+     * @param i Index of the vector you wish to retrieve.
+     * @return Ith value of the Vector.
      */
-    public void setX(double x) {
-        m_data[0] = x;
+    public double get(int i) {
+        return m_data[i];
     }
 
-    /** Sets the y-component of the Vector.
-     * @param y Value to assign to the y-component.
+    /** Sets the ith-component of the Vector
+     * @param i Index of the vector you wish to set.
+     * @param value Value to set the component to.
      */
-    public void setY(double y) {
-        m_data[1] = y;
-    }
-
-    /** Sets the z-component of the Vector.
-     * @param z Value to assign to the z-component.
-     */
-    public void setZ(double z) {
-        m_data[2] = z;
+    public void set(int i, double value) {
+        m_data[i] = value;
     }
 
 ///@}
+
 }

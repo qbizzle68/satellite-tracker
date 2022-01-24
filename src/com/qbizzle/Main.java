@@ -1,11 +1,8 @@
 package com.qbizzle;
 
 import com.qbizzle.Math.JD;
-import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 import com.qbizzle.Orbit.BadTLEFormatException;
-import com.qbizzle.Orbit.COE;
-import com.qbizzle.Orbit.TLE;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
@@ -41,29 +38,6 @@ public class Main {
 //        System.out.println(offsetAngle);
 //        Vector issPos = Rotate(state.Position(), -offsetAngle);
 //        System.out.println(issPos.toString());
-
-        String strLEOTLE = "ISS (ZARYA)             \n" +
-                "1 25544U 98067A   22022.91470718  .00005958  00000+0  11386-3 0  9993\n" +
-                "2 25544  51.6445 336.0056 0006830  51.7508  17.5213 15.49594026322655";
-        COE coe = new COE(new TLE(strLEOTLE));
-        System.out.println("sma: " + coe.sma);
-        System.out.println("ecc: " + coe.ecc);
-        System.out.println("inc: " + coe.inc);
-        System.out.println("lan: " + coe.lan);
-        System.out.println("aop: " + coe.aop);
-        System.out.println("ta: " + coe.ta);
-        System.out.println("ta-rad: " + Math.toRadians(coe.ta));
-        System.out.println("ma: " + OrbitalMath.True2Mean(Math.toRadians(coe.ta), coe.ecc));
-        System.out.println("ea: " + OrbitalMath.True2Eccentric(Math.toRadians(coe.ta), coe.ecc));
-        System.out.println("ea: " + OrbitalMath.Mean2Eccentric(1.126815678, .000683));
-        System.out.println("ta: " + OrbitalMath.Mean2True(1.126815678, .000683));
-        System.out.println("pos: " + toIJK(new Vector(2910730.115,6138964.276,0), Math.toRadians(coe.aop), Math.toRadians(coe.inc), Math.toRadians(coe.lan)).toString());
-        System.out.println("vel: " + toIJK(new Vector(-6920.006959,3286.284615,0), Math.toRadians(coe.aop), Math.toRadians(coe.inc), Math.toRadians(coe.lan)).toString());
-
-        Vector vexp = new Vector(-1222362.021127256, 4678181.947355996, 4772805.981926173);
-        Vector vact = new Vector(-1225493.0931284525, 4676792.423899453, 4769592.7817697795);
-        double alpha = Math.acos(vexp.dot(vact) / (vexp.mag() * vact.mag()));
-        System.out.println(Math.toDegrees(alpha));
     }
 
     // time zone should be relative to GMT (CST = -6.0)
