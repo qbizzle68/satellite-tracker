@@ -131,6 +131,21 @@ class MatrixTest {
     }
 
     @Test
+    @DisplayName("Test unary minus operator method")
+    public void testUnaryMinusOperatorMethod() {
+        Matrix mat = mat1.minus();
+        assertAll(() -> assertEquals(1.1, mat.get(0, 0)),
+                () -> assertEquals(2.2, mat.get(0, 1)),
+                () -> assertEquals(3.3, mat.get(0, 2)),
+                () -> assertEquals(4.4, mat.get(1, 0)),
+                () -> assertEquals(5.5, mat.get(1, 1)),
+                () -> assertEquals(6.6, mat.get(1, 2)),
+                () -> assertEquals(7.7, mat.get(2, 0)),
+                () -> assertEquals(8.8, mat.get(2, 1)),
+                () -> assertEquals(9.9, mat.get(2, 2)));
+    }
+
+    @Test
     @DisplayName("Test minus operator method")
     public void testMinusOperatorMethod() {
         Matrix mat = mat1.minus(mat2);
