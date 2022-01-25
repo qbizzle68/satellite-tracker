@@ -24,30 +24,16 @@ import java.util.*;
 public class JD {
     private final double m_julianDate;
     /// Number of seconds in a solar day.
+    @SuppressWarnings("unused")
     public static final double SECONDSPERDAY = 86400.0;
     /// Number of minutes in a solar day.
+    @SuppressWarnings("unused")
     public static final double MINUTESPERDAY = 1440.0;
     /// Number of hours in a solar day.
+    @SuppressWarnings("unused")
     public static final double HOURSPERDAY = 24.0;
     /// Julian Date number of the J2000 epoch of 1/1/2000 12:00:00.
     public static final double J2000 = 2451545.0;
-
-    // This feels like a waste, removing
-//    /** Constructs the Julian Date from the Java GregorianCalendar object.
-//     * @param GregCal GregorianCalendar instance that represents the Julian Date.
-//     */
-////    This is ideal if the GregorianCalendar can handle error checking of the inputs.
-////    If not we may as well implement our own constructor similar to the GetDate method.
-//    public JD(GregorianCalendar GregCal) {
-//        m_julianDate = GetDate(
-//                GregCal.get(Calendar.MONTH),
-//                GregCal.get(Calendar.DATE),
-//                GregCal.get(Calendar.YEAR),
-//                GregCal.get(Calendar.HOUR_OF_DAY),
-//                GregCal.get(Calendar.MINUTE),
-//                GregCal.get(Calendar.SECOND)
-//        );
-//    }
 
     /** Constructs the Julian Date from the Java Date object.
      * @param date Date object that the Julian Day is meant to represent. Ideal
@@ -141,7 +127,7 @@ public class JD {
     /** Computes a Julian Date relative to the current instance.
      * @param days Number of solar days added to current date.
      * @return A Julian Date equal to the current date plus the @p days param.
-     * @note A negative value for @p days will return a Julian Date that preceeds
+     * @note A negative value for @p days will return a Julian Date that precedes
      * the date of the current instance.
      */
     public JD Future(double days) {
@@ -150,8 +136,8 @@ public class JD {
 
 ///@}*/
 
-    /** Get the month number of the abreviated string.
-     * A helper method to convert the string abreviation from the Java Date class to the
+    /** Get the month number of the abbreviated string.
+     * A helper method to convert the string abbreviation from the Java Date class to the
      * corresponding month number.
      * @param str The string abbreviation of the month gotten from the
      *            <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Date.html#toString--">Date.toString()</a> method.
