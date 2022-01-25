@@ -79,6 +79,7 @@ public class COE {
      */
     public COE(TLE tle, double dt) {
         inc = tle.Inclination();
+        @SuppressWarnings("SpellCheckingInspection")
         double nconvert = tle.MeanMotion() * 2 * Math.PI / 86400.0;
         double a0 = Math.pow( OrbitalMath.MU / Math.pow(nconvert, 2), 1.0/3.0 );
         double dM = (tle.MeanMotion() * dt // these are in rev / day
@@ -88,14 +89,18 @@ public class COE {
         ta = Math.toDegrees( OrbitalMath.Mean2True(M1, tle.Eccentricity()) ); // true anomaly at t1 in deg
         double n0 = tle.MeanMotion();
         double n0dot = tle.MeanMotionDot() * 2;
+        @SuppressWarnings("SpellCheckingInspection")
         double adot = -2.0 * a0 * n0dot / (3.0 * n0);
         sma = a0 + adot * dt;
+        @SuppressWarnings("SpellCheckingInspection")
         double edot = -2.0 * (1 - tle.Eccentricity()) * n0dot / (3.0 * n0);
         ecc = tle.Eccentricity() + edot * dt;
+        @SuppressWarnings("SpellCheckingInspection")
         double lanj2dot = CJ2 * Math.pow(a0, -3.5)
                 * Math.pow( (1 - Math.pow(tle.Eccentricity(), 2)), -2)
                 * Math.cos( Math.toRadians(inc) );
         lan = tle.LAN() + lanj2dot * dt;
+        @SuppressWarnings("SpellCheckingInspection")
         double aopj2dot = (CJ2 / 2.0) * Math.pow(a0, -3.5)
                 * Math.pow( (1 - Math.pow(tle.Eccentricity(), 2)), -2)
                 * Math.cos( Math.toRadians(inc) );
