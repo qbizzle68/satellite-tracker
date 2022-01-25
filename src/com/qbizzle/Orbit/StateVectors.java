@@ -105,8 +105,7 @@ public class StateVectors implements Cloneable {
      * @throws IllegalArgumentException is thrown if @p ob argument is not of type StateVector.
      */
     public boolean equals(Object ob) {
-        if (ob instanceof StateVectors) {
-            StateVectors state = (StateVectors) ob;
+        if (ob instanceof StateVectors state) {
             return (m_position.equals(state.m_position) && m_velocity.equals(state.m_velocity));
         }
         else throw new IllegalArgumentException("Object not of type 'StateVectors'");
@@ -143,7 +142,7 @@ public class StateVectors implements Cloneable {
     }
 
     /** Gets the velocity state vector.
-     * @return A Vector with the satellites velocity.
+     * @return A Vector with the satellite's velocity.
      */
     public Vector Velocity() {
         return m_velocity;
@@ -152,8 +151,8 @@ public class StateVectors implements Cloneable {
 ///@}
 
     /** Method used to place hold for the absence of a rotation matrix. This method effectively
-     * rotates the vector @p xOrbitFrame from an orbital reference frame with orbital elements
-     * @p lan, @p inc and @p aop, to an inertial geocentric-equitorial reference frame. In more
+     * rotates the vector @p xOrbitFrame from an orbital reference frame with orbital
+     * elements @p lan, @p inc and @p aop, to an inertial geocentric-equitorial reference frame. In more
      * complex terms it's equal to rotating the vector @p xOrbitFrame by the matrix R(-lan)*R(-inc)*R(-aop).
      * @param xOrbitFrame Vector that is to be rotated from one frame to another.
      * @param lan Longitude of ascending node in @em radians.
