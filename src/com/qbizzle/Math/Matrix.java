@@ -30,9 +30,9 @@ public class Matrix implements Cloneable {
      * @param column3 Column Vector that the k unit vector maps to.
      */
     public Matrix(Vector column1, Vector column2, Vector column3) {
-        m_data[0][0] = column1.x(); m_data[0][1] = column1.y(); m_data[0][2] = column1.z();
-        m_data[1][0] = column2.x(); m_data[1][1] = column2.y(); m_data[1][2] = column2.z();
-        m_data[2][0] = column3.x(); m_data[2][1] = column3.y(); m_data[2][2] = column3.z();
+        m_data[0][0] = column1.x(); m_data[1][0] = column1.y(); m_data[2][0] = column1.z();
+        m_data[0][1] = column2.x(); m_data[1][1] = column2.y(); m_data[2][1] = column2.z();
+        m_data[0][2] = column3.x(); m_data[1][2] = column3.y(); m_data[2][2] = column3.z();
     }
 
     /// @name Overloaded methods.
@@ -114,6 +114,7 @@ public class Matrix implements Cloneable {
      * @throws ArrayIndexOutOfBoundsException if column index is out of range
      * (indexing starts at 0).
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Vector getColumn(int col) {
         return new Vector(m_data[0][col], m_data[1][col], m_data[2][col]);
     }
@@ -136,7 +137,7 @@ public class Matrix implements Cloneable {
      * @param rhs Matrix to be added to this matrix.
      * @return A clone of this instance after the addition.
      */
-    public Matrix pluseEquals(Matrix rhs) {
+    public Matrix plusEquals(Matrix rhs) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 m_data[i][j] += rhs.m_data[i][j];
@@ -151,9 +152,7 @@ public class Matrix implements Cloneable {
     public Matrix minus() {
         Matrix rtn = new Matrix();
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                rtn.m_data[i][j] = this.m_data[i][j];
-            }
+            System.arraycopy(this.m_data[i], 0, rtn.m_data[i], 0, 3);
         }
         return rtn;
     }
@@ -177,7 +176,6 @@ public class Matrix implements Cloneable {
      * @return A clone of this instance after it has been subtracted.
      */
     public Matrix minusEquals(Matrix rhs) {
-        Matrix rtn = new Matrix();
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
                 m_data[i][j] -= rhs.m_data[i][j];
@@ -215,7 +213,7 @@ public class Matrix implements Cloneable {
 
     /** Vector multiplication operator. Vector multiplication is right-handed
      * so that the matrix columns are where the ijk unit vectors map to, instead
-     * of rows. This is to increases 'readability' of the matrix, and is also
+     * of rows. This is to increase 'readability' of the matrix, and is also
      * the rationale behind why the @link com.qbizzle.Math.Matrix#getColumn
      * getColumn() @endlink is not a @em getRow() method.
      * @param rhs Vector to multiply matrix by. This is the vector that is to be operated
@@ -257,12 +255,11 @@ public class Matrix implements Cloneable {
      * @param rhs Matrix to compound this rotation by.
      * @return A clone of this matrix after it has been multiplied.
      */
+    @SuppressWarnings("UnusedReturnValue")
     public Matrix multEquals(Matrix rhs) {
         Matrix tmp = this.mult(rhs);
         for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 3; j++) {
-                m_data[i][j] = tmp.m_data[i][j];
-            }
+            System.arraycopy(tmp.m_data[i], 0, m_data[i], 0, 3);
         }
         return (Matrix)this.clone();
     }
