@@ -14,8 +14,9 @@ class MatrixTest {
     MatrixTest() {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 3; j++) {
-                mat1.set(i, j, 1.0 + i*3 + j + ((1.0 + i*3 + j) / 10.0));
-                mat2.set(i, j, 1.0 + i*3 + j + ((1.0 + i*3 + j) / 10.0));
+                double val = 1.0 + i*3 + j + ((1.0 + i*3 + j) / 10.0);
+                mat1.set(i, j, val);
+                mat2.set(i, j, val);
             }
         }
     }
@@ -69,7 +70,16 @@ class MatrixTest {
         Vector col1 = new Vector(1.1, 4.4, 7.7);
         Vector col2 = new Vector(2.2, 5.5, 8.8);
         Vector col3 = new Vector(3.3, 6.6, 9.9);
-        Matrix vec = new Matrix(col1, col2, col3);
+        Matrix mat = new Matrix(col1, col2, col3);
+        assertAll(() -> assertEquals(1.1, mat.get(0, 0)),
+                () -> assertEquals(2.2, mat.get(0, 1)),
+                () -> assertEquals(3.3, mat.get(0, 2)),
+                () -> assertEquals(4.4, mat.get(1, 0)),
+                () -> assertEquals(5.5, mat.get(1, 1)),
+                () -> assertEquals(6.6, mat.get(1, 2)),
+                () -> assertEquals(7.7, mat.get(2, 0)),
+                () -> assertEquals(8.8, mat.get(2, 1)),
+                () -> assertEquals(9.9, mat.get(2, 2)));
     }
 
     @Test
@@ -118,7 +128,7 @@ class MatrixTest {
     @DisplayName("Test plus assignment operator method")
     public void testPlusAssignmentOperatorMethod() {
         Matrix mat = (Matrix)mat1.clone();
-        mat.pluseEquals(mat2);
+        mat.plusEquals(mat2);
         assertAll(() -> assertEquals(2.2, mat.get(0, 0)),
                 () -> assertEquals(4.4, mat.get(0, 1)),
                 () -> assertEquals(6.6, mat.get(0, 2)),
