@@ -11,16 +11,20 @@ package com.qbizzle.Math;
  */
 public class OrbitalMath {
     /** Earth radius in meters. */
+    @SuppressWarnings("unused")
     public static final double ER = 6.3781363e6; // m
     /** Earth gravitational parameter, equal to GM in m^3/s^2. */
     public static final double MU = 3.986004418e14; // m3/s2
     /** Newton's Gravitational parameter. */
+    @SuppressWarnings("unused")
     public static final double G = 6.67408e-11; // m3/kgs2
     /** Epsilon value used in Newton Raphson Method. */
     public static double newtonEpsilon = 0.0000001;
     /** Constant to convert radians to degrees. */
+    @SuppressWarnings("unused")
     public static final double RAD2DEG = 180.0 / Math.PI;
     /** Constant to convert degrees to radians. */
+    @SuppressWarnings("unused")
     public static final double DEG2RAD = Math.PI / 180.0;
 
     /** Acts as a wrapper around the native atan2 method, but converts the output
