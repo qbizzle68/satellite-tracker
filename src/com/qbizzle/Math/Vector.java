@@ -57,10 +57,12 @@ public class Vector implements Cloneable {
      */
     @Override
     public String toString() {
-        return "[" + m_data[0] + ", " + m_data[1] + ", " + m_data[2] + "]";
+        return "Vector{" +
+                "m_data=" + Arrays.toString(m_data) +
+                '}';
     }
 
-     /** Indicates whether a Vector is 'equal to' this instance.
+    /** Indicates whether a Vector is 'equal to' this instance.
      * @param o Vector to compare this Vector to.
      * @return True if this object is the same as @p ob argument, false otherwise.
      */
