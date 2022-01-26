@@ -60,27 +60,24 @@ public class Vector implements Cloneable {
         return "[" + m_data[0] + ", " + m_data[1] + ", " + m_data[2] + "]";
     }
 
+     /** Indicates whether a Vector is 'equal to' this instance.
+     * @param o Vector to compare this Vector to.
+     * @return True if this object is the same as @p ob argument, false otherwise.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Vector vector = (Vector) o;
+        return Arrays.equals(m_data, vector.m_data);
+    }
+
     /** Generates a hash code based on the component values of this vector.
      * @return A hash code for this vector instance.
      */
     @Override
     public int hashCode() {
         return Arrays.hashCode(m_data);
-    }
-
-    /** Indicates whether a Vector is 'equal to' this instance.
-     * @param ob Vector to compare this Vector to.
-     * @return True if this object is the same as @p ob argument, false otherwise.
-     * @throws IllegalArgumentException if @p ob argument is not of type Vector.
-     */
-    @Override
-    public boolean equals(Object ob) {
-        if (ob instanceof Vector rhs) {
-            return (this.m_data[0] == rhs.m_data[0]
-                    && this.m_data[1] == rhs.m_data[1]
-                    && this.m_data[2] == rhs.m_data[2]);
-        }
-        throw new IllegalArgumentException("Object not of type 'Vector'");
     }
 
     /** Creates and returns a copy of this object.
