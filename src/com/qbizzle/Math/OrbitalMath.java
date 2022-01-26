@@ -7,7 +7,7 @@
 package com.qbizzle.Math;
 
 /**
- * Class that contains constants and methods that pertain to orbital math.
+ * Static class that contains constants and methods that pertain to orbital math.
  */
 public class OrbitalMath {
     /** Earth radius in meters. */
@@ -117,7 +117,6 @@ public class OrbitalMath {
      * @return The eccentric anomaly in @em radians.
      */
     public static double True2Eccentric(double trueAnomaly, double eccentricity) {
-//        return Math.acos( (eccentricity + Math.cos(trueAnomaly)) / (1 + eccentricity * Math.cos(trueAnomaly)) );
         return atan2(
                 Math.sqrt(1 - Math.pow(eccentricity, 2)) * Math.sin(trueAnomaly),
                 Math.cos(trueAnomaly) + eccentricity
