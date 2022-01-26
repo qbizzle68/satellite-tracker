@@ -46,9 +46,9 @@ public class Matrix implements Cloneable {
      */
     @Override
     public String toString() {
-        return "[ " + m_data[0][0] + ", " + m_data[0][1] + ", " + m_data[0][2] + "\n  "
-                + m_data[1][0] + ", " + m_data[1][1] + ", " + m_data[1][2] + "\n  "
-                + m_data[2][0] + ", " + m_data[2][1] + ", " + m_data[2][2] + " ]";
+        return "Matrix{" +
+                "m_data=" + Arrays.deepToString(m_data) +
+                '}';
     }
 
     /** Generates a hash code for this matrix object based on the component values.
