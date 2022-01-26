@@ -94,13 +94,22 @@ public class StateVectors implements Cloneable {
     /// Methods that are inherited from Java Cloneable class.
 ///@{
 
-    /** Returns a string representation of the state vectors. Syntax is of the form
-     * 'Position: [rx, ry, rz], Velocity: [vx, vy, vz].
-     * @return A string representation of the vector.
-     */
+//    /** Returns a string representation of the state vectors. Syntax is of the form
+//     * 'Position: [rx, ry, rz], Velocity: [vx, vy, vz].
+//     * @return A string representation of the vector.
+//     */
+//    @Override
+//    public String toString() {
+//        return "Position: " + m_position.toString() + ", Velocity: " + m_velocity.toString();
+//    }
+
+
     @Override
     public String toString() {
-        return "Position: " + m_position.toString() + ", Velocity: " + m_velocity.toString();
+        return "StateVectors{" +
+                "m_position=" + m_position +
+                ", m_velocity=" + m_velocity +
+                '}';
     }
 
     /** Indicates whether a State is 'equal to' this instance.
