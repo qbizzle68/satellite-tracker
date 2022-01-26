@@ -8,6 +8,8 @@
 
 package com.qbizzle.Math;
 
+import java.util.Arrays;
+
 /** A vector class to represent a physical quantity. All instances have a length
  * of three. The three components are referred to as x, y and z, which coincide
  * with the i, j and k unit vectors respectively.
@@ -49,11 +51,21 @@ public class Vector implements Cloneable {
     /// @name Overloaded methods.
     /// Methods that are inherited from Java Cloneable class.
 ///@{
+
     /** Returns a string representation of the vector. Syntax is of the form '[x, y, z]'.
      * @return A string representation of the vector.
      */
+    @Override
     public String toString() {
         return "[" + m_data[0] + ", " + m_data[1] + ", " + m_data[2] + "]";
+    }
+
+    /** Generates a hash code based on the component values of this vector.
+     * @return A hash code for this vector instance.
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(m_data);
     }
 
     /** Indicates whether a Vector is 'equal to' this instance.
@@ -61,6 +73,7 @@ public class Vector implements Cloneable {
      * @return True if this object is the same as @p ob argument, false otherwise.
      * @throws IllegalArgumentException if @p ob argument is not of type Vector.
      */
+    @Override
     public boolean equals(Object ob) {
         if (ob instanceof Vector rhs) {
             return (this.m_data[0] == rhs.m_data[0]
@@ -76,6 +89,7 @@ public class Vector implements Cloneable {
      * @warning This method returns a Java Object, so explicit casting may be necessary
      * to avoid errors.
      */
+    @Override
     public Object clone() {
         try {
             Vector tmp = (Vector)super.clone();
@@ -87,6 +101,7 @@ public class Vector implements Cloneable {
             throw new InternalError(ex.toString());
         }
     }
+
 ///@}
 
     /// @name Operators

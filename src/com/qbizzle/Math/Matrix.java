@@ -6,6 +6,8 @@
 
 package com.qbizzle.Math;
 
+import java.util.Arrays;
+
 /** Matrix class used in conjunction with the Vector class to handle linear
  * algebra computations.
  */
@@ -42,27 +44,32 @@ public class Matrix implements Cloneable {
     /** Returns a string representation of the matrix.
      * @return A string representation of the matrix.
      */
+    @Override
     public String toString() {
         return "[ " + m_data[0][0] + ", " + m_data[0][1] + ", " + m_data[0][2] + "\n  "
                 + m_data[1][0] + ", " + m_data[1][1] + ", " + m_data[1][2] + "\n  "
                 + m_data[2][0] + ", " + m_data[2][1] + ", " + m_data[2][2] + " ]";
     }
 
+    /** Generates a hash code for this matrix object based on the component values.
+     * @return The hash code for this matrix instance.
+     */
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(m_data);
+    }
+
     /** Indicates whether a Matrix is 'equal to' this instance.
      * @param obj Matrix to compare this matrix to.
-     * @return True if this object is the same as @p obj argument, false otherwise.
-     * @throws IllegalArgumentException if @p obj argument is not of type Matrix.
+     * @return True if the matrix values are the same as @p obj argument, false otherwise.
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Matrix rhs) {
-            for (int i = 0; i < 3; i++) {
-                for (int j = 0; j < 3; j++) {
-                    if (m_data[i][j] != rhs.m_data[i][j]) return false;
-                }
-            }
-            return true;
-        }
-        throw new IllegalArgumentException("Object is not of type 'Matrix'");
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (this.getClass() != obj.getClass()) return false;
+        Matrix rhs = (Matrix) obj;
+        return Arrays.deepEquals(this.m_data, rhs.m_data);
     }
 
     /** Creates and returns a copy of this object.
@@ -71,6 +78,7 @@ public class Matrix implements Cloneable {
      * @warning This method returns a Java Object, so explicit casting may be necessary
      * to avoid errors.
      */
+    @Override
     public Object clone() {
         try {
             Matrix tmp = (Matrix)super.clone();

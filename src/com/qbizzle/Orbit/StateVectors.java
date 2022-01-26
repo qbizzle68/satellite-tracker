@@ -12,6 +12,8 @@ package com.qbizzle.Orbit;
 import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 
+import java.util.Objects;
+
 /** Container class for holding the position and velocity vectors of a satellite at a given epoch.
  */
 public class StateVectors implements Cloneable {
@@ -95,8 +97,17 @@ public class StateVectors implements Cloneable {
      * 'Position: [rx, ry, rz], Velocity: [vx, vy, vz].
      * @return A string representation of the vector.
      */
+    @Override
     public String toString() {
         return "Position: " + m_position.toString() + ", Velocity: " + m_velocity.toString();
+    }
+
+    /** Generates a hash code for this class based on the Vector values.
+     * @return A hash code for this StateVectors instance.
+     */
+    @Override
+    public int hashCode() {
+        return Objects.hash(m_position, m_velocity);
     }
 
     /** Indicates whether a State is 'equal to' this instance.
@@ -104,6 +115,7 @@ public class StateVectors implements Cloneable {
      * @return True if this object is the same as @p ob argument, false otherwise.
      * @throws IllegalArgumentException is thrown if @p ob argument is not of type StateVector.
      */
+    @Override
     public boolean equals(Object ob) {
         if (ob instanceof StateVectors state) {
             return (m_position.equals(state.m_position) && m_velocity.equals(state.m_velocity));
@@ -117,6 +129,7 @@ public class StateVectors implements Cloneable {
      * @warning This method returns a Java Object, so explicit casting may be necessary
      * to avoid errors.
      */
+    @Override
     public Object clone() {
         try {
             StateVectors rtn = (StateVectors)super.clone();
