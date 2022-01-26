@@ -11,6 +11,7 @@ package com.qbizzle.Orbit;
  * then use that object to retrieve whichever data may be necessary.
  * @todo Create a constructor that takes a File argument and reads a TLE from a file.
  */
+// maybe store all these data in a map?
 public class TLE {
     private String m_satelliteName;
 //    line 1
