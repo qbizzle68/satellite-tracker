@@ -9,6 +9,7 @@
  */
 
 package com.qbizzle.Orbit;
+
 import com.qbizzle.Math.OrbitalMath;
 import com.qbizzle.Math.Vector;
 
@@ -102,25 +103,24 @@ public class StateVectors implements Cloneable {
         return "Position: " + m_position.toString() + ", Velocity: " + m_velocity.toString();
     }
 
+    /** Indicates whether a State is 'equal to' this instance.
+     * @param o State to compare this State to.
+     * @return True if this object is the same as @p ob argument, false otherwise.
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StateVectors that = (StateVectors) o;
+        return m_position.equals(that.m_position) && m_velocity.equals(that.m_velocity);
+    }
+
     /** Generates a hash code for this class based on the Vector values.
      * @return A hash code for this StateVectors instance.
      */
     @Override
     public int hashCode() {
         return Objects.hash(m_position, m_velocity);
-    }
-
-    /** Indicates whether a State is 'equal to' this instance.
-     * @param ob State to compare this State to.
-     * @return True if this object is the same as @p ob argument, false otherwise.
-     * @throws IllegalArgumentException is thrown if @p ob argument is not of type StateVector.
-     */
-    @Override
-    public boolean equals(Object ob) {
-        if (ob instanceof StateVectors state) {
-            return (m_position.equals(state.m_position) && m_velocity.equals(state.m_velocity));
-        }
-        else throw new IllegalArgumentException("Object not of type 'StateVectors'");
     }
 
     /** Creates and returns a copy of this object.
