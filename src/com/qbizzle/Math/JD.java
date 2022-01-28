@@ -57,7 +57,7 @@ public class JD {
      *            a Julian Date.
      */
     public JD(TLE tle) {
-        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0) + tle.EpochDay() - 0.5;
+        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0) + tle.EpochDay();// - 0.5;
     }
 
     /** Constructs the Julian Date directly from a known Julian Date number
