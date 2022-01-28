@@ -3,7 +3,9 @@
  * parse the elements into their appropriate values.
  */
 
-package com.qbizzle.Orbit;
+package com.qbizzle.orbit;
+
+import com.qbizzle.exception.InvalidTLEFormat;
 
 /** This is a container class for TLE elements, and has the ability to parse
  * a TLE string into its distinct elements. Any other class wishing to be constructed
@@ -28,12 +30,12 @@ public class TLE {
      * TLE string is retrieved from common online repositories such as Celestrak
      * then formatting shouldn't be an issue.
      * @param tle A string containing the two line element separated into three lines.
-     * @throws BadTLEFormatException Ane exception will be thrown if some part of the
+     * @throws InvalidTLEFormat Ane exception will be thrown if some part of the
      * formatting is invalid.
      * @note Even though this is a two-line element, three lines are expected, with
      * the '0th' line being the satellite name.
      */
-    public TLE(String tle) throws BadTLEFormatException {
+    public TLE(String tle) throws InvalidTLEFormat {
         if (checkLines(tle)) {
             if (parseString(tle)) System.out.println("TLE String parse successful.");
             else System.out.println("TLE String parse failed.");
@@ -205,19 +207,19 @@ public class TLE {
     /** Checks each line of the TLE to ensure it has the correct formatting.
      * @param tle TLE string used to construct a TLE instance.
      * @return True if the string is formatted correctly.
-     * @throws BadTLEFormatException Thrown if there is an error in the TLE format.
+     * @throws InvalidTLEFormat Thrown if there is an error in the TLE format.
      * @todo Use regex to check the format of these lines. for reference: https://ai-solutions.com/_help_Files/two-line_element_set_file.htm
      */
-    private boolean checkLines(String tle) throws BadTLEFormatException {
+    private boolean checkLines(String tle) throws InvalidTLEFormat {
         String delims = "[\n]";
         String[] tokens = tle.split(delims);
 
 //        to use regex, split lines with '\s' delimiter then check each token with a specific regex.
 //        rules for tle: check number of lines, then check length of lines, checksum, number of tokens per line, then format of each token.
-        if (tokens.length > 3) throw new BadTLEFormatException("Too many lines in TLE, check TLE format.");
-        else if (tokens.length < 3) throw new BadTLEFormatException("Too few lines in TLE, check TLE format.");
-        else if (tokens[1].split("[\s]+").length != 9) throw new BadTLEFormatException("Line 1 token number mismatch, check TLE format.");
-        else if (tokens[2].split("[\s]+").length != 8) throw new BadTLEFormatException("Line 2 token number mismatch, check TLE format.");
+        if (tokens.length > 3) throw new InvalidTLEFormat("Too many lines in TLE, check TLE format.");
+        else if (tokens.length < 3) throw new InvalidTLEFormat("Too few lines in TLE, check TLE format.");
+        else if (tokens[1].split("[\s]+").length != 9) throw new InvalidTLEFormat("Line 1 token number mismatch, check TLE format.");
+        else if (tokens[2].split("[\s]+").length != 8) throw new InvalidTLEFormat("Line 2 token number mismatch, check TLE format.");
         return true;
     }
 

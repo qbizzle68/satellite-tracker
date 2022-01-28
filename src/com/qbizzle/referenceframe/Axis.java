@@ -2,7 +2,7 @@
  * This file contains the Axis class which in itself contains the Direction enumerated type.
  */
 
-package com.qbizzle.ReferenceFrame;
+package com.qbizzle.referenceframe;
 
 import java.util.Objects;
 

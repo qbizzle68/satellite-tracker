@@ -6,9 +6,9 @@
  *  "Fundamentals of Astrodynamics 2nd Edition."
  */
 
-package com.qbizzle.Orbit;
-import com.qbizzle.Math.OrbitalMath;
-import com.qbizzle.Math.Vector;
+package com.qbizzle.orbit;
+import com.qbizzle.math.OrbitalMath;
+import com.qbizzle.math.Vector;
 
 /** Container class for the classical orbital elements. The class contains the semi-major axis,
  * eccentricity, longitude of ascending node (right ascension of ascending node), argument of

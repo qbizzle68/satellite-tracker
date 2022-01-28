@@ -9,9 +9,9 @@
  * without the need for further implementation or duplication of code.
  */
 
-package com.qbizzle.Math;
+package com.qbizzle.math;
 
-import com.qbizzle.Orbit.TLE;
+import com.qbizzle.orbit.TLE;
 import java.util.*;
 
 /**

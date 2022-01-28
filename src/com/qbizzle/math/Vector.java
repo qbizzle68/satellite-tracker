@@ -6,7 +6,7 @@
  * quantities, all instances are of length 3.
  */
 
-package com.qbizzle.Math;
+package com.qbizzle.math;
 
 import java.util.Arrays;
 

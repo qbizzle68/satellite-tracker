@@ -1,6 +1,6 @@
 package test.math;
 
-import com.qbizzle.Math.Vector;
+import com.qbizzle.math.Vector;
 import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;

@@ -4,7 +4,7 @@
  * as well as frequently used constants.
  */
 
-package com.qbizzle.Math;
+package com.qbizzle.math;
 
 /**
  * Static class that contains constants and methods that pertain to orbital math.

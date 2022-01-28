@@ -1,7 +1,7 @@
 package test.orbit;
 
-import com.qbizzle.Orbit.BadTLEFormatException;
-import com.qbizzle.Orbit.TLE;
+import com.qbizzle.exception.InvalidTLEFormat;
+import com.qbizzle.orbit.TLE;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -35,7 +35,7 @@ public class TLETest {
         private final TLE molniyatle = new TLE(strMolniyaTLE);
         private final TLE polartle = new TLE(strPolarTLE);
 
-        public ConstructorTest() throws BadTLEFormatException {
+        public ConstructorTest() throws InvalidTLEFormat {
         }
 
         @Test

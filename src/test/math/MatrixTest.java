@@ -1,7 +1,7 @@
 package test.math;
 
-import com.qbizzle.Math.Matrix;
-import com.qbizzle.Math.Vector;
+import com.qbizzle.math.Matrix;
+import com.qbizzle.math.Vector;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

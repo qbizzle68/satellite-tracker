@@ -1,8 +1,8 @@
 package test.math;
 
-import com.qbizzle.Math.JD;
-import com.qbizzle.Orbit.BadTLEFormatException;
-import com.qbizzle.Orbit.TLE;
+import com.qbizzle.math.JD;
+import com.qbizzle.exception.InvalidTLEFormat;
+import com.qbizzle.orbit.TLE;
 import com.sun.jdi.InternalException;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -39,7 +39,7 @@ public class JDTest {
         JD tleJD;
         try {
             tleJD = new JD(new TLE(tleString));
-        } catch (BadTLEFormatException e) {
+        } catch (InvalidTLEFormat e) {
             e.printStackTrace();
             throw new InternalException();
         }

@@ -8,10 +8,10 @@
  * "Keplerian-Orbit-Elements-to-Cartesian-State-Vectors.pdf" file.
  */
 
-package com.qbizzle.Orbit;
+package com.qbizzle.orbit;
 
-import com.qbizzle.Math.OrbitalMath;
-import com.qbizzle.Math.Vector;
+import com.qbizzle.math.OrbitalMath;
+import com.qbizzle.math.Vector;
 
 import java.util.Objects;
 

@@ -1,9 +1,9 @@
 package test.orbit;
 
-import com.qbizzle.Math.Vector;
-import com.qbizzle.Orbit.BadTLEFormatException;
-import com.qbizzle.Orbit.COE;
-import com.qbizzle.Orbit.TLE;
+import com.qbizzle.math.Vector;
+import com.qbizzle.exception.InvalidTLEFormat;
+import com.qbizzle.orbit.COE;
+import com.qbizzle.orbit.TLE;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ class COETest {
             "2 25544  51.6445 336.0056 0006830  51.7508  17.5213 15.49594026322655";
     private final TLE tle = new TLE(strLEOTLE);
 
-    COETest() throws BadTLEFormatException {
+    COETest() throws InvalidTLEFormat {
     }
 
     @Test

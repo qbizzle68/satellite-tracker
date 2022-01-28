@@ -1,4 +1,4 @@
-package com.qbizzle.Orbit;
+package com.qbizzle.orbit;
 
 //public class SGP4 {
 ////    static StateVectors Propagate(TLE tle, double dt, double step) {
@@ -10,8 +10,8 @@ package com.qbizzle.Orbit;
 ////    }
 //}
 
-import com.qbizzle.Math.OrbitalMath;
-import com.qbizzle.Math.Vector;
+import com.qbizzle.math.OrbitalMath;
+import com.qbizzle.math.Vector;
 
 public class Propagator extends SGPConstants {
     private static double SGPKeplerEpsilon = 0.0000001;

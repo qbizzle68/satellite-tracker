@@ -4,7 +4,7 @@
  * intended use will be to operate on Vectors, mostly exclusively for rotations.
  */
 
-package com.qbizzle.Math;
+package com.qbizzle.math;
 
 import java.util.Arrays;
 

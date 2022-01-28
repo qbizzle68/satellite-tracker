@@ -3,14 +3,14 @@
  * used by the TLE class to alert to a badly formatted TLE text.
  */
 
-package com.qbizzle.Orbit;
+package com.qbizzle.exception;
 
 /**
  * This exception class is used to signal a bad formatted TLE string.
  * @todo possibly derive more descriptive exceptions that extend this class
  */
-public class BadTLEFormatException extends Exception {
-    public BadTLEFormatException(String errorMessage) {
+public class InvalidTLEFormat extends Exception {
+    public InvalidTLEFormat(String errorMessage) {
         super(errorMessage);
     }
 }
