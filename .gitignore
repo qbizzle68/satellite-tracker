@@ -4,3 +4,4 @@ doc/
 strip-package.py
 **/.class
 !**/Main.class
+output/
