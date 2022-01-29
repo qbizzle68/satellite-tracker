@@ -12,7 +12,7 @@ public class ArrayLengthException extends Exception {
     /** Constructs an ArrayLengthException with an error message.
      * @param errorMessage The error message for this exception.
      */
-    ArrayLengthException(String errorMessage) {
+    public ArrayLengthException(String errorMessage) {
         super(errorMessage);
     }
 
