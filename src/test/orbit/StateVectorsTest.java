@@ -1,7 +1,7 @@
 package test.orbit;
 
 import com.qbizzle.math.Vector;
-import com.qbizzle.exception.InvalidTLEFormat;
+import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.orbit.COE;
 import com.qbizzle.orbit.StateVectors;
 import com.qbizzle.orbit.TLE;
@@ -19,7 +19,7 @@ class StateVectorsTest {
 
     @Test
     @DisplayName("Current COE constructor test")
-    public void currentCoeConstructorTest() throws InvalidTLEFormat {
+    public void currentCoeConstructorTest() throws InvalidTLEException {
         COE coe = new COE(new TLE(strLEOTLE));
         StateVectors state = new StateVectors(coe);
         Assertions.assertAll(() -> assertEquals(new Vector(3796651.7981394175, 2625110.4264662312, 4981712.072374897), state.Position()),
@@ -28,7 +28,7 @@ class StateVectorsTest {
 
     @Test
     @DisplayName("Future COE constructor test")
-    public void futureCoeConstructorTest() throws InvalidTLEFormat {
+    public void futureCoeConstructorTest() throws InvalidTLEException {
         COE coe = new COE(new TLE(strLEOTLE), 1.23456);
         StateVectors state = new StateVectors(coe);
         assertAll(() -> assertEquals(new Vector(-1225493.0931284525, 4676792.423899453, 4769592.7817697795), state.Position()),
@@ -37,7 +37,7 @@ class StateVectorsTest {
     
     @Test
     @DisplayName("Current TLE constructor test")
-    public void currentTleConstructorTest() throws InvalidTLEFormat {
+    public void currentTleConstructorTest() throws InvalidTLEException {
         StateVectors state = new StateVectors(new TLE(strLEOTLE));
         Assertions.assertAll(() -> assertEquals(new Vector(3796651.7981394175, 2625110.4264662312, 4981712.072374897), state.Position()),
                 () -> assertEquals(new Vector(-5864.6649866517355, 4451.790185127849, 2125.8473021967284), state.Velocity()));
@@ -45,7 +45,7 @@ class StateVectorsTest {
 
     @Test
     @DisplayName("Future TLE constructor test")
-    public void futureTleConstructorTest() throws InvalidTLEFormat {
+    public void futureTleConstructorTest() throws InvalidTLEException {
         StateVectors state = new StateVectors(new TLE(strLEOTLE), 1.23456);
         assertAll(() -> assertEquals(new Vector(-1225493.0931284525, 4676792.423899453, 4769592.7817697795), state.Position()),
                 () -> assertEquals(new Vector(-7131.55337935173, 861.3728394739792, -2670.313696201894), state.Velocity()));

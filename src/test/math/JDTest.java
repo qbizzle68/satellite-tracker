@@ -1,7 +1,7 @@
 package test.math;
 
 import com.qbizzle.math.JD;
-import com.qbizzle.exception.InvalidTLEFormat;
+import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.orbit.TLE;
 import com.sun.jdi.InternalException;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class JDTest {
         JD tleJD;
         try {
             tleJD = new JD(new TLE(tleString));
-        } catch (InvalidTLEFormat e) {
+        } catch (InvalidTLEException e) {
             e.printStackTrace();
             throw new InternalException();
         }

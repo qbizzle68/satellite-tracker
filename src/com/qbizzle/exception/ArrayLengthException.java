@@ -1,4 +1,5 @@
-/** @File Contains the ArrayLengthException checked exception.
+/** @File Contains the ArrayLengthException checked exception, which
+ * is used to alert an array of invalid length.
  */
 
 package com.qbizzle.exception;
@@ -14,4 +15,5 @@ public class ArrayLengthException extends Exception {
     ArrayLengthException(String errorMessage) {
         super(errorMessage);
     }
+
 }

@@ -1,7 +1,7 @@
 package com.qbizzle.rotation;
 
-import com.qbizzle.exception.IllegalRotationAxis;
-import com.qbizzle.exception.IllegalRotationAxisNumber;
+import com.qbizzle.exception.InvalidEulerRotationLengthException;
+import com.qbizzle.exception.InvalidAxisException;
 import com.qbizzle.math.Matrix;
 import com.qbizzle.referenceframe.Axis;
 
@@ -26,12 +26,14 @@ public class Rotation {
 
     // intrinsic rotation
     public static Matrix getEulerMatrix(String axisOrder, double alpha, double beta, double gamma)
-            throws IllegalRotationAxisNumber, IllegalRotationAxis {
-        if (axisOrder.length() != 3) throw new IllegalRotationAxisNumber();
+            throws InvalidEulerRotationLengthException, InvalidAxisException {
+        if (axisOrder.length() != 3)
+            throw new InvalidEulerRotationLengthException("Invalid number of Euler rotation axes, which is " + axisOrder.length());
         axisOrder = axisOrder.toLowerCase();
         for (int i = 0; i < 3; i++) {
             char chrAt = axisOrder.charAt(i);
-            if (chrAt != 'x' && chrAt != 'y' && chrAt != 'z') throw new IllegalRotationAxis();
+            if (chrAt != 'x' && chrAt != 'y' && chrAt != 'z')
+                throw new InvalidAxisException("Invalid Euler rotation axis="+i+" which is " + axisOrder.charAt(i));
         }
 
         return getMatrix(axisMap.get(axisOrder.substring(0, 1)), alpha)

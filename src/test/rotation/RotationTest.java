@@ -1,7 +1,7 @@
 package test.rotation;
 
-import com.qbizzle.exception.IllegalRotationAxis;
-import com.qbizzle.exception.IllegalRotationAxisNumber;
+import com.qbizzle.exception.InvalidAxisException;
+import com.qbizzle.exception.InvalidEulerRotationLengthException;
 import com.qbizzle.math.Matrix;
 import com.qbizzle.referenceframe.Axis;
 import com.qbizzle.rotation.Rotation;
@@ -123,7 +123,7 @@ class RotationTest {
 
     @Test
     @DisplayName("euler ZXY rotation matrix test")
-    public void eulerZxyRotationMatrixTest() throws IllegalRotationAxis, IllegalRotationAxisNumber {
+    public void eulerZxyRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
         Matrix eulerMat = Rotation.getEulerMatrix("ZXY", 90, 90, 90);
         assertAll(  // x column
                 () -> assertEquals(-1, eulerMat.get(0, 0), 0.000001),
@@ -141,7 +141,7 @@ class RotationTest {
 
     @Test
     @DisplayName("euler ZYX rotation matrix test")
-    public void eulerZyxRotationMatrixTest() throws IllegalRotationAxis, IllegalRotationAxisNumber {
+    public void eulerZyxRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
         Matrix eulerMat = Rotation.getEulerMatrix("ZYX", 90, 90, 90);
         assertAll(  // x column
                 () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
@@ -159,7 +159,7 @@ class RotationTest {
 
     @Test
     @DisplayName("euler YZX rotation matrix test")
-    public void eulerYzxRotationMatrixTest() throws IllegalRotationAxis, IllegalRotationAxisNumber {
+    public void eulerYzxRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
         Matrix eulerMat = Rotation.getEulerMatrix("YZX", 90, 90, 90);
         assertAll(  // x column
                 () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
@@ -177,7 +177,7 @@ class RotationTest {
 
     @Test
     @DisplayName("euler YXZ rotation matrix test")
-    public void eulerYxzRotationMatrixTest() throws IllegalRotationAxis, IllegalRotationAxisNumber {
+    public void eulerYxzRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
         Matrix eulerMat = Rotation.getEulerMatrix("YXZ", 90, 90, 90);
         assertAll(  // x column
                 () -> assertEquals(1, eulerMat.get(0, 0), 0.000001),
@@ -195,7 +195,7 @@ class RotationTest {
 
     @Test
     @DisplayName("euler XZY rotation matrix test")
-    public void eulerXzyRotationMatrixTest() throws IllegalRotationAxis, IllegalRotationAxisNumber {
+    public void eulerXzyRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
         Matrix eulerMat = Rotation.getEulerMatrix("XZY", 90, 90, 90);
         assertAll(  // x column
                 () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
@@ -213,7 +213,7 @@ class RotationTest {
 
     @Test
     @DisplayName("euler XYZ rotation matrix test")
-    public void eulerXyzRotationMatrixTest() throws IllegalRotationAxis, IllegalRotationAxisNumber {
+    public void eulerXyzRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
         Matrix eulerMat = Rotation.getEulerMatrix("XYZ", 90, 90, 90);
         assertAll(  // x column
                 () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),

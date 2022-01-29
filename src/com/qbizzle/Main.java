@@ -1,9 +1,9 @@
 package com.qbizzle;
 
+import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.math.JD;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
-import com.qbizzle.exception.InvalidTLEFormat;
 import com.qbizzle.orbit.StateVectors;
 import com.qbizzle.orbit.TLE;
 
@@ -19,7 +19,7 @@ public class Main {
 
     Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidTLEFormat, IOException {
+    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidTLEException, IOException {
         String strZarya = "ISS (ZARYA)             \n" +
                 "1 25544U 98067A   22027.75547926  .00007563  00000+0  14194-3 0  9990\n" +
                 "2 25544  51.6451 312.0370 0006903  67.9238  24.2396 15.49669141323407";
