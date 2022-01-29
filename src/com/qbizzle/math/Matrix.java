@@ -272,4 +272,17 @@ public class Matrix implements Cloneable {
         return (Matrix)this.clone();
     }
 
+    /** Returns a transposed version of the matrix.
+     * @return This matrix transposed.
+     */
+    public Matrix transpose() {
+        Matrix rtn = new Matrix();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                rtn.m_data[i][j] = m_data[j][i];
+            }
+        }
+        return rtn;
+    }
+
 }
