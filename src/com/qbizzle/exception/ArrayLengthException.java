@@ -4,10 +4,10 @@
 
 package com.qbizzle.exception;
 
-/** A checked exception thrown when an array of specific length
+/** Unchecked exception thrown when an array of specific length
  * is not passed into a method as an argument.
  */
-public class ArrayLengthException extends Exception {
+public class ArrayLengthException extends RuntimeException {
 
     /** Constructs an ArrayLengthException with an error message.
      * @param errorMessage The error message for this exception.

@@ -27,8 +27,7 @@ public class Rotation {
     }
 
     // intrinsic rotation
-    public static Matrix getEulerMatrix(String axisOrder, double alpha, double beta, double gamma)
-            throws InvalidEulerRotationLengthException, InvalidAxisException {
+    public static Matrix getEulerMatrix(String axisOrder, double alpha, double beta, double gamma) {
         if (axisOrder.length() != 3)
             throw new InvalidEulerRotationLengthException("Invalid number of Euler rotation axes, which is " + axisOrder.length());
         axisOrder = axisOrder.toLowerCase();
@@ -51,8 +50,7 @@ public class Rotation {
         return Rotate(getMatrix(axis, angle), vector);
     }
 
-    public static Vector Rotate(String axisOrder, double alpha, double beta, double gamma, Vector vector)
-            throws InvalidEulerRotationLengthException, InvalidAxisException {
+    public static Vector Rotate(String axisOrder, double alpha, double beta, double gamma, Vector vector) {
         return Rotate(getEulerMatrix(axisOrder, alpha, beta, gamma), vector);
     }
 

@@ -34,11 +34,11 @@ public class ReferenceFrame implements Cloneable {
         m_axes[2] = new Axis(Axis.Direction.Z);
     }
 
-    public ReferenceFrame(Vector[] colVectors) throws ArrayLengthException {
+    public ReferenceFrame(Vector[] colVectors) {
         this(colVectors, new Axis[]{new Axis(Axis.Direction.X), new Axis(Axis.Direction.X), new Axis(Axis.Direction.X)});
     }
 
-    public ReferenceFrame(Vector[] colVectors, Axis[] axes) throws ArrayLengthException {
+    public ReferenceFrame(Vector[] colVectors, Axis[] axes) {
         if (Array.getLength(colVectors) != 3)
             throw new ArrayLengthException("colVectors array is not of length=3, (length="+Array.getLength(colVectors)+")");
         if (Array.getLength(axes) != 3)
@@ -47,11 +47,11 @@ public class ReferenceFrame implements Cloneable {
         System.arraycopy(axes, 0, m_axes, 0, 3);
     }
 
-    public ReferenceFrame(Matrix frame) throws ArrayLengthException {
+    public ReferenceFrame(Matrix frame) {
         this(frame, new Axis[]{new Axis(Axis.Direction.X), new Axis(Axis.Direction.X), new Axis(Axis.Direction.X)});
     }
 
-    public ReferenceFrame(Matrix frame, Axis[] axes) throws ArrayLengthException {
+    public ReferenceFrame(Matrix frame, Axis[] axes) {
         if (Array.getLength(axes) != 3)
             throw new ArrayLengthException("axes array is not of length=3, (length="+Array.getLength(axes)+")");
         m_frame = (Matrix) frame.clone();

@@ -3,10 +3,10 @@
  */
 package com.qbizzle.exception;
 
-/** Exception used to indicate the order of an Euler rotation is not
+/** Unchecked Exception used to indicate the order of an Euler rotation is not
  * a valid length.
  */
-public class InvalidEulerRotationLengthException extends Exception {
+public class InvalidEulerRotationLengthException extends RuntimeException {
 
     /** Constructs an InvalidEulerRotationLengthException with an error message.
      * @param errorMessage The error message for this exception.

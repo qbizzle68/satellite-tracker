@@ -3,10 +3,10 @@
  */
 package com.qbizzle.exception;
 
-/** Exception thrown when a character or string representing
+/** Unchecked Exception thrown when a character or string representing
  * axes contains an invalid character (i.e. not 'x', 'y' or 'z').
  */
-public class InvalidAxisException extends Exception {
+public class InvalidAxisException extends RuntimeException {
 
     /** Constructs an InvalidAxisException with an error message.
      * @param errorMessage The error message for this exception.
