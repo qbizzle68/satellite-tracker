@@ -38,30 +38,21 @@ public class Rotation {
         w.set(1, 2, -normVector.x());
         w.set(2, 0, -normVector.y());
         w.set(2, 1, normVector.x());
-        double sinangle = Math.sin( Math.toRadians(angle) );
-        return I3.plus(w.scale(sinangle).plus(w.mult(w).scale(2 * Math.pow(sinangle/2.0, 2))));
+        Matrix mat1 = I3.plus( w.scale( Math.sin( Math.toRadians(angle) ) ) );
+        System.out.println(mat1);
+        Matrix mat2 = w.mult(w).scale(2 * Math.pow( Math.sin( Math.toRadians(angle)/2.0 ), 2 ) );
+        System.out.println(mat2);
+        return mat1.plus(mat2);
     }
 
     // euler intrinsic rotation
     public static Matrix getEulerMatrix(String axisOrder, EulerAngles angles) {
-//    public static Matrix getEulerMatrix(String axisOrder, double alpha, double beta, double gamma) {
-//        if (axisOrder.length() != 3)
-//            throw new InvalidEulerRotationLengthException("Invalid number of Euler rotation axes, which is " + axisOrder.length());
-//        axisOrder = axisOrder.toLowerCase();
-//        for (int i = 0; i < 3; i++) {
-//            char chrAt = axisOrder.charAt(i);
-//            if (chrAt != 'x' && chrAt != 'y' && chrAt != 'z')
-//                throw new InvalidAxisException("Invalid Euler rotation axis="+i+" which is " + axisOrder.charAt(i));
-//        }
-        String axisOrderLower = axisOrder.toLowerCase();
-        checkEulerString(axisOrderLower);
+    String axisOrderLower = axisOrder.toLowerCase();
+    checkEulerString(axisOrderLower);
 
-        return getMatrix(axisMap.get(axisOrderLower.substring(0, 1)), angles.get(0))
-                .mult( getMatrix(axisMap.get(axisOrderLower.substring(1, 2)), angles.get(1))
-                        .mult( getMatrix(axisMap.get(axisOrderLower.substring(2, 3)), angles.get(2)) ) );
-//        return getMatrix(axisMap.get(axisOrder.substring(0, 1)), alpha)
-//                .mult( getMatrix(axisMap.get(axisOrder.substring(1, 2)), beta)
-//                        .mult( getMatrix(axisMap.get(axisOrder.substring(2, 3)), gamma) ) );
+    return getMatrix(axisMap.get(axisOrderLower.substring(0, 1)), angles.get(0))
+            .mult( getMatrix(axisMap.get(axisOrderLower.substring(1, 2)), angles.get(1))
+                    .mult( getMatrix(axisMap.get(axisOrderLower.substring(2, 3)), angles.get(2)) ) );
     }
     //euler extrinsic rotation
     public static Matrix getEulerMatrixExtrinsic(String axisOrder, EulerAngles angles) {
@@ -78,9 +69,11 @@ public class Rotation {
     public static Vector Rotate(Axis.Direction axis, double angle, Vector vector) {
         return Rotate(getMatrix(axis, angle), vector);
     }
-    public static Vector RotateIntrinsic(Vector vector, double angle) {
-        return Rotate(getMatrixIntrinsic(vector, angle), vector);
+    public static Vector RotateIntrinsic(Vector axisVector, double angle, Vector rotateVector) {
+        return Rotate(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
+    // to future self: not putting a RotateIntrinsic(Axis.Direction, double, Vector) here because
+    // it seems excessive, not likely to be used, and needs extra code for very little if any payoff.
 
     // euler rotations
     public static Vector Rotate(String axisOrder, EulerAngles angles, Vector vector) {
@@ -92,6 +85,7 @@ public class Rotation {
 
     // struggling on this one hard. will come back to it later
 //    @todo not sure about the logic here, need to double check
+    @SuppressWarnings("unused")
     public static Vector Rotate(ReferenceFrame from, ReferenceFrame to, Vector vector) {
         Matrix rotation = to.toMatrix().mult(from.toMatrix().transpose());
         return rotation.mult(vector);
