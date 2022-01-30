@@ -30,16 +30,18 @@ public class TLE {
      * TLE string is retrieved from common online repositories such as Celestrak
      * then formatting shouldn't be an issue.
      * @param tle A string containing the two line element separated into three lines.
-     * @throws InvalidTLEException Ane exception will be thrown if some part of the
+     * @throws InvalidTLEException An exception will be thrown if some part of the
      * formatting is invalid.
      * @note Even though this is a two-line element, three lines are expected, with
      * the '0th' line being the satellite name.
      */
-    public TLE(String tle) throws InvalidTLEException {
-        if (checkLines(tle)) {
-            if (parseString(tle)) System.out.println("TLE String parse successful.");
-            else System.out.println("TLE String parse failed.");
-        }
+    public TLE(String tle) {
+        checkLines(tle);
+        parseString(tle);
+//        if (checkLines(tle)) {
+//            if (parseString(tle)) System.out.println("TLE String parse successful.");
+//            else System.out.println("TLE String parse failed.");
+//        }
     }
 
     /** Creates a string with all the elements represented in name value pairs.
@@ -206,11 +208,10 @@ public class TLE {
 
     /** Checks each line of the TLE to ensure it has the correct formatting.
      * @param tle TLE string used to construct a TLE instance.
-     * @return True if the string is formatted correctly.
      * @throws InvalidTLEException Thrown if there is an error in the TLE format.
      * @todo Use regex to check the format of these lines. for reference: https://ai-solutions.com/_help_Files/two-line_element_set_file.htm
      */
-    private boolean checkLines(String tle) throws InvalidTLEException {
+    private void checkLines(String tle) {
         String delims = "[\n]";
         String[] tokens = tle.split(delims);
 
@@ -220,7 +221,6 @@ public class TLE {
         else if (tokens.length < 3) throw new InvalidTLEException("Too few lines in TLE, check TLE format.");
         else if (tokens[1].split("[\s]+").length != 9) throw new InvalidTLEException("Line 1 token number mismatch, check TLE format.");
         else if (tokens[2].split("[\s]+").length != 8) throw new InvalidTLEException("Line 2 token number mismatch, check TLE format.");
-        return true;
     }
 
     /** Method to corroborate the checksum value in each line.
@@ -247,10 +247,8 @@ public class TLE {
      * is parsed into individual elements and those elements are stored in
      * their corresponding variable.
      * @param tle String that contains the TLE.
-     * @return True if the string was parsed successfully, false if otherwise.
-     * @todo Evaluate if this should be a void function, right now it can only return true.
      */
-    private boolean parseString(String tle) {
+    private void parseString(String tle) {
         String[] lines = tle.split("[\n]");
         for (int i = 0; i < 3; i++) lines[i] = lines[i].trim();
         String[] line1Tokens = lines[1].split("[\s]+");
@@ -292,8 +290,6 @@ public class TLE {
         m_meanAnomaly = Double.parseDouble(line2Tokens[6]);
         m_meanMotion = Double.parseDouble(line2Tokens[7].substring(0, line2Tokens[7].length()-6));
         m_revNumber = Integer.parseInt(line2Tokens[7].substring(line2Tokens[7].length()-6, line2Tokens[7].length()-1));
-
-        return true;
     }
 
 }

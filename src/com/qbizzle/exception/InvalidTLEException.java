@@ -5,10 +5,10 @@
 package com.qbizzle.exception;
 
 /**
- * This exception class is used to signal a bad formatted TLE string.
+ * This unchecked exception class is used to signal a bad formatted TLE string.
  * @todo possibly derive more descriptive exceptions that extend this class
  */
-public class InvalidTLEException extends Exception {
+public class InvalidTLEException extends RuntimeException {
 
     /** Constructs an InvalidTLEException with an error message.
      * @param errorMessage The error message for this exception.
