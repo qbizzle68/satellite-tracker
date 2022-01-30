@@ -10,9 +10,12 @@ package com.qbizzle.math;
  * Static class that contains constants and methods that pertain to orbital math.
  */
 public class OrbitalMath {
-    /** Earth radius in meters. */
+    /** Earth equitorial radius in meters. */
     @SuppressWarnings("unused")
-    public static final double ER = 6.3781363e6; // m
+    public static final double EARTH_EQUITORIAL_RADIUS = 6.3781363e6; // m
+    /** Earth polar radius in meters. */
+    @SuppressWarnings("unused")
+    public static final double EARTH_POLAR_RADIUS = 6.356752e6; // m
     /** Earth gravitational parameter, equal to GM in m^3/s^2. */
     public static final double MU = 3.986004418e14; // m3/s2
     /** Newton's Gravitational parameter. */
