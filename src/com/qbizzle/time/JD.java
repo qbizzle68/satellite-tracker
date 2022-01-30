@@ -9,7 +9,7 @@
  * without the need for further implementation or duplication of code.
  */
 
-package com.qbizzle.math;
+package com.qbizzle.time;
 
 import com.qbizzle.orbit.TLE;
 import java.util.*;
@@ -93,7 +93,7 @@ public class JD {
 
     /** Getter method for retrieving the Julian Date Number.
      * @return The Julian Day number associated with this instance.
-     * @note This is the integer portion of @link com.qbizzle.math.JD#Value Value(). @endlink
+     * @note This is the integer portion of @link com.qbizzle.time.JD#Value Value(). @endlink
      */
     public int Number() {
         return (int) m_julianDate;
