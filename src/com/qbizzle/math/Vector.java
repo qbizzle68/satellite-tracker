@@ -104,7 +104,7 @@ public class Vector implements Cloneable {
 ///@}
 
     /// @name Operators
-    /// Methods used to operator on a Vector.
+    /// Vector operator methods.
 ///@{
 
     /** Addition operator.
@@ -257,8 +257,8 @@ public class Vector implements Cloneable {
 
 ///@}
 
-    /// @name Getter/setter methods.
-    /// Methods to retrieve or set the component values of a Vector.
+    /// @name Accessor methods
+    /// Methods used to access vector components.
 ///@{
 
     /** Gets the x-component of the Vector.

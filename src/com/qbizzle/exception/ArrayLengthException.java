@@ -1,4 +1,5 @@
-/** @File Contains the ArrayLengthException checked exception, which
+/** @file
+ * Contains the ArrayLengthException checked exception, which
  * is used to alert an array of invalid length.
  */
 

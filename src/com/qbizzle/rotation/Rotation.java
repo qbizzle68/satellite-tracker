@@ -1,3 +1,8 @@
+/** @file
+ * Contains a static class used for rotating vectors, matrices,
+ * reference frames and other rotations.
+ */
+
 package com.qbizzle.rotation;
 
 import com.qbizzle.exception.InvalidAxisException;
@@ -12,15 +17,34 @@ import java.util.Map;
 
 import static com.qbizzle.math.util.I3;
 
-//@todo create an euler angles class as a container for all three euler angles (to be more explicit than a double array).
+/** Rotation class with all static methods used to create matrices for
+ * rotating other objects. The class also contains methods for doing
+ * the actual rotation, in an effort to keep future code cleaner.
+ * Rotations can be single axis or in groups of three (Euler or Tait-Brian
+ * rotations), and they can be either intrinsic or extrinsic. Single axis
+ * rotations are considered extrinsic by default, and Euler rotations are
+ * considered intrinsic by default, but methods for the other types can be
+ * found as well.
+ * Angles for all rotations use the right-hand rule for the positive direction.
+ * @todo create Rotate() methods to rotate rotations(matrices) intrinsically or extrinsically.
+ * @todo create Rotate() methods to rotate reference frames intrinsically or extrinsically.
+ */
 public class Rotation {
 
+//    map to correlate a character to an Axis.Direction
     private final static Map<String, Axis.Direction> axisMap = new HashMap<>() {{
         put("x", Axis.Direction.X); put("y", Axis.Direction.Y); put("z", Axis.Direction.Z);
     }};
 
-    // angle in degrees
-    // single axis extrinsic
+    /// @name Single axis matrices
+    /// Methods that create a rotation matrix from a single axis rotation.
+///@{
+
+    /** Creates a rotation matrix for an extrinsic rotation about a given axis.
+     * @param axis The axis in which to rotate around extrinsically.
+     * @param angle The angle to rotate in @em degrees.
+     * @return A rotation matrix.
+     */
     public static Matrix getMatrix(Axis.Direction axis, double angle) {
         return switch (axis.ordinal()) {
             case 1 -> yRotationMatrix(Math.toRadians(angle));
@@ -28,7 +52,12 @@ public class Rotation {
             default -> xRotationMatrix(Math.toRadians(angle));
         };
     }
-    // single axis intrinsic
+
+    /** Creates a rotation matrix for an intrinsic rotation about a given axis.
+     * @param vector A vector representing the axis in which to rotate around intrinsically.
+     * @param angle The angle to rotate in @em degrees.
+     * @return A rotation matrix.
+     */
     public static Matrix getMatrixIntrinsic(Vector vector, double angle) {
         Vector normVector = vector.norm();
         Matrix w = new Matrix();
@@ -45,7 +74,20 @@ public class Rotation {
         return mat1.plus(mat2);
     }
 
-    // euler intrinsic rotation
+///@}
+
+    /// @name Euler rotation matrices
+    /// Methods that create a rotation matrix from Euler rotations.
+///@{
+
+    /** Creates a rotation matrix for an intrinsic Euler rotation about a series
+     * of three axes.
+     * @param axisOrder A string representing the order in which to rotate intrinsically. The
+     *                  string must be exactly @em three characters long and contain only the
+     *                  characters 'x', 'y' and 'z'.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees.
+     * @return A rotation matrix.
+     */
     public static Matrix getEulerMatrix(String axisOrder, EulerAngles angles) {
     String axisOrderLower = axisOrder.toLowerCase();
     checkEulerString(axisOrderLower);
@@ -54,7 +96,15 @@ public class Rotation {
             .mult( getMatrix(axisMap.get(axisOrderLower.substring(1, 2)), angles.get(1))
                     .mult( getMatrix(axisMap.get(axisOrderLower.substring(2, 3)), angles.get(2)) ) );
     }
-    //euler extrinsic rotation
+
+    /** Creates a rotation matrix for an extrinsic Euler rotation about a series
+     * of three axes.
+     * @param axisOrder A string representing the order in which to rotate extrinsically. The
+     *                  string must be exactly @em three characters long and contain only the
+     *                  characters 'x', 'y' and 'z'.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees.
+     * @return A rotation matrix.
+     */
     public static Matrix getEulerMatrixExtrinsic(String axisOrder, EulerAngles angles) {
         return getEulerMatrix(
                 axisOrder.substring(2, 3) + axisOrder.charAt(1) + axisOrder.charAt(0),
@@ -62,23 +112,74 @@ public class Rotation {
         );
     }
 
-    // single axis rotation
+///@}
+
+    /// @name Single axis rotators
+    /// Methods that rotate objects from a single axis rotation.
+///@{
+
+    /** Rotates a vector around a single axis extrinsically. Same
+     * as getMatrix(...).mult(vector).
+     * @param rotMatrix Matrix representing the rotation to apply.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
     public static Vector Rotate(Matrix rotMatrix, Vector vector) {
         return rotMatrix.mult(vector);
     }
+
+    /** Rotates a vector around a single axis extrinsically. Same
+     * as getMatrix(axis, angle).mult(vector).
+     * @param axis Axis in which to rotate around extrinsically.
+     * @param angle The angle in which to rotate in @em degrees.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
     public static Vector Rotate(Axis.Direction axis, double angle, Vector vector) {
         return Rotate(getMatrix(axis, angle), vector);
     }
+
+    /** Rotates a vector around a single axis intrinsically. Same
+     * as getMatrixIntrinsic(axisVector, angle).mult(rotateVector).
+     * @param axisVector A vector representing the axis in which to rotate around intrinsically.
+     * @param angle The angle in which to rotate in @em degrees.
+     * @param rotateVector The vector to rotate.
+     * @return The rotated vector.
+     */
     public static Vector RotateIntrinsic(Vector axisVector, double angle, Vector rotateVector) {
         return Rotate(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
     // to future self: not putting a RotateIntrinsic(Axis.Direction, double, Vector) here because
     // it seems excessive, not likely to be used, and needs extra code for very little if any payoff.
 
-    // euler rotations
+///@}
+
+    /// @name Euler rotation rotators
+    /// Methods that rotate objects from Euler rotations.
+///@{
+
+    /** Rotates a vector through a series of Euler rotations intrinsically. Same
+     * as getEulerMatrix(axisOrder, angles).mult(vector).
+     * @param axisOrder A string representing the order in which to rotate intrinsically. The
+     *                  string must be exactly @em three characters long and contain only the
+     *                  characters 'x', 'y' and 'z'.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
     public static Vector Rotate(String axisOrder, EulerAngles angles, Vector vector) {
         return Rotate(getEulerMatrix(axisOrder, angles), vector);
     }
+
+    /** Rotates a vector through a series of Euler rotations extrinsically. Same
+     * as getEulerMatrixExtrinsic(axisOrder, angles).mult(vector).
+     * @param axisOrder A string representing the order in which to rotate extrinsically. The
+     *                  string must be exactly @em three characters long and contain only the
+     *                  characters 'x', 'y' and 'z'.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
     public static Vector RotateExtrinsic(String axisOrder, EulerAngles angles, Vector vector) {
         return Rotate(getEulerMatrixExtrinsic(axisOrder, angles), vector);
     }
@@ -90,6 +191,8 @@ public class Rotation {
         Matrix rotation = to.toMatrix().mult(from.toMatrix().transpose());
         return rotation.mult(vector);
     }
+
+///@}
 
     // alpha in radians
     private static Matrix xRotationMatrix(double alpha) {

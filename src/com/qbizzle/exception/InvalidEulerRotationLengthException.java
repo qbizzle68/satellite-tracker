@@ -1,4 +1,5 @@
-/** @file Contains InvalidEulerRotationLengthException class used
+/** @file
+ * Contains InvalidEulerRotationLengthException class used
  * when an Euler rotation order String is not valid length (which is usually 3).
  */
 package com.qbizzle.exception;

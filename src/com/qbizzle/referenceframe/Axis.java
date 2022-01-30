@@ -108,8 +108,8 @@ public class Axis implements Cloneable {
 
 //@}
 
-    /// @name Getter methods
-    /// Methods to retrieve values associated with this axis
+    /// @name Accessor methods
+    /// Methods to retrieve values associated with this axis.
 ///@{
 
     /** Gets the Direction associated with this axis.

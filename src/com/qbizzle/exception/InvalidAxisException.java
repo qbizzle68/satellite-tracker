@@ -1,4 +1,5 @@
-/** @file Contains InvalidRotationAxis exception which is used to
+/** @file
+ * Contains InvalidRotationAxis exception which is used to
  * alert when an invalid labeled rotation axis.
  */
 package com.qbizzle.exception;

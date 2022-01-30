@@ -1,4 +1,5 @@
-/** @file This file contains the InvalidTLEException class, which is
+/** @file
+ * This file contains the InvalidTLEException class, which is
  * used by the TLE class to alert to a badly formatted TLE text.
  */
 

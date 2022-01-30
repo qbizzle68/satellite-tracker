@@ -76,7 +76,7 @@ public class OrbitalMath {
     }
 
     /** Converts mean anomaly to eccentric anomaly. The method involves solving Kepler's
-     * equation using the Newton-Raphson numerical method. The field @link com.qbizzle.Math.OrbitalMath.newtonEpsilon newtonEpsilon @endlink
+     * equation using the Newton-Raphson numerical method. The field @link com.qbizzle.math.OrbitalMath.newtonEpsilon newtonEpsilon @endlink
      * is used to determine when to stop iterating the algorithm.
      * @param meanAnomaly Mean anomaly in @em radians.
      * @param eccentricity Eccentricity of the orbit.
@@ -136,7 +136,7 @@ public class OrbitalMath {
 
     /** Newton-Raphson numerical method used to solve Kepler's equation for eccentric anomaly.
      * The method is iterated until the difference in successive outputs is less than or equal to
-     * the @link com.qbizzle.Math.OrbitalMath.newtonEpsilon newtonEpsilon @endlink field which can be adjusted if needed.
+     * the @link com.qbizzle.math.OrbitalMath.newtonEpsilon newtonEpsilon @endlink field which can be adjusted if needed.
      * @param M Mean anomaly in @em radians.
      * @param Ej The Jth computation for eccentric anomaly. The initial guess should be the mean anomaly in @em radians.
      * @param ecc The eccentricity of the orbit.

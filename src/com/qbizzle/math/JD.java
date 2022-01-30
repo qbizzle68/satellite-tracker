@@ -53,7 +53,7 @@ public class JD {
 
     /**Constructs the Julian Date from the epoch element of a TLE./ Ideal for computing
      * future positions from the TLE epoch.
-     * @param tle @link com.qbizzle.Orbit.TLE TLE @endlink that contains the epoch used to create
+     * @param tle @link com.qbizzle.orbit.TLE TLE @endlink that contains the epoch used to create
      *            a Julian Date.
      */
     public JD(TLE tle) {
@@ -93,7 +93,7 @@ public class JD {
 
     /** Getter method for retrieving the Julian Date Number.
      * @return The Julian Day number associated with this instance.
-     * @note This is the integer portion of @link com.qbizzle.Math.JD.Value() value. @endlink
+     * @note This is the integer portion of @link com.qbizzle.math.JD#Value Value(). @endlink
      */
     public int Number() {
         return (int) m_julianDate;

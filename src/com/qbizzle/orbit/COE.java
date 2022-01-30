@@ -14,7 +14,7 @@ import com.qbizzle.math.Vector;
  * eccentricity, longitude of ascending node (right ascension of ascending node), argument of
  * periapsis, inclination and true anomaly. Notable elements not contained are mean motion and
  * mean and eccentric anomalies. These quantities can all be computed using the
- * @link com.qbizzle.Math.OrbitalMath OrbitalMath @endlink class. For ease of use, and to be
+ * @link com.qbizzle.math.OrbitalMath OrbitalMath @endlink class. For ease of use, and to be
  * able to quickly construct custom orbits, all element fields have public access.
  * @note All angles are measured in degrees, so converting true anomaly will require also
  * converting units for the appropriate method.

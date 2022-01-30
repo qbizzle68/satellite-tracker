@@ -94,6 +94,10 @@ public class Matrix implements Cloneable {
 
 ///@}
 
+    /// @name Accessor methods
+    /// Accessor methods to get and set component values.
+///@{
+
     /** Retrieves a certain component of the matrix by index (starting at 0).
      * @param row Row index of desired element.
      * @param col Column index of desired element.
@@ -126,6 +130,12 @@ public class Matrix implements Cloneable {
     public Vector getColumn(int col) {
         return new Vector(m_data[0][col], m_data[1][col], m_data[2][col]);
     }
+
+///@}
+
+    /// @name Operators
+    /// Matrix operator methods.
+///@{
 
     /** Matrix addition operator.
      * @param rhs Matrix to be added to this matrix.
@@ -222,7 +232,7 @@ public class Matrix implements Cloneable {
     /** Vector multiplication operator. Vector multiplication is right-handed
      * so that the matrix columns are where the ijk unit vectors map to, instead
      * of rows. This is to increase 'readability' of the matrix, and is also
-     * the rationale behind why the @link com.qbizzle.Math.Matrix#getColumn
+     * the rationale behind why the @link com.qbizzle.math.Matrix#getColumn
      * getColumn() @endlink is not a @em getRow() method.
      * @param rhs Vector to multiply matrix by. This is the vector that is to be operated
      *            on by the Matrix, that is to say the vector that will be rotated by this
@@ -284,5 +294,7 @@ public class Matrix implements Cloneable {
         }
         return rtn;
     }
+
+///@}
 
 }
