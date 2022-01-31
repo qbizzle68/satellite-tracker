@@ -3,6 +3,8 @@ package com.qbizzle.tracking;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 
+import java.util.Arrays;
+
 import static com.qbizzle.math.OrbitalMath.EARTH_EQUITORIAL_RADIUS;
 import static com.qbizzle.math.OrbitalMath.EARTH_POLAR_RADIUS;
 
@@ -24,6 +26,13 @@ public class GeoPosition {
         m_coordinates[0] = geocentricToGeodetic(declination);
         double lng = OrbitalMath.atan2(position.y(), position.x());
         m_coordinates[1] = Math.toDegrees( (lng > Math.PI) ? lng - 2*Math.PI : lng );
+    }
+
+    @Override
+    public String toString() {
+        return "GeoPosition{" +
+               "m_coordinates=" + Arrays.toString(m_coordinates) +
+               '}';
     }
 
     public double getLatitude() {
