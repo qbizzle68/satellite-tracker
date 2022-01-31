@@ -7,6 +7,8 @@ import com.qbizzle.orbit.StateVectors;
 import com.qbizzle.orbit.TLE;
 import com.qbizzle.time.JD;
 import com.qbizzle.time.SiderealTime;
+import com.qbizzle.tracking.GeoPosition;
+import com.qbizzle.tracking.tracker;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -43,21 +45,39 @@ public class Main {
         System.out.println("lat: " + Math.toDegrees( geocentricToGeodetic(latlng[0]) ));
         System.out.println("long: " + Math.toDegrees(latlng[1]));
 
+        GeoPosition geo1 = tracker.getPositionAt(tleZarya, 0.47570602);
+        GeoPosition geo2 = tracker.getPositionAt(tleZarya, currentPosTime);
+
+        System.out.println("geo1 lat: " + geo1.getLatitude());
+        System.out.println("geo1 lng: " + geo1.getLongitude());
+        System.out.println("geo2 lat: " + geo2.getLatitude());
+        System.out.println("geo2 lng: " + geo2.getLongitude());
+
 //        double dt = 10 / 86400.0; // days
-//        double timeToPlot = 1.0; //2.0 / tleZarya.MeanMotion(); // days
+//        double timeToPlot = 2.0 / tleZarya.MeanMotion(); // days
 //        int numItr = (int)(timeToPlot / dt);
 //
 //        JD startTime = new JD(tleZarya);
-//        String filename = "output/iss_1day_10sec.csv";
+//        String filename = "output/zarya_2orbit_test1.csv";
 //        FileWriter writer = new FileWriter(filename);
 //        writer.write("latitude, longitude\n");
 //        for (int i = 0; i < numItr; i++) {
 //            JD currentTime = startTime.Future(dt * i);
 //            StateVectors state = new StateVectors(tleZarya, dt * i);
-//            double offsetAngle = ST(currentTime, 0.0) / 24.0 * 360.0;
+////            double offsetAngle = ST(currentTime, 0.0) / 24.0 * 360.0;
+//            double offsetAngle = SiderealTime.siderealTime(currentTime, 0.0) / 24.0 * 360.0;
 //            Vector currentPosition = Rotate(state.Position(), -offsetAngle);
 //            double[] latlng = toLatLng(currentPosition);
 //            writer.write(Math.toDegrees(latlng[0]) + ", " + Math.toDegrees(latlng[1]) + '\n');
+//            if (i % 10 == 0) writer.flush();
+//        }
+//
+//        GeoPosition[] zaryaGroundTrack = getGroundTrack(tleZarya, timeToPlot, 10 / 86400.0);
+//        FileWriter writer2 = new FileWriter("output/zarya_2orbit_test2.csv");
+//        writer2.write("latitude, longitude\n");
+//        for (int i = 0; i < Array.getLength(zaryaGroundTrack); i++) {
+//            writer2.write(zaryaGroundTrack[i].getLatitude() + ", " + zaryaGroundTrack[i].getLongitude() + '\n');
+//            if (i % 10 == 0) writer2.flush();
 //        }
 
     }
