@@ -20,10 +20,10 @@ public class GeoPosition {
     public GeoPosition(Vector position) {
         m_coordinates = new double[2];
         double xyMag = Math.sqrt( Math.pow(position.x(), 2) + Math.pow(position.y(), 2) );
-        double declination = Math.atan2(position.z(), xyMag);
+        double declination = Math.toDegrees( Math.atan2(position.z(), xyMag) );
         m_coordinates[0] = geocentricToGeodetic(declination);
         double lng = OrbitalMath.atan2(position.y(), position.x());
-        m_coordinates[1] = (lng > Math.PI) ? lng - 2*Math.PI : lng;
+        m_coordinates[1] = Math.toDegrees( (lng > Math.PI) ? lng - 2*Math.PI : lng );
     }
 
     public double getLatitude() {
