@@ -14,14 +14,14 @@ import java.lang.reflect.Array;
 import static com.qbizzle.rotation.Rotation.Rotate;
 
 
-public class tracker {
+public class Tracker {
 
-    public static GeoPosition getPositionAt(TLE tle, double dt) {
-        return getPositionAt(tle, new JD(tle).Future(dt));
+    public static GeoPosition getGeoPositionAt(TLE tle, double dt) {
+        return getGeoPositionAt(tle, new JD(tle).Future(dt));
     }
 
     // jd needs to be time in utc
-    public static GeoPosition getPositionAt(TLE tle, JD t1) {
+    public static GeoPosition getGeoPositionAt(TLE tle, JD t1) {
         StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
         double siderealTimeAtT1 = SiderealTime.siderealTime(t1, 0.0); // the timezone should go away if we incorporate it into the JD constructor
         double earthOffsetAngle = siderealTimeAtT1 / 24.0 * 360.0;
@@ -43,9 +43,9 @@ public class tracker {
 
         for (int i = 0; i < numIterations - 1; i++) {
             JD currentTime = startTime.Future(interval * i);
-            arrGeoPos[i] = getPositionAt(tle, currentTime);
+            arrGeoPos[i] = getGeoPositionAt(tle, currentTime);
         }
-        arrGeoPos[numIterations-1] = getPositionAt(tle, t1);
+        arrGeoPos[numIterations-1] = getGeoPositionAt(tle, t1);
         return arrGeoPos;
     }
 

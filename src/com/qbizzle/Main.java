@@ -3,12 +3,7 @@ package com.qbizzle;
 import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
-import com.qbizzle.orbit.StateVectors;
 import com.qbizzle.orbit.TLE;
-import com.qbizzle.time.JD;
-import com.qbizzle.time.SiderealTime;
-import com.qbizzle.tracking.GeoPosition;
-import com.qbizzle.tracking.tracker;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -29,29 +24,29 @@ public class Main {
                 1 25544U 98067A   22030.51179398  .00005765  00000+0  11002-3 0  9999
                 2 25544  51.6444 298.3935 0006761  77.9892 281.4353 15.49702707323823""";
         TLE tleZarya = new TLE(strZarya);
-        JD currentPosTime = new JD(1, 30, 2022, 23, 42, 0.0); // UTC
-        StateVectors state = new StateVectors(tleZarya, currentPosTime.Difference(new JD(tleZarya)));
-        System.out.println(state.Position());
-        double siderealTime = SiderealTime.siderealTime(currentPosTime, 0.0);
-        System.out.println("sidereal time: " + siderealTime);
-        double offsetAngle = siderealTime / 24.0 * 360.0;
-        System.out.println("offset angle: " + offsetAngle);
-
-        Vector issPos = Rotate(state.Position(), -offsetAngle);
-        System.out.println("iss position: " + issPos.toString());
-
-        double [] latlng = toLatLng(issPos);
-        System.out.println("declination: " + Math.toDegrees(latlng[0]));
-        System.out.println("lat: " + Math.toDegrees( geocentricToGeodetic(latlng[0]) ));
-        System.out.println("long: " + Math.toDegrees(latlng[1]));
-
-        GeoPosition geo1 = tracker.getPositionAt(tleZarya, 0.47570602);
-        GeoPosition geo2 = tracker.getPositionAt(tleZarya, currentPosTime);
-
-        System.out.println("geo1 lat: " + geo1.getLatitude());
-        System.out.println("geo1 lng: " + geo1.getLongitude());
-        System.out.println("geo2 lat: " + geo2.getLatitude());
-        System.out.println("geo2 lng: " + geo2.getLongitude());
+//        JD currentPosTime = new JD(1, 30, 2022, 23, 42, 0.0); // UTC
+//        StateVectors state = new StateVectors(tleZarya, currentPosTime.Difference(new JD(tleZarya)));
+//        System.out.println(state.Position());
+//        double siderealTime = SiderealTime.siderealTime(currentPosTime, 0.0);
+//        System.out.println("sidereal time: " + siderealTime);
+//        double offsetAngle = siderealTime / 24.0 * 360.0;
+//        System.out.println("offset angle: " + offsetAngle);
+//
+//        Vector issPos = Rotate(state.Position(), -offsetAngle);
+//        System.out.println("iss position: " + issPos.toString());
+//
+//        double [] latlng = toLatLng(issPos);
+//        System.out.println("declination: " + Math.toDegrees(latlng[0]));
+//        System.out.println("lat: " + Math.toDegrees( geocentricToGeodetic(latlng[0]) ));
+//        System.out.println("long: " + Math.toDegrees(latlng[1]));
+//
+//        GeoPosition geo1 = tracker.getPositionAt(tleZarya, 0.47570602);
+//        GeoPosition geo2 = tracker.getPositionAt(tleZarya, currentPosTime);
+//
+//        System.out.println("geo1 lat: " + geo1.getLatitude());
+//        System.out.println("geo1 lng: " + geo1.getLongitude());
+//        System.out.println("geo2 lat: " + geo2.getLatitude());
+//        System.out.println("geo2 lng: " + geo2.getLongitude());
 
 //        double dt = 10 / 86400.0; // days
 //        double timeToPlot = 2.0 / tleZarya.MeanMotion(); // days
@@ -79,6 +74,14 @@ public class Main {
 //            writer2.write(zaryaGroundTrack[i].getLatitude() + ", " + zaryaGroundTrack[i].getLongitude() + '\n');
 //            if (i % 10 == 0) writer2.flush();
 //        }
+
+        String strZarya2 = """
+                ISS (ZARYA)            \s
+                1 25544U 98067A   22031.74347940  .00005978  00000+0  11373-3 0  9992
+                2 25544  51.6445 292.2902 0006822  83.2131 312.2718 15.49718573324024""";
+        TLE tleZarya2 = new TLE(strZarya2);
+
+
 
     }
 
