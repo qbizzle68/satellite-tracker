@@ -7,6 +7,10 @@ import com.qbizzle.referenceframe.Axis;
 import com.qbizzle.time.JD;
 import com.qbizzle.time.SiderealTime;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Array;
+
 import static com.qbizzle.rotation.Rotation.Rotate;
 
 
@@ -43,6 +47,25 @@ public class tracker {
         }
         arrGeoPos[numIterations-1] = getPositionAt(tle, t1);
         return arrGeoPos;
+    }
+
+    public static boolean plotGroundTrack(TLE tle, double dt, double interval, String filename) throws IOException {
+        return plotGroundTrack(tle, new JD(tle).Future(dt), interval, filename);
+    }
+
+    /*@todo find out if we can handle any exceptions for FileWriter, or need to do checks to find out
+    *   if the file is being written. If no checks exist theres really no reason to return a boolean
+    */
+    public static boolean plotGroundTrack(TLE tle, JD t1, double interval, String filename) throws IOException {
+        final int flushLimit = 10; // this is just a guess right now, previous files have been failing a little after 1000
+        FileWriter writer = new FileWriter(filename);
+        GeoPosition[] arrGroundTrack = getGroundTrack(tle, t1, interval);
+        writer.write("latitude, longitude\n");
+        for (int i = 0; i < Array.getLength(arrGroundTrack); i++) {
+            writer.write(arrGroundTrack[i].getLatitude() + ", " + arrGroundTrack[i].getLongitude() + '\n');
+            if (i % flushLimit == 0) writer.flush();
+        }
+        return true;
     }
 
 }
