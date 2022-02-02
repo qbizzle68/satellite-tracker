@@ -16,7 +16,7 @@ public class SiderealTime {
      * @param timeZone The timezone of the time to convert.
      * @return The local sidereal time of Greenwich, England.
      */
-    public static double siderealTime(JD julianDay, double timeZone) {
+    public static double ST(JD julianDay, double timeZone) {
         double dt = julianDay.Value() - (timeZone / 24.0) - JD.J2000;
         return (18.697_374_558 + 24.065_709_824_419_08 * dt) % 24.0;
     }
