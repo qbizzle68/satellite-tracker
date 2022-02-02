@@ -19,6 +19,12 @@ public class GeoPosition {
         m_coordinates = new double[]{lat, lng};
     }
 
+    public GeoPosition(int lat, int latMinutes, double latSeconds, int lng, int lngMinutes, double lngSeconds) {
+        this(lat + latMinutes/60.0 + latSeconds/3600.0,
+                lng + lngMinutes/60.0 + lngSeconds/3600.0
+        );
+    }
+
     public GeoPosition(Vector position) {
         m_coordinates = new double[2];
         double xyMag = Math.sqrt( Math.pow(position.x(), 2) + Math.pow(position.y(), 2) );
