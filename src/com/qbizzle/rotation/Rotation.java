@@ -5,15 +5,12 @@
 
 package com.qbizzle.rotation;
 
-import com.qbizzle.exception.InvalidAxisException;
-import com.qbizzle.exception.InvalidEulerRotationLengthException;
 import com.qbizzle.math.Matrix;
 import com.qbizzle.math.Vector;
 import com.qbizzle.referenceframe.Axis;
+import com.qbizzle.referenceframe.EulerAngles;
+import com.qbizzle.referenceframe.EulerOrder;
 import com.qbizzle.referenceframe.ReferenceFrame;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.qbizzle.math.util.I3;
 
@@ -30,11 +27,6 @@ import static com.qbizzle.math.util.I3;
  * @todo create Rotate() methods to rotate reference frames intrinsically or extrinsically.
  */
 public class Rotation {
-
-//    map to correlate a character to an Axis.Direction
-    private final static Map<String, Axis.Direction> axisMap = new HashMap<>() {{
-        put("x", Axis.Direction.X); put("y", Axis.Direction.Y); put("z", Axis.Direction.Z);
-    }};
 
     /// @name Single axis matrices
     /// Methods that create a rotation matrix from a single axis rotation.
@@ -82,33 +74,49 @@ public class Rotation {
 
     /** Creates a rotation matrix for an intrinsic Euler rotation about a series
      * of three axes.
-     * @param axisOrder A string representing the order in which to rotate intrinsically. The
-     *                  string must be exactly @em three characters long and contain only the
-     *                  characters 'x', 'y' and 'z'.
-     * @param angles The angles to rotate, in their rotation order, in @em degrees.
-     * @return A rotation matrix.
+     * @param order The order of the Euler rotation.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees
+     * @return A single matrix representing the three rotations of the Euler angles.
      */
-    public static Matrix getEulerMatrix(String axisOrder, EulerAngles angles) {
-    String axisOrderLower = axisOrder.toLowerCase();
-    checkEulerString(axisOrderLower);
+    public static Matrix getEulerMatrix(EulerOrder order, EulerAngles angles) {
+        return getMatrix(order.first_rotation, angles.get(0))
+                .mult( getMatrix(order.second_rotation, angles.get(1)) )
+                .mult( getMatrix(order.third_rotation, angles.get(2)) );
+    }
 
-    return getMatrix(axisMap.get(axisOrderLower.substring(0, 1)), angles.get(0))
-            .mult( getMatrix(axisMap.get(axisOrderLower.substring(1, 2)), angles.get(1))
-                    .mult( getMatrix(axisMap.get(axisOrderLower.substring(2, 3)), angles.get(2)) ) );
+    /** Creates a rotation matrix for moving between two Euler rotations.
+     * @param fromOrder The order of rotations of the reference frame moving from.
+     * @param fromAngles The angles to rotate, in their rotation order, in @em degrees
+     *                   of the reference frame moving from.
+     * @param toOrder The order of rotations of the reference frame moving to.
+     * @param toAngles The angles to rotate, in their rotation order, in @em degrees
+     *                 of the reference frame moving to.
+     * @return A single matrix representing the move between reference frames.
+     */
+    public static Matrix getEulerMatrix(EulerOrder fromOrder, EulerAngles fromAngles, EulerOrder toOrder, EulerAngles toAngles) {
+        return getEulerMatrix(toOrder, toAngles).transpose()
+                .mult(getEulerMatrix(fromOrder, fromAngles));
+    }
+
+    /** Creates a rotation matrix for moving between two Euler rotations.
+     * @param from The reference frame moving from.
+     * @param to The reference frame moving to.
+     * @return A single matrix representing the rotation between reference frames.
+     */
+    public static Matrix getEulerMatrix(ReferenceFrame from, ReferenceFrame to) {
+        return to.toMatrix().transpose().mult(from.toMatrix());
     }
 
     /** Creates a rotation matrix for an extrinsic Euler rotation about a series
      * of three axes.
-     * @param axisOrder A string representing the order in which to rotate extrinsically. The
-     *                  string must be exactly @em three characters long and contain only the
-     *                  characters 'x', 'y' and 'z'.
+     * @param order The order of the rotations.
      * @param angles The angles to rotate, in their rotation order, in @em degrees.
-     * @return A rotation matrix.
+     * @return A single matrix representing the three rotations of the Euler angles.
      */
-    public static Matrix getEulerMatrixExtrinsic(String axisOrder, EulerAngles angles) {
+    public static Matrix getEulerMatrixExtrinsic(EulerOrder order, EulerAngles angles) {
         return getEulerMatrix(
-                axisOrder.substring(2, 3) + axisOrder.charAt(1) + axisOrder.charAt(0),
-                new EulerAngles(angles.get(2), angles.get(1), angles.get(0))
+                new EulerOrder( order.third_rotation, order.second_rotation, order.first_rotation ),
+                new EulerAngles( angles.get(2), angles.get(1), angles.get(0) )
         );
     }
 
@@ -149,8 +157,6 @@ public class Rotation {
     public static Vector RotateIntrinsic(Vector axisVector, double angle, Vector rotateVector) {
         return Rotate(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
-    // to future self: not putting a RotateIntrinsic(Axis.Direction, double, Vector) here because
-    // it seems excessive, not likely to be used, and needs extra code for very little if any payoff.
 
 ///@}
 
@@ -158,43 +164,44 @@ public class Rotation {
     /// Methods that rotate objects from Euler rotations.
 ///@{
 
-    /** Rotates a vector through a series of Euler rotations intrinsically. Same
-     * as getEulerMatrix(axisOrder, angles).mult(vector).
-     * @param axisOrder A string representing the order in which to rotate intrinsically. The
-     *                  string must be exactly @em three characters long and contain only the
-     *                  characters 'x', 'y' and 'z'.
+    /** Rotates a vector through a series of Euler rotations intrinsically. Behaviour is
+     * identical to getEulerMatrix(order, angles).mult(vector).
+     * @param order The order of rotations.
      * @param angles The angles to rotate, in their rotation order, in @em degrees.
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector Rotate(String axisOrder, EulerAngles angles, Vector vector) {
-        return Rotate(getEulerMatrix(axisOrder, angles), vector);
+    public static Vector Rotate(EulerOrder order, EulerAngles angles, Vector vector) {
+        return Rotate(getEulerMatrix(order, angles), vector);
     }
 
-    /** Rotates a vector through a series of Euler rotations extrinsically. Same
-     * as getEulerMatrixExtrinsic(axisOrder, angles).mult(vector).
-     * @param axisOrder A string representing the order in which to rotate extrinsically. The
-     *                  string must be exactly @em three characters long and contain only the
-     *                  characters 'x', 'y' and 'z'.
+    /** Rotates a vector through a series of Euler rotations extrinsically. Behaviour is
+     * identical to getEulerMatrixExtrinsic(order, angles).mult(vector).
+     * @param order The order of rotations.
      * @param angles The angles to rotate, in their rotation order, in @em degrees.
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateExtrinsic(String axisOrder, EulerAngles angles, Vector vector) {
-        return Rotate(getEulerMatrixExtrinsic(axisOrder, angles), vector);
+    public static Vector RotateExtrinsic(EulerOrder order, EulerAngles angles, Vector vector) {
+        return Rotate(getEulerMatrixExtrinsic(order, angles), vector);
     }
 
-    // struggling on this one hard. will come back to it later
-//    @todo not sure about the logic here, need to double check
-    @SuppressWarnings("unused")
+    /** Rotates a vector from one reference frame to another.
+     * @param from   The reference frame moving from.
+     * @param to     The reference frame moving to.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
     public static Vector Rotate(ReferenceFrame from, ReferenceFrame to, Vector vector) {
-        Matrix rotation = to.toMatrix().mult(from.toMatrix().transpose());
-        return rotation.mult(vector);
+        return to.toMatrix().transpose().mult(from.toMatrix()).mult(vector);
     }
 
 ///@}
 
-    // alpha in radians
+    /** Generates an extrinsic rotation around the X-Axis.
+     * @param alpha Angle to rotate in @em radians.
+     * @return The rotation matrix.
+     */
     private static Matrix xRotationMatrix(double alpha) {
         double cosAlpha = Math.cos( alpha );
         double sinAlpha = Math.sin( alpha );
@@ -207,7 +214,10 @@ public class Rotation {
         return rtn;
     }
 
-    // beta in radians
+    /** Generates an extrinsic rotation around the Y-Axis.
+     * @param beta Angle to rotate in @em radians.
+     * @return The rotation matrix.
+     */
     private static Matrix yRotationMatrix(double beta) {
         double cosBeta = Math.cos( beta );
         double sinBeta = Math.sin( beta );
@@ -220,7 +230,10 @@ public class Rotation {
         return rtn;
     }
 
-    // gamma in radians
+    /** Generates an extrinsic ration around the Z-Axis.
+     * @param gamma Angle to rotate in @em radians.
+     * @return The rotation matrix.
+     */
     private static Matrix zRotationMatrix(double gamma) {
         double cosGamma = Math.cos( gamma );
         double sinGamma = Math.sin( gamma );
@@ -231,17 +244,6 @@ public class Rotation {
         rtn.set(1, 0, sinGamma);
         rtn.set(2, 2, 1);
         return rtn;
-    }
-
-    private static void checkEulerString(String axisOrder) {
-        if (axisOrder.length() != 3)
-            throw new InvalidEulerRotationLengthException("Invalid number of Euler rotation axes, which is " + axisOrder.length());
-//        axisOrder = axisOrder.toLowerCase();
-        for (int i = 0; i < 3; i++) {
-            char chrAt = axisOrder.charAt(i);
-            if (chrAt != 'x' && chrAt != 'y' && chrAt != 'z')
-                throw new InvalidAxisException("Invalid Euler rotation axis="+i+" which is " + axisOrder.charAt(i));
-        }
     }
 
 }
