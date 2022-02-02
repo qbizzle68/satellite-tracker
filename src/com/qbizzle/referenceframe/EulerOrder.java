@@ -1,17 +1,37 @@
 package com.qbizzle.referenceframe;
 
-public class EulerOrder {
-    public static final EulerOrderTemplate XYZ = new EulerOrderTemplate(Axis.Direction.X, Axis.Direction.Y, Axis.Direction.Z);
-    public static final EulerOrderTemplate XZY = new EulerOrderTemplate(Axis.Direction.X, Axis.Direction.Z, Axis.Direction.Y);
-    public static final EulerOrderTemplate YXZ = new EulerOrderTemplate(Axis.Direction.Y, Axis.Direction.X, Axis.Direction.Z);
-    public static final EulerOrderTemplate YZX = new EulerOrderTemplate(Axis.Direction.Y, Axis.Direction.Z, Axis.Direction.X);
-    public static final EulerOrderTemplate ZXY = new EulerOrderTemplate(Axis.Direction.Z, Axis.Direction.X, Axis.Direction.Y);
-    public static final EulerOrderTemplate ZYX = new EulerOrderTemplate(Axis.Direction.Z, Axis.Direction.Y, Axis.Direction.X);
-    public static final EulerOrderTemplate XYX = new EulerOrderTemplate(Axis.Direction.X, Axis.Direction.Y, Axis.Direction.X);
-    public static final EulerOrderTemplate XZX = new EulerOrderTemplate(Axis.Direction.X, Axis.Direction.Z, Axis.Direction.X);
-    public static final EulerOrderTemplate YXY = new EulerOrderTemplate(Axis.Direction.Y, Axis.Direction.X, Axis.Direction.Y);
-    public static final EulerOrderTemplate YZY = new EulerOrderTemplate(Axis.Direction.Y, Axis.Direction.Z, Axis.Direction.Y);
-    public static final EulerOrderTemplate ZXZ = new EulerOrderTemplate(Axis.Direction.Z, Axis.Direction.X, Axis.Direction.Z);
-    public static final EulerOrderTemplate ZYZ = new EulerOrderTemplate(Axis.Direction.Z, Axis.Direction.Y, Axis.Direction.Z);
+import java.util.Objects;
 
+public class EulerOrder {
+    public final Axis.Direction first_rotation;
+    public final Axis.Direction second_rotation;
+    public final Axis.Direction third_rotation;
+
+    public EulerOrder(Axis.Direction first_axis, Axis.Direction second_axis, Axis.Direction third_axis) {
+        first_rotation = first_axis;
+        second_rotation = second_axis;
+        third_rotation = third_axis;
+    }
+
+    @Override
+    public String toString() {
+        return "EulerOrder{" +
+               "first_rotation=" + first_rotation +
+               ", second_rotation=" + second_rotation +
+               ", third_rotation=" + third_rotation +
+               '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EulerOrder that = (EulerOrder) o;
+        return first_rotation == that.first_rotation && second_rotation == that.second_rotation && third_rotation == that.third_rotation;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(first_rotation, second_rotation, third_rotation);
+    }
 }
