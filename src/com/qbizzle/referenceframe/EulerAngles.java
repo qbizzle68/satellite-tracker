@@ -2,7 +2,7 @@
  * Contains the EulerAngles class.
  */
 
-package com.qbizzle.rotation;
+package com.qbizzle.referenceframe;
 
 import java.util.Arrays;
 
