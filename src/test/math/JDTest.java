@@ -16,7 +16,7 @@ public class JDTest {
     private final JD jan1_2022 = new JD(1, 1, 2022, 12, 34, 56);
     private final JD dateJD = new JD(new Date(1641062096000L));
     private final double jdValue = 2459581.0242592595;
-    private final double tleJDValue = 2454729.51783;
+    private final double tleJDValue = 2454730.01783;
 
     @Test
     @DisplayName("Value method and long constructor test")
