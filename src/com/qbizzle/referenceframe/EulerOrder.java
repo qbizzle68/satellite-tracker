@@ -3,6 +3,10 @@ package com.qbizzle.referenceframe;
 import java.util.Objects;
 
 public class EulerOrder {
+    public enum RotationNumber {
+        first, second, third
+    };
+
     public final Axis.Direction first_rotation;
     public final Axis.Direction second_rotation;
     public final Axis.Direction third_rotation;
