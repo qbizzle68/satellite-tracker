@@ -37,9 +37,28 @@ public class JD {
 
     /** Constructs the Julian Date from the Java Date object.
      * @param date Date object that the Julian Day is meant to represent. Ideal
-     *             for using the now() method to compute current satellite positions.
+     *             for using the default Date constructor to compute current satellite positions.
      */
     public JD(Date date) {
+//        String[] strTokens = date.toString().split("[\s]");
+//        m_julianDate = GetDate(
+//                MonthTable(strTokens[1]),
+//                Integer.parseInt(strTokens[2]),
+//                Integer.parseInt(strTokens[5]),
+//                Integer.parseInt(strTokens[3].substring(0, 2)),
+//                Integer.parseInt(strTokens[3].substring(3, 5)),
+//                Integer.parseInt(strTokens[3].substring(6)),
+//                0.0
+//        );
+        this(date, 0.0);
+    }
+
+    /** Constructs the Julian Date from the Java Date object.
+     * @param date Date object that the Julian Day is meant to represent. Ideal
+     *             for using the default Date constructor to compute current satellite positions.
+     * @param timeZone The timezone relative to UTC.
+     */
+    public JD(Date date, double timeZone) {
         String[] strTokens = date.toString().split("[\s]");
         m_julianDate = GetDate(
                 MonthTable(strTokens[1]),
@@ -47,17 +66,29 @@ public class JD {
                 Integer.parseInt(strTokens[5]),
                 Integer.parseInt(strTokens[3].substring(0, 2)),
                 Integer.parseInt(strTokens[3].substring(3, 5)),
-                Integer.parseInt(strTokens[3].substring(6))
+                Integer.parseInt(strTokens[3].substring(6)),
+                timeZone
         );
     }
 
-    /**Constructs the Julian Date from the epoch element of a TLE./ Ideal for computing
+    /**Constructs the Julian Date from the epoch element of a TLE. Ideal for computing
      * future positions from the TLE epoch.
      * @param tle @link com.qbizzle.orbit.TLE TLE @endlink that contains the epoch used to create
      *            a Julian Date.
      */
     public JD(TLE tle) {
-        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0) + tle.EpochDay();// - 0.5;
+        this(tle, 0.0);
+//        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0, 0.0) + tle.EpochDay();// - 0.5;
+    }
+
+    /** Constucts the Julian Date from the epoch element of a TLE in GMT. Ideal for computing
+     * future positions from the TLE epoch.
+     * @param tle @link com.qbizzle.orbit.TLE TLE @endlink that contains the epoch used to create
+     *            a Julian Date.
+     * @param timeZone The timezone relative to UTC.
+     */
+    public JD(TLE tle, double timeZone) {
+        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0, timeZone) + tle.EpochDay();
     }
 
     /** Constructs the Julian Date directly from a known Julian Date number
@@ -77,7 +108,21 @@ public class JD {
      * @note Parameter values that are out of their normal range may not behave as expected.
      */
     public JD(int mon, int day, int yr, int hr, int min, double sec) {
-        m_julianDate = GetDate(mon, day, yr, hr, min, sec);
+        m_julianDate = GetDate(mon, day, yr, hr, min, sec, 0.0);
+    }
+
+    /** Construct the Julian Date from Gregorian Date components for GMT.
+     * @param mon Month number of the year, starting with 1.
+     * @param day Day of the month.
+     * @param yr Year relative to 1 AD.
+     * @param hr Hour of the day in 24 hour notation.
+     * @param min Minute of the hour.
+     * @param sec Seconds, can include additional fractions of a second (hence the double type).
+     * @param timeZone The timezone relative to UTC.
+     * @note Parameter values that are out of their normal range may not behave as expected.
+     */
+    public JD(int mon, int day, int yr, int hr, int min, double sec, double timeZone) {
+        m_julianDate = GetDate(mon, day, yr, hr, min, sec, timeZone);
     }
 
     /// @name Getter methods.
@@ -172,8 +217,8 @@ public class JD {
      *     <a href="https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_Day_Number">
      *     here</a>.
      */
-    private static double GetDate(int mon, int day, int yr, int hr, int min, double sec) {
+    private static double GetDate(int mon, int day, int yr, int hr, int min, double sec, double timeZone) {
         int julianNumber = (1461 * (yr + 4800 + (mon - 14)/12))/4 + (367 * (mon - 2 - 12 * ((mon - 14)/12)))/12 - (3 * ((yr + 4900 + (mon - 14)/12)/100))/4 + day - 32075;
-        return (double)julianNumber + ((hr - 12) / 24.0) + (min / 1440.0) + (sec / 86400.0);
+        return (double)julianNumber + ((hr - 12) / 24.0) + (min / 1440.0) + (sec / 86400.0) - (timeZone / 24.0);
     }
 }
