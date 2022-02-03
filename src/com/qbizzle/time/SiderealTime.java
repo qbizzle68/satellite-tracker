@@ -41,7 +41,7 @@ public class SiderealTime {
      * @return The offset angle in @em degrees.
      */
     public static double EarthOffsetAngle(JD julianDay) {
-        return ST(julianDay) / 360.0 * 24.0;
+        return ST(julianDay) / 24.0 * 360.0;
     }
 
 }
