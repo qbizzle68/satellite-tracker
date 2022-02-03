@@ -1,6 +1,5 @@
 /** @file
  * This file contains a utility math class.
- *
  */
 
 package com.qbizzle.math;
