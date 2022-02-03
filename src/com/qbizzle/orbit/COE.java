@@ -7,6 +7,7 @@
  */
 
 package com.qbizzle.orbit;
+
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 
