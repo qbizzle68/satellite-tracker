@@ -38,10 +38,6 @@ public class TLE {
     public TLE(String tle) {
         checkLines(tle);
         parseString(tle);
-//        if (checkLines(tle)) {
-//            if (parseString(tle)) System.out.println("TLE String parse successful.");
-//            else System.out.println("TLE String parse failed.");
-//        }
     }
 
     /** Creates a string with all the elements represented in name value pairs.
