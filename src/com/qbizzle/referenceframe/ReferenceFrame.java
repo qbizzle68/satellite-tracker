@@ -27,6 +27,10 @@ public class ReferenceFrame {
         );
     }
 
+    /** Constructs a reference frame with an Euler order and angles.
+     * @param order Euler rotation order.
+     * @param angles Euler angles in rotation order, in @em degrees.
+     */
     public ReferenceFrame(EulerOrder order, EulerAngles angles) {
         m_order = order;
         m_angles = angles;
@@ -90,6 +94,9 @@ public class ReferenceFrame {
         };
     }
 
+    /** Sets the EulerAngles and adjusts the internal matrix.
+     * @param angles The angles in their rotation order in @em degrees.
+     */
     public void setAngles(EulerAngles angles) {
         m_angles = angles;
         m_frame = Rotation.getEulerMatrix(m_order, m_angles);
