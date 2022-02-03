@@ -1,5 +1,13 @@
+/** @file
+ * This file contains a class with static fields holding all
+ * necessary instances of EulerOrder's.
+ */
+
 package com.qbizzle.referenceframe;
 
+/** This class contains the 12 possible Euler rotations, both proper and improper.
+ * This helps from needing to instantiating an EulerOrder every time we need one.
+ */
 public class EulerOrderList {
     public static final EulerOrder XYZ = new EulerOrder(Axis.Direction.X, Axis.Direction.Y, Axis.Direction.Z);
     public static final EulerOrder XZY = new EulerOrder(Axis.Direction.X, Axis.Direction.Z, Axis.Direction.Y);
