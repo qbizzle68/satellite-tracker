@@ -212,6 +212,7 @@ public class JD {
      * @param hr Hour of the day in 24 hour notation.
      * @param min Minute of the hour.
      * @param sec Seconds, can include additional fractions of a second.
+     * @param timeZone Time zone relative to UTC (used to create JD in UTC).
      * @return The number of days since 12:00:00 1/1/4713 BCE.
      * @note The algorithm used for converting dates can be found
      *     <a href="https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_Day_Number">
