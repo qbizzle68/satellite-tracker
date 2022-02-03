@@ -1,3 +1,7 @@
+/** @file
+ * This file contains a class for handling GeoPositions.
+ */
+
 package com.qbizzle.tracking;
 
 import com.qbizzle.math.OrbitalMath;
