@@ -186,6 +186,7 @@ public class Rotation {
      * @param rotateVector The vector to rotate.
      * @return The rotated vector.
      */
+    @SuppressWarnings("unused")
     public static Vector RotateIntrinsicFrom(Vector axisVector, double angle, Vector rotateVector) {
         return RotateFrom(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
@@ -225,6 +226,7 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
+    @SuppressWarnings("unused")
     public static Vector RotateExtrinsicTo(EulerOrder order, EulerAngles angles, Vector vector) {
         return RotateTo(getEulerMatrixExtrinsic(order, angles), vector);
     }
@@ -236,6 +238,7 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
+    @SuppressWarnings("unused")
     public static Vector RotateExtrinsicFrom(EulerOrder order, EulerAngles angles, Vector vector) {
         return RotateFrom(getEulerMatrixExtrinsic(order, angles), vector);
     }

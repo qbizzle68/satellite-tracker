@@ -47,16 +47,12 @@ public class Tracker {
      */
     public static GeoPosition getGeoPositionAt(TLE tle, JD t1) {
         StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
-//        double siderealTimeAtT1 = SiderealTime.ST(t1); // the timezone should go away if we incorporate it into the JD constructor
-//        double earthOffsetAngle2 = siderealTimeAtT1 / 24.0 * 360.0;
         double earthOffsetAngle = SiderealTime.EarthOffsetAngle(t1);
         Vector positionAtT1 = Rotation.RotateFrom(Axis.Direction.Z, -earthOffsetAngle, stateAtT1.Position());
-//        Vector positionAtT1 = Rotate(Axis.Direction.Z, -earthOffsetAngle, stateAtT1.Position());
         return new GeoPosition(positionAtT1);
-//        return new GeoPosition();
     }
 
-    // may make getpositionat with COE, JD t0, JD t1 args.
+    // may make getGeoPositionAt with COE, JD t0, JD t1 args.
 
     /** Computes an array of GeoPositions of a satellite over a given period.
      * @param tle The TLE of the satellite to track.
@@ -64,6 +60,7 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @return An array of GeoPositions making up the ground track.
      */
+    @SuppressWarnings("unused")
     public static GeoPosition[] getGroundTrack(TLE tle, double dt, double interval) {
         return getGroundTrack(tle, new JD(tle).Future(dt), interval);
     }
@@ -94,8 +91,9 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @param filename The file to print to, should contain .CSV extensions.
      * @return True if the print was successful, false if otherwise.
-     * @throws IOException
+     * @throws IOException From FileWriter.
      */
+    @SuppressWarnings("unused")
     public static boolean plotGroundTrack(TLE tle, double dt, double interval, String filename) throws IOException {
         return plotGroundTrack(tle, new JD(tle).Future(dt), interval, filename);
     }
@@ -106,7 +104,7 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @param filename The file to print to, should contain .CSV extensions.
      * @return True if the print was successful, false if otherwise.
-     * @throws IOException
+     * @throws IOException From FileWriter.
      * @todo find out if we can handle any exceptions for FileWriter, or need to do checks to find out
      *   if the file is being written. If no checks exist theres really no reason to return a boolean
      */
@@ -134,25 +132,7 @@ public class Tracker {
                 new EulerAngles(localSiderealTime*DEGREES_PER_HOUR, 90-geoPos.getLatitude(), 0),
                 stateAtT1.Position()
         );
-//        return getEulerMatrix(
-//                EulerOrderList.ZYX,
-//                new EulerAngles(localSiderealTime*DEGREES_PER_HOUR, 90-geoPos.getLatitude(), 0)
-//        ).transpose().mult(stateAtT1.Position());
-
-//        return Rotation.Rotate(
-//                EulerOrderList.ZYX,
-//                new EulerAngles(localSiderealTime, 90 - geoPos.getLatitude(), 0.0),
-//                stateAtT1.Position()
-//        );
     }
-//    public static Vector getSEZPosition(TLE tle, JD t1, GeoPosition geoPos) {
-//        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
-//        double localSiderealTime = SiderealTime.ST(t1, 0.0)*DEGREES_PER_HOUR + geoPos.getLongitude();
-//        return Rotation.Rotate("ZYX",
-//                new EulerAngles(localSiderealTime, 90 - geoPos.getLatitude(), 0.0),
-//                stateAtT1.Position()
-//        );
-//    }
 
     public static AltAz getAltAz(TLE tle, JD t1, GeoPosition geoPos) {
         Vector sezPosition = getSEZPosition(tle, t1, geoPos);
