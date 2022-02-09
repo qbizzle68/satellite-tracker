@@ -12,6 +12,9 @@ package com.qbizzle.orbit;
 
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
+import com.qbizzle.referenceframe.EulerAngles;
+import com.qbizzle.referenceframe.EulerOrderList;
+import com.qbizzle.rotation.Rotation;
 
 import java.util.Objects;
 
@@ -57,18 +60,15 @@ public class StateVectors implements Cloneable {
                 0
         ).scale(Math.sqrt(OrbitalMath.MU * coe.sma) / radius);
 //        now rotate state vectors from orbital reference frame, to inertial IJK reference frame
-//        TODO: replace this hard code with a rotation (probably a matrix).
-        m_position = rotateToInertialFrame(
-                posOrbitFrame,
-                Math.toRadians(coe.lan),
-                Math.toRadians(coe.inc),
-                Math.toRadians(coe.aop)
+        m_position = Rotation.RotateFrom(
+                EulerOrderList.ZXZ,
+                new EulerAngles(coe.lan, coe.inc, coe.aop),
+                posOrbitFrame
         );
-        m_velocity = rotateToInertialFrame(
-                velOrbitFrame,
-                Math.toRadians(coe.lan),
-                Math.toRadians(coe.inc),
-                Math.toRadians(coe.aop)
+        m_velocity = Rotation.RotateFrom(
+                EulerOrderList.ZXZ,
+                new EulerAngles(coe.lan, coe.inc, coe.aop),
+                velOrbitFrame
         );
     }
 
@@ -164,36 +164,5 @@ public class StateVectors implements Cloneable {
     }
 
 ///@}
-
-    /** Method used to place hold for the absence of a rotation matrix. This method effectively
-     * rotates the vector @p xOrbitFrame from an orbital reference frame with orbital
-     * elements @p lan, @p inc and @p aop, to an inertial geocentric-equitorial reference frame. In more
-     * complex terms it's equal to rotating the vector @p xOrbitFrame by the matrix R(-lan)*R(-inc)*R(-aop).
-     * @param xOrbitFrame Vector that is to be rotated from one frame to another.
-     * @param lan Longitude of ascending node in @em radians.
-     * @param inc Inclination of the orbit in @em radians.
-     * @param aop Argument of apoapsis in @em radians.
-     * @return The rotated Vector.
-     * @note This method takes the orbital elements in radians so-as to not need to convert them itself.
-     * @todo Create a rotation library in order to replace this entire method with a rotation matrix.
-     */
-    private Vector rotateToInertialFrame(Vector xOrbitFrame, double lan, double inc, double aop) {
-        double xXTerm1 = xOrbitFrame.x()
-                * (Math.cos(aop) * Math.cos(lan) - Math.sin(aop) * Math.cos(inc) * Math.sin(lan));
-        double xXTerm2 = xOrbitFrame.y()
-                * (Math.sin(aop) * Math.cos(lan) + Math.cos(aop) * Math.cos(inc) * Math.sin(lan));
-        double xYTerm1 = xOrbitFrame.x()
-                * (Math.cos(aop) * Math.sin(lan) + Math.sin(aop) * Math.cos(inc) * Math.cos(lan));
-        double xYTerm2 = xOrbitFrame.y()
-                * (Math.cos(aop) * Math.cos(inc) * Math.cos(lan) - Math.sin(aop) * Math.sin(lan));
-        double xZTerm1 = xOrbitFrame.x() * (Math.sin(aop) * Math.sin(inc));
-        double xZTerm2 = xOrbitFrame.y() * (Math.cos(aop) * Math.sin(inc));
-
-        return new Vector(
-                xXTerm1 - xXTerm2,
-                xYTerm1 + xYTerm2,
-                xZTerm1 + xZTerm2
-        );
-    }
 
 }

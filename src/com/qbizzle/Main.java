@@ -4,6 +4,10 @@ import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 import com.qbizzle.orbit.TLE;
+import com.qbizzle.time.JD;
+import com.qbizzle.tracking.AltAz;
+import com.qbizzle.tracking.GeoPosition;
+import com.qbizzle.tracking.Tracker;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -75,13 +79,31 @@ public class Main {
 //            if (i % 10 == 0) writer2.flush();
 //        }
 
-        String strZarya2 = """
-                ISS (ZARYA)            \s
-                1 25544U 98067A   22031.74347940  .00005978  00000+0  11373-3 0  9992
-                2 25544  51.6445 292.2902 0006822  83.2131 312.2718 15.49718573324024""";
-        TLE tleZarya2 = new TLE(strZarya2);
+        GeoPosition geo = Tracker.getGeoPositionAt(tleZarya, 0.0);
+        System.out.println("geo: " + geo);
+        Vector sezPos = Tracker.getSEZPosition(tleZarya, 0.0, geo);
+        System.out.println("sezPos: " + sezPos);
+        AltAz altaz = Tracker.getAltAz(tleZarya, new JD(tleZarya), geo);
+        System.out.println("altitude: " + altaz.getAltitude());
+        System.out.println("azimuth: " + altaz.getAzimuth());
 
+    }
 
+    public static void noaaTest() {
+        String strTLE = """
+                NOAA 20 [+]            \s
+                1 43013U 17073A   22032.53991112  .00000015  00000+0  27859-4 0  9999
+                2 43013  98.7448 332.9363 0001514  88.1570 271.9780 14.19526485217944""";
+        String strFutureTLE = """
+                NOAA 20 [+]            \s
+                1 43013U 17073A   22032.82185385  .00000017  00000+0  28794-4 0  9999
+                2 43013  98.7449 333.2147 0001513  87.9741 272.1608 14.19526540217983""";
+        TLE tle = new TLE(strTLE);
+        TLE futureTLE = new TLE(strFutureTLE);
+        GeoPosition guess = Tracker.getGeoPositionAt(tle, new JD(futureTLE));
+        GeoPosition actual = Tracker.getGeoPositionAt(futureTLE, 0.0);
+        System.out.println("guess: " + guess);
+        System.out.println("actual: " + actual);
 
     }
 
