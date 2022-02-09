@@ -1,845 +1,428 @@
 package test.rotation;
 
-import com.qbizzle.exception.InvalidAxisException;
-import com.qbizzle.exception.InvalidEulerRotationLengthException;
 import com.qbizzle.math.Matrix;
 import com.qbizzle.math.Vector;
+import com.qbizzle.math.util;
 import com.qbizzle.referenceframe.Axis;
 import com.qbizzle.referenceframe.EulerAngles;
 import com.qbizzle.referenceframe.EulerOrderList;
+import com.qbizzle.referenceframe.ReferenceFrame;
 import com.qbizzle.rotation.Rotation;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static com.qbizzle.math.util.*;
-import static com.qbizzle.rotation.Rotation.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RotationTest {
 
-    @Test
-    @DisplayName("test positive x rotation")
-    public void testPositiveXRotation() {
-        Matrix xMat = Rotation.getMatrix(Axis.Direction.X, 90);
-        assertAll(  // x column
-                () -> assertEquals(1, xMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, xMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, xMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, xMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, xMat.get(1, 1), 0.000001),
-                () -> assertEquals(1, xMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, xMat.get(0, 2), 0.000001),
-                () -> assertEquals(-1, xMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, xMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(xMat, e1);
-        Vector e2Rotate = Rotate(xMat, e2);
-        Vector e3Rotate = Rotate(xMat, e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
-        Vector e1Rotate2 = Rotate(Axis.Direction.X, 90, e1);
-        Vector e2Rotate2 = Rotate(Axis.Direction.X, 90, e2);
-        Vector e3Rotate2 = Rotate(Axis.Direction.X, 90, e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate2.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate2.get(0), 0.000001),
-                () -> assertEquals(-1, e3Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(2), 0.000001));
+    final double cos15 = Math.cos(Math.toRadians(15));
+    final double sin15 = Math.sin(Math.toRadians(15));
+    final double cos30 = Math.cos(Math.toRadians(30));
+    final double sin30 = Math.sin(Math.toRadians(30));
+    final double cos45 = Math.cos(Math.toRadians(45));
+    final double sin45 = Math.sin(Math.toRadians(45));
+    final double epsilon = 0.00001;
+    Matrix xyz, yzx, zxy, zyx2xyz, zyx2yzx;
+
+    RotationTest() {
+        xyz = new Matrix();
+        yzx = new Matrix();
+        zxy = new Matrix();
+        zyx2xyz = new Matrix();
+        zyx2yzx = new Matrix();
+
+        xyz.set(0, 0, 0.6123724357);
+        xyz.set(1, 0, 0.7745190528);
+        xyz.set(2, 0, -0.1584936491);
+        xyz.set(0, 1, -0.6123724357);
+        xyz.set(1, 1, 0.5915063509);
+        xyz.set(2, 1, 0.5245190528);
+        xyz.set(0, 2, 0.5);
+        xyz.set(1, 2, -0.224143868);
+        xyz.set(2, 2, 0.8365163037);
+
+        yzx.set(0, 0, 0.8365163037);
+        yzx.set(1, 0, 0.5);
+        yzx.set(2, 0, -0.224143868);
+        yzx.set(0, 1, -0.1584936491);
+        yzx.set(1, 1, 0.6123724357);
+        yzx.set(2, 1, 0.7745190528);
+        yzx.set(0, 2, 0.5245190528);
+        yzx.set(1, 2, -0.6123724357);
+        yzx.set(2, 2, 0.5915063509);
+
+        zxy.set(0, 0, 0.5915063509);
+        zxy.set(1, 0, 0.5245190528);
+        zxy.set(2, 0, -0.6123724357);
+        zxy.set(0, 1, -0.224143868);
+        zxy.set(1, 1, 0.8365163037);
+        zxy.set(2, 1, 0.5);
+        zxy.set(0, 2, 0.7745190528);
+        zxy.set(1, 2, -0.1584936491);
+        zxy.set(2, 2, 0.6123724357);
+
+        zyx2xyz.set(0, 0, 0.765110473);
+        zyx2xyz.set(1, 0, 0.5998797632);
+        zyx2xyz.set(2, 0, -0.2339890706);
+        zyx2xyz.set(0, 1, -0.6419365314);
+        zyx2xyz.set(1, 1, 0.6822768067);
+        zyx2xyz.set(2, 1, -0.3498797632);
+        zyx2xyz.set(0, 2, -0.0502404736);
+        zyx2xyz.set(1, 2, 0.4179026546);
+        zyx2xyz.set(2, 2, 0.9071015743);
+
+        zyx2yzx.set(0, 0, 0.9239033945);
+        zyx2yzx.set(1, 0, -0.3825825215);
+        zyx2yzx.set(2, 0, 0.0057560374);
+        zyx2yzx.set(0, 1, 0.3825825215);
+        zyx2yzx.set(1, 1, 0.923468001);
+        zyx2yzx.set(2, 1, -0.0289389953);
+        zyx2yzx.set(0, 2, 0.0057560374);
+        zyx2yzx.set(1, 2, 0.0289389953);
+        zyx2yzx.set(2, 2, 0.9995646065);
     }
 
     @Test
-    @DisplayName("test negative x rotation")
-    public void testNegativeXRotation() {
-        Matrix xMat = Rotation.getMatrix(Axis.Direction.X, -90);
-        assertAll(  // x column
-                () -> assertEquals(1, xMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, xMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, xMat.get(2, 0), 0.000001),
+    @DisplayName("Derive X rotation matrix")
+    public void deriveXRotationMatrix() {
+        Matrix mat = Rotation.getMatrix(Axis.Direction.X, 30);
+        assertAll( //  x column
+                () -> assertEquals(1, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(0, mat.get(2, 0), epsilon, "(2, 0)"),
                 // y column
-                () -> assertEquals(0, xMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, xMat.get(1, 1), 0.000001),
-                () -> assertEquals(-1, xMat.get(2, 1), 0.000001),
+                () -> assertEquals(0, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(cos30, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(sin30, mat.get(2, 1), epsilon, "(2, 1)"),
                 // z column
-                () -> assertEquals(0, xMat.get(0, 2), 0.000001),
-                () -> assertEquals(1, xMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, xMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(xMat, e1);
-        Vector e2Rotate = Rotate(xMat, e2);
-        Vector e3Rotate = Rotate(xMat, e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
-        Vector e1Rotate2 = Rotate(Axis.Direction.X, -90, e1);
-        Vector e2Rotate2 = Rotate(Axis.Direction.X, -90, e2);
-        Vector e3Rotate2 = Rotate(Axis.Direction.X, -90, e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(1), 0.000001),
-                () -> assertEquals(-1, e2Rotate2.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate2.get(0), 0.000001),
-                () -> assertEquals(1, e3Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(2), 0.000001));
-    }
-    
-    @Test
-    @DisplayName("test positive y rotation")
-    public void testPositiveYRotation() {
-        Matrix yMat = getMatrix(Axis.Direction.Y, 90);
-        assertAll(  // x column
-                () -> assertEquals(0, yMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, yMat.get(1, 0), 0.000001),
-                () -> assertEquals(-1, yMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, yMat.get(0, 1), 0.000001),
-                () -> assertEquals(1, yMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, yMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(1, yMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, yMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, yMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(yMat, e1);
-        Vector e2Rotate = Rotate(yMat, e2);
-        Vector e3Rotate = Rotate(yMat, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
-        Vector e1Rotate2 = Rotate(Axis.Direction.Y, 90, e1);
-        Vector e2Rotate2 = Rotate(Axis.Direction.Y, 90, e2);
-        Vector e3Rotate2 = Rotate(Axis.Direction.Y, 90, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(1), 0.000001),
-                () -> assertEquals(-1, e1Rotate2.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate2.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(2), 0.000001));
-    }
-    
-    @Test
-    @DisplayName("test negative y rotation")
-    public void testNegativeYRotation() {
-        Matrix yMat = getMatrix(Axis.Direction.Y, -90);
-        assertAll(  // x column
-                () -> assertEquals(0, yMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, yMat.get(1, 0), 0.000001),
-                () -> assertEquals(1, yMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, yMat.get(0, 1), 0.000001),
-                () -> assertEquals(1, yMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, yMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(-1, yMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, yMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, yMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(yMat, e1);
-        Vector e2Rotate = Rotate(yMat, e2);
-        Vector e3Rotate = Rotate(yMat, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(-1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
-        Vector e1Rotate2 = Rotate(Axis.Direction.Y, -90, e1);
-        Vector e2Rotate2 = Rotate(Axis.Direction.Y, -90, e2);
-        Vector e3Rotate2 = Rotate(Axis.Direction.Y, -90, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(1), 0.000001),
-                () -> assertEquals(1, e1Rotate2.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate2.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(2), 0.000001),
-                // z column
-                () -> assertEquals(-1, e3Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(2), 0.000001));
-    }
-    
-    @Test
-    @DisplayName("test positive z rotation")
-    public void testPositiveZRotation() {
-        Matrix zMat = getMatrix(Axis.Direction.Z, 90);
-        assertAll(  // x column
-                () -> assertEquals(0, zMat.get(0, 0), 0.000001),
-                () -> assertEquals(1, zMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, zMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(-1, zMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, zMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, zMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, zMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, zMat.get(1, 2), 0.000001),
-                () -> assertEquals(1, zMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(zMat, e1);
-        Vector e2Rotate = Rotate(zMat, e2);
-        Vector e3Rotate = Rotate(zMat, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(-1, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(2), 0.000001));
-        Vector e1Rotate2 = Rotate(Axis.Direction.Z, 90, e1);
-        Vector e2Rotate2 = Rotate(Axis.Direction.Z, 90, e2);
-        Vector e3Rotate2 = Rotate(Axis.Direction.Z, 90, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate2.get(0), 0.000001),
-                () -> assertEquals(1, e1Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(2), 0.000001),
-                // y column
-                () -> assertEquals(-1, e2Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(1), 0.000001),
-                () -> assertEquals(1, e3Rotate2.get(2), 0.000001));
-    }
-
-    @Test
-    @DisplayName("test negative z rotation")
-    public void testNegativeZRotation() {
-        Matrix zMat = getMatrix(Axis.Direction.Z, -90);
-        assertAll(  // x column
-                () -> assertEquals(0, zMat.get(0, 0), 0.000001),
-                () -> assertEquals(-1, zMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, zMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(1, zMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, zMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, zMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, zMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, zMat.get(1, 2), 0.000001),
-                () -> assertEquals(1, zMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(zMat, e1);
-        Vector e2Rotate = Rotate(zMat, e2);
-        Vector e3Rotate = Rotate(zMat, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(1, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(2), 0.000001));
-        Vector e1Rotate2 = Rotate(Axis.Direction.Z, -90, e1);
-        Vector e2Rotate2 = Rotate(Axis.Direction.Z, -90, e2);
-        Vector e3Rotate2 = Rotate(Axis.Direction.Z, -90, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate2.get(0), 0.000001),
-                () -> assertEquals(-1, e1Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate2.get(2), 0.000001),
-                // y column
-                () -> assertEquals(1, e2Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate2.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate2.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate2.get(1), 0.000001),
-                () -> assertEquals(1, e3Rotate2.get(2), 0.000001));
-    }
-
-    @Test
-    @DisplayName("euler ZXY rotation matrix test")
-    public void eulerZxyRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
-        Matrix eulerMat = Rotation.getEulerMatrix(EulerOrderList.ZXY,
-                new EulerAngles(90, 90, 90)
+                () -> assertEquals(0, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(-sin30, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(cos30, mat.get(2, 2), epsilon, "(2, 2)")
         );
-        assertAll(  // x column
-                () -> assertEquals(-1, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(EulerOrderList.ZXY, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = Rotate(EulerOrderList.ZXY, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = Rotate(EulerOrderList.ZXY, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(-1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
     }
 
     @Test
-    @DisplayName("euler ZYX rotation matrix test")
-    public void eulerZyxRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
-        Matrix eulerMat = Rotation.getEulerMatrix(EulerOrderList.ZYX,
-                new EulerAngles(90, 90, 90)
+    @DisplayName("Derive Y rotation matrix")
+    public void deriveYRotationMatrix() {
+        Matrix mat = Rotation.getMatrix(Axis.Direction.Y, 30);
+        assertAll( //  x column
+                () -> assertEquals(cos30, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(-sin30, mat.get(2, 0), epsilon, "(2, 0)"),
+                // y column
+                () -> assertEquals(0, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(1, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0, mat.get(2, 1), epsilon, "(2, 1)"),
+                // z column
+                () -> assertEquals(sin30, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(0, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(cos30, mat.get(2, 2), epsilon, "(2, 2)")
         );
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(1, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(EulerOrderList.ZYX, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = Rotate(EulerOrderList.ZYX, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = Rotate(EulerOrderList.ZYX, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
     }
 
     @Test
-    @DisplayName("euler YZX rotation matrix test")
-    public void eulerYzxRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
-        Matrix eulerMat = Rotation.getEulerMatrix(EulerOrderList.YZX,
-                new EulerAngles(90, 90, 90)
+    @DisplayName("Derive Z rotation matrix")
+    public void deriveZRotationMatrix() {
+        Matrix mat = Rotation.getMatrix(Axis.Direction.Z, 30);
+        assertAll( //  x column
+                () -> assertEquals(cos30, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(sin30, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(0, mat.get(2, 0), epsilon, "(2, 0)"),
+                // y column
+                () -> assertEquals(-sin30, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(cos30, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0, mat.get(2, 1), epsilon, "(2, 1)"),
+                // z column
+                () -> assertEquals(0, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(0, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(1, mat.get(2, 2), epsilon, "(2, 2)")
         );
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(1, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(EulerOrderList.YZX, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = Rotate(EulerOrderList.YZX, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = Rotate(EulerOrderList.YZX, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(1, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e3Rotate.get(2), 0.000001));
     }
 
     @Test
-    @DisplayName("euler YXZ rotation matrix test")
-    public void eulerYxzRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
-        Matrix eulerMat = Rotation.getEulerMatrix(EulerOrderList.YXZ,
-                new EulerAngles(90, 90, 90)
+    @DisplayName("Derive intrinsic X rotation matrix")
+    public void deriveIntrinsicXRotationMatrix() {
+        Matrix mat = Rotation.getMatrixIntrinsic(util.e1, 45);
+        assertAll( //  x column
+                () -> assertEquals(1, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(0, mat.get(2, 0), epsilon, "(2, 0)"),
+                // y column
+                () -> assertEquals(0, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(cos45, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(sin45, mat.get(2, 1), epsilon, "(2, 1)"),
+                // z column
+                () -> assertEquals(0, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(-sin45, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(cos45, mat.get(2, 2), epsilon, "(2, 2)")
         );
-        assertAll(  // x column
-                () -> assertEquals(1, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(EulerOrderList.YXZ, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = Rotate(EulerOrderList.YXZ, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = Rotate(EulerOrderList.YXZ, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
     }
 
     @Test
-    @DisplayName("euler XZY rotation matrix test")
-    public void eulerXzyRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
-        Matrix eulerMat = Rotation.getEulerMatrix(EulerOrderList.XZY,
-                new EulerAngles(90, 90, 90)
+    @DisplayName("Derive intrinsic Y rotation matrix")
+    public void deriveIntrinsicYRotationMatrix() {
+        Matrix mat = Rotation.getMatrixIntrinsic(util.e2, 45);
+        assertAll( //  x column
+                () -> assertEquals(cos45, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(-sin45, mat.get(2, 0), epsilon, "(2, 0)"),
+                // y column
+                () -> assertEquals(0, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(1, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0, mat.get(2, 1), epsilon, "(2, 1)"),
+                // z column
+                () -> assertEquals(sin45, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(0, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(cos45, mat.get(2, 2), epsilon, "(2, 2)")
         );
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(-1, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(EulerOrderList.XZY, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = Rotate(EulerOrderList.XZY, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = Rotate(EulerOrderList.XZY, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(-1, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(2), 0.000001));
     }
 
     @Test
-    @DisplayName("euler XYZ rotation matrix test")
-    public void eulerXyzRotationMatrixTest() throws InvalidAxisException, InvalidEulerRotationLengthException {
-        Matrix eulerMat = Rotation.getEulerMatrix(EulerOrderList.XYZ,
-                new EulerAngles(90, 90, 90)
+    @DisplayName("Derive intrinsic Z rotation matrix")
+    public void deriveIntrinsicZRotationMatrix() {
+        Matrix mat = Rotation.getMatrix(Axis.Direction.Z, 45);
+        assertAll( //  x column
+                () -> assertEquals(cos45, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(sin45, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(0, mat.get(2, 0), epsilon, "(2, 0)"),
+                // y column
+                () -> assertEquals(-sin45, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(cos45, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0, mat.get(2, 1), epsilon, "(2, 1)"),
+                // z column
+                () -> assertEquals(0, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(0, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(1, mat.get(2, 2), epsilon, "(2, 2)")
         );
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(1, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = Rotate(EulerOrderList.XYZ, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = Rotate(EulerOrderList.XYZ, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = Rotate(EulerOrderList.XYZ, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
     }
 
     @Test
-    @DisplayName("intrinsic x axis rotation")
-    public void intrinsicXAxisRotation() {
-        Matrix xMat = getMatrixIntrinsic(e1, 90);
-        assertAll(  // x column
-                () -> assertEquals(1, xMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, xMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, xMat.get(2, 0), 0.000001),
+    @DisplayName("Derive XYZ Euler matrix")
+    public void deriveXyzEulerMatrix() {
+        Matrix mat = Rotation.getEulerMatrix(EulerOrderList.XYZ, new EulerAngles(15, 30, 45));
+        assertAll( //  x column
+                () -> assertEquals(0.6123724357, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0.7745190528, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(-0.1584936491, mat.get(2, 0), epsilon, "(2, 0)"),
                 // y column
-                () -> assertEquals(0, xMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, xMat.get(1, 1), 0.000001),
-                () -> assertEquals(1, xMat.get(2, 1), 0.000001),
+                () -> assertEquals(-0.6123724357, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(0.5915063509, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0.5245190528, mat.get(2, 1), epsilon, "(2, 1)"),
                 // z column
-                () -> assertEquals(0, xMat.get(0, 2), 0.000001),
-                () -> assertEquals(-1, xMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, xMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateIntrinsic(e1, 90, e1);
-        Vector e2Rotate = RotateIntrinsic(e1, 90, e2);
-        Vector e3Rotate = RotateIntrinsic(e1, 90, e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
+                () -> assertEquals(0.5, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(-0.224143868, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(0.8365163037, mat.get(2, 2), epsilon, "(2, 2)")
+        );
     }
 
     @Test
-    @DisplayName("intrinsic y axis rotation")
-    public void intrinsicYAxisRotation() {
-        Matrix yMat = getMatrixIntrinsic(e2, 90);
-        assertAll(  // x column
-                () -> assertEquals(0, yMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, yMat.get(1, 0), 0.000001),
-                () -> assertEquals(-1, yMat.get(2, 0), 0.000001),
+    @DisplayName("Derive YZX Euler matrix")
+    public void deriveYzxEulerMatrix() {
+        Matrix mat = Rotation.getEulerMatrix(EulerOrderList.YZX, new EulerAngles(15, 30, 45));
+        assertAll( //  x column
+                () -> assertEquals(0.8365163037, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0.5, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(-0.224143868, mat.get(2, 0), epsilon, "(2, 0)"),
                 // y column
-                () -> assertEquals(0, yMat.get(0, 1), 0.000001),
-                () -> assertEquals(1, yMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, yMat.get(2, 1), 0.000001),
+                () -> assertEquals(-0.1584936491, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(0.6123724357, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0.7745190528, mat.get(2, 1), epsilon, "(2, 1)"),
                 // z column
-                () -> assertEquals(1, yMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, yMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, yMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateIntrinsic(e2, 90, e1);
-        Vector e2Rotate = RotateIntrinsic(e2, 90, e2);
-        Vector e3Rotate = RotateIntrinsic(e2, 90, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
+                () -> assertEquals(0.5245190528, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(-0.6123724357, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(0.5915063509, mat.get(2, 2), epsilon, "(2, 2)")
+        );
     }
 
     @Test
-    @DisplayName("intrinsic z axis rotation")
-    public void intrinsicZAxisRotation() {
-        Matrix zMat = getMatrixIntrinsic(e3, 90);
-        assertAll(  // x column
-                () -> assertEquals(0, zMat.get(0, 0), 0.000001, "0-0"),
-                () -> assertEquals(1, zMat.get(1, 0), 0.000001, "1-0"),
-                () -> assertEquals(0, zMat.get(2, 0), 0.000001, "2-0"),
+    @DisplayName("Derive ZXY Euler matrix")
+    public void deriveZxyEulerMatrix() {
+        Matrix mat = Rotation.getEulerMatrix(EulerOrderList.ZXY, new EulerAngles(15, 30, 45));
+        assertAll( //  x column
+                () -> assertEquals(0.5915063509, mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(0.5245190528, mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(-0.6123724357, mat.get(2, 0), epsilon, "(2, 0)"),
                 // y column
-                () -> assertEquals(-1, zMat.get(0, 1), 0.000001, "0-1"),
-                () -> assertEquals(0, zMat.get(1, 1), 0.000001, "1-1"),
-                () -> assertEquals(0, zMat.get(2, 1), 0.000001, "2-1"),
+                () -> assertEquals(-0.224143868, mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(0.8365163037, mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(0.5, mat.get(2, 1), epsilon, "(2, 1)"),
                 // z column
-                () -> assertEquals(0, zMat.get(0, 2), 0.000001, "0-2"),
-                () -> assertEquals(0, zMat.get(1, 2), 0.000001, "1-2"),
-                () -> assertEquals(1, zMat.get(2, 2), 0.000001, "2-2"));
-        Vector e1Rotate = RotateIntrinsic(e3, 90, e1);
-        Vector e2Rotate = RotateIntrinsic(e3, 90, e2);
-        Vector e3Rotate = RotateIntrinsic(e3, 90, e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001, "e1-x"),
-                () -> assertEquals(1, e1Rotate.get(1), 0.000001, "e1-y"),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001, "e1-z"),
-                // y column
-                () -> assertEquals(-1, e2Rotate.get(0), 0.000001, "e2-x"),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001, "e2-y"),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001, "e2-z"),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001, "e3-x"),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001, "e3-y"),
-                () -> assertEquals(1, e3Rotate.get(2), 0.000001, "e3-z"));
+                () -> assertEquals(0.7745190528, mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(-0.1584936491, mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(0.6123724357, mat.get(2, 2), epsilon, "(2, 2)")
+        );
     }
 
     @Test
-    @DisplayName("euler XYZ extrinsic matrix")
-    public void eulerXyzExtrinsicMatrix() {
-        Matrix eulerMat = getEulerMatrixExtrinsic(EulerOrderList.XYZ, new EulerAngles(90, 90, 90));
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(2, 0), 0.000001),
+    @DisplayName("Derive ZYX to XYZ Euler matrix")
+    public void deriveXyzToZyxEulerMatrix() {
+        Matrix mat = Rotation.getEulerMatrix(
+                EulerOrderList.XYZ,
+                new EulerAngles(15, 30, 45),
+                EulerOrderList.ZYX,
+                new EulerAngles(15, 30, 45)
+        );
+        assertAll( //  x column
+                () -> assertEquals(zyx2xyz.get(0, 0), mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(zyx2xyz.get(1, 0), mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(zyx2xyz.get(2, 0), mat.get(2, 0), epsilon, "(2, 0)"),
                 // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
+                () -> assertEquals(zyx2xyz.get(0, 1), mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(zyx2xyz.get(1, 1), mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(zyx2xyz.get(2, 1), mat.get(2, 1), epsilon, "(2, 1)"),
                 // z column
-                () -> assertEquals(1, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateExtrinsic(EulerOrderList.XYZ, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = RotateExtrinsic(EulerOrderList.XYZ, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = RotateExtrinsic(EulerOrderList.XYZ, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
+                () -> assertEquals(zyx2xyz.get(0, 2), mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(zyx2xyz.get(1, 2), mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(zyx2xyz.get(2, 2), mat.get(2, 2), epsilon, "(2, 2)")
+        );
     }
 
     @Test
-    @DisplayName("euler XZY extrinsic matrix")
-    public void eulerXzyExtrinsicMatrix() {
-        Matrix eulerMat = getEulerMatrixExtrinsic(EulerOrderList.XZY, new EulerAngles(90, 90, 90));
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
+    @DisplayName("Derive ZYX to YZX Euler matrix")
+    public void deriveZyxToYzxEulerMatrix() {
+        ReferenceFrame refZYX = new ReferenceFrame(EulerOrderList.ZYX, new EulerAngles(15, 30, 45));
+        ReferenceFrame refYZX = new ReferenceFrame(EulerOrderList.YZX, new EulerAngles(15, 30, 45));
+        Matrix mat = Rotation.getEulerMatrix(refZYX, refYZX);
+        assertAll( //  x column
+                () -> assertEquals(zyx2yzx.get(0, 0), mat.get(0, 0), epsilon, "(0, 0)"),
+                () -> assertEquals(zyx2yzx.get(1, 0), mat.get(1, 0), epsilon, "(1, 0)"),
+                () -> assertEquals(zyx2yzx.get(2, 0), mat.get(2, 0), epsilon, "(2, 0)"),
                 // y column
-                () -> assertEquals(1, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
+                () -> assertEquals(zyx2yzx.get(0, 1), mat.get(0, 1), epsilon, "(0, 1)"),
+                () -> assertEquals(zyx2yzx.get(1, 1), mat.get(1, 1), epsilon, "(1, 1)"),
+                () -> assertEquals(zyx2yzx.get(2, 1), mat.get(2, 1), epsilon, "(2, 1)"),
                 // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateExtrinsic(EulerOrderList.XZY, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = RotateExtrinsic(EulerOrderList.XZY, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = RotateExtrinsic(EulerOrderList.XZY, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(1, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(-1, e3Rotate.get(2), 0.000001));
+                () -> assertEquals(zyx2yzx.get(0, 2), mat.get(0, 2), epsilon, "(0, 2)"),
+                () -> assertEquals(zyx2yzx.get(1, 2), mat.get(1, 2), epsilon, "(1, 2)"),
+                () -> assertEquals(zyx2yzx.get(2, 2), mat.get(2, 2), epsilon, "(2, 2)")
+        );
+    }
+
+    /**
+     * put getEulerMatrixExtrinsic() test here
+     */
+
+    @Test
+    @DisplayName("Rotate to another reference frame")
+    public void rotateToAnotherReferenceFrame() {
+        Vector rotated = Rotation.RotateTo(xyz, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(1.228397839, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(0.503652968, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(1.112372436, rotated.get(2), epsilon, "z")
+        );
     }
 
     @Test
-    @DisplayName("euler YXZ extrinsic matrix")
-    public void eulerYxzExtrinsicMatrix() {
-        Matrix eulerMat = getEulerMatrixExtrinsic(EulerOrderList.YXZ, new EulerAngles(90, 90, 90));
-        assertAll(  // x column
-                () -> assertEquals(-1, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateExtrinsic(EulerOrderList.YXZ, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = RotateExtrinsic(EulerOrderList.YXZ, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = RotateExtrinsic(EulerOrderList.YXZ, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(-1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
+    @DisplayName("Rotate from another reference frame")
+    public void rotateFromAnotherReferenceFrame() {
+        Vector rotated = Rotation.RotateFrom(zxy, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(1.141881536, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(1.202541909, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(0.5, rotated.get(2), epsilon, "z")
+        );
+//        zxy.set(0, 0, 0.5915063509);
+//        zxy.set(1, 0, 0.5245190528);
+//        zxy.set(2, 0, -0.6123724357);
+//        zxy.set(0, 1, -0.224143868);
+//        zxy.set(1, 1, 0.8365163037);
+//        zxy.set(2, 1, 0.5);
+//        zxy.set(0, 2, 0.7745190528);
+//        zxy.set(1, 2, -0.1584936491);
+//        zxy.set(2, 2, 0.6123724357);
     }
 
     @Test
-    @DisplayName("euler YZX extrinsic matrix")
-    public void eulerYzxExtrinsicMatrix() {
-        Matrix eulerMat = getEulerMatrixExtrinsic(EulerOrderList.YZX, new EulerAngles(90, 90, 90));
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(1, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(-1, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateExtrinsic(EulerOrderList.YZX, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = RotateExtrinsic(EulerOrderList.YZX, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = RotateExtrinsic(EulerOrderList.YZX, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(-1, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e3Rotate.get(2), 0.000001));
+    @DisplayName("Rotate to with axis")
+    public void rotateToWithAxis() {
+        Vector rotated = Rotation.RotateTo(Axis.Direction.X, 45, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(1, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(cos45 + sin45, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(cos45 - sin45, rotated.get(2), epsilon, "z")
+        );
     }
 
     @Test
-    @DisplayName("euler ZXY extrinsic matrix")
-    public void eulerZxyExtrinsicMatrix() {
-        Matrix eulerMat = getEulerMatrixExtrinsic(EulerOrderList.ZXY, new EulerAngles(90, 90, 90));
-        assertAll(  // x column
-                () -> assertEquals(1, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(0, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateExtrinsic(EulerOrderList.ZXY, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = RotateExtrinsic(EulerOrderList.ZXY, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = RotateExtrinsic(EulerOrderList.ZXY, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(1, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(0, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
+    @DisplayName("Rotate from with axis")
+    public void rotateFromWithAxis() {
+        Vector rotated = Rotation.RotateTo(Axis.Direction.Y, 45, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(cos45 - sin45, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(1, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(cos45 + sin45, rotated.get(2), epsilon, "z")
+        );
     }
 
     @Test
-    @DisplayName("euler ZYX extrinsic matrix")
-    public void eulerZyxExtrinsicMatrix() {
-        Matrix eulerMat = getEulerMatrixExtrinsic(EulerOrderList.ZYX, new EulerAngles(90, 90, 90));
-        assertAll(  // x column
-                () -> assertEquals(0, eulerMat.get(0, 0), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 0), 0.000001),
-                () -> assertEquals(1, eulerMat.get(2, 0), 0.000001),
-                // y column
-                () -> assertEquals(0, eulerMat.get(0, 1), 0.000001),
-                () -> assertEquals(-1, eulerMat.get(1, 1), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 1), 0.000001),
-                // z column
-                () -> assertEquals(1, eulerMat.get(0, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(1, 2), 0.000001),
-                () -> assertEquals(0, eulerMat.get(2, 2), 0.000001));
-        Vector e1Rotate = RotateExtrinsic(EulerOrderList.ZYX, new EulerAngles(90, 90, 90), e1);
-        Vector e2Rotate = RotateExtrinsic(EulerOrderList.ZYX, new EulerAngles(90, 90, 90), e2);
-        Vector e3Rotate = RotateExtrinsic(EulerOrderList.ZYX, new EulerAngles(90, 90, 90), e3);
-        assertAll(  // x column
-                () -> assertEquals(0, e1Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e1Rotate.get(1), 0.000001),
-                () -> assertEquals(1, e1Rotate.get(2), 0.000001),
-                // y column
-                () -> assertEquals(0, e2Rotate.get(0), 0.000001),
-                () -> assertEquals(-1, e2Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e2Rotate.get(2), 0.000001),
-                // z column
-                () -> assertEquals(1, e3Rotate.get(0), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(1), 0.000001),
-                () -> assertEquals(0, e3Rotate.get(2), 0.000001));
+    @DisplayName("Rotate intrinsic to with axis")
+    public void rotateIntrinsicToWithAxis() {
+        Vector rotated = Rotation.RotateIntrinsicTo(util.e3, 45, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(cos45 + sin45, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(cos45 - sin45, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(1, rotated.get(2), epsilon, "z")
+        );
     }
 
-    //  EXCEPTIONS
-
-    @Disabled
     @Test
-    @DisplayName("test InvalidEulerRotationLengthException")
-    public void testInvalidEulerRotationLengthException() {
-//        assertThrows(InvalidEulerRotationLengthException.class, () -> {
-//            getEulerMatrix("XY", new EulerAngles(0, 0, 0));
-//        }, "Too few axes");
-//        assertThrows(InvalidEulerRotationLengthException.class, () ->{
-//            getEulerMatrix("XYZX", new EulerAngles(0, 0, 0));
-//        }, "Too many axes");
+    @DisplayName("Rotate intrinsic from with axis")
+    public void rotateIntrinsicFromWithAxis() {
+        Vector rotated = Rotation.RotateIntrinsicTo(util.e3, 45, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(cos45 + sin45, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(cos45 - sin45, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(1, rotated.get(2), epsilon, "z")
+        );
     }
 
-    @Disabled
     @Test
-    @DisplayName("test InvalidAxisException")
-    public void testInvalidAxisException() {
-//        assertThrows(InvalidAxisException.class, () -> {
-//            getEulerMatrix("XIZ", new EulerAngles(90, 90, 90));
-//        });
-//        assertThrows(InvalidAxisException.class, () -> {
-//            getEulerMatrix("AYZ", new EulerAngles(90, 90, 90));
-//        });
-//        assertThrows(InvalidAxisException.class, () -> {
-//            getEulerMatrix("YXN", new EulerAngles(90, 90, 90));
-//        });
+    @DisplayName("Rotate to Euler order")
+    public void rotateToEulerOrder() {
+        Vector rotated = Rotation.RotateTo(
+                EulerOrderList.XYZ,
+                new EulerAngles(15, 30, 45),
+                new Vector(1, 1, 1)
+        );
+        assertAll(
+                () -> assertEquals(1.228397839, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(0.503652968, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(1.112372436, rotated.get(2), epsilon, "z")
+        );
+    }
+
+    @Test
+    @DisplayName("Rotate from Euler order")
+    public void rotateFromEulerOrder() {
+        Vector rotated = Rotation.RotateFrom(
+                EulerOrderList.XYZ,
+                new EulerAngles(15, 30, 45),
+                new Vector(1, 1, 1)
+        );
+        assertAll(
+                () -> assertEquals(0.5, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(1.141881536, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(1.202541707, rotated.get(2), epsilon, "z")
+        );
+    }
+
+    /**
+     * add extrinsic rotate to and from tests here
+     */
+
+    @Test
+    @DisplayName("Rotate between reference frames")
+    public void rotateBetweenReferenceFrames() {
+        ReferenceFrame refZYX = new ReferenceFrame(EulerOrderList.ZYX, new EulerAngles(15, 30, 45));
+        ReferenceFrame refYZX = new ReferenceFrame(EulerOrderList.YZX, new EulerAngles(15, 30, 45));
+        Vector rotated = Rotation.Rotate(refZYX, refYZX, new Vector(1, 1, 1));
+        assertAll(
+                () -> assertEquals(1.312241953, rotated.get(0), epsilon, "x"),
+                () -> assertEquals(0.5698244748, rotated.get(1), epsilon, "y"),
+                () -> assertEquals(0.9763816486, rotated.get(2), epsilon, "z")
+        );
     }
 
 }

@@ -126,36 +126,68 @@ public class Rotation {
     /// Methods that rotate objects from a single axis rotation.
 ///@{
 
-    /** Rotates a vector around a single axis extrinsically. Same
-     * as getMatrix(...).mult(vector).
+    /** Rotates a vector from an inertial reference frame, to a rotated
+     * reference frame.
      * @param rotMatrix Matrix representing the rotation to apply.
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector Rotate(Matrix rotMatrix, Vector vector) {
+    public static Vector RotateTo(Matrix rotMatrix, Vector vector) {
+        return rotMatrix.transpose().mult(vector);
+    }
+
+    /** Rotates a vector from a rotated reference frame, to an inertial
+     * reference frame.
+     * @param rotMatrix Matrix representing the rotation to apply.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
+    public static Vector RotateFrom(Matrix rotMatrix, Vector vector) {
         return rotMatrix.mult(vector);
     }
 
-    /** Rotates a vector around a single axis extrinsically. Same
-     * as getMatrix(axis, angle).mult(vector).
+    /** Rotates a vector from an inertial reference frame, to a reference
+     * frame rotated around a single axis extrinsically.
      * @param axis Axis in which to rotate around extrinsically.
      * @param angle The angle in which to rotate in @em degrees.
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector Rotate(Axis.Direction axis, double angle, Vector vector) {
-        return Rotate(getMatrix(axis, angle), vector);
+    public static Vector RotateTo(Axis.Direction axis, double angle, Vector vector) {
+        return RotateTo(getMatrix(axis, angle), vector);
     }
 
-    /** Rotates a vector around a single axis intrinsically. Same
-     * as getMatrixIntrinsic(axisVector, angle).mult(rotateVector).
-     * @param axisVector A vector representing the axis in which to rotate around intrinsically.
+    /** Rotates a vector from a reference frame rotated by a single axis
+     * extrinsically, to an inertial reference frame.
+     * @param axis Axis in which to rotate around.
+     * @param angle The angle in which to rotate in @em degrees.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
+    public static Vector RotateFrom(Axis.Direction axis, double angle, Vector vector) {
+        return RotateFrom(getMatrix(axis, angle), vector);
+    }
+
+    /** Rotates a vector from an inertial reference frame, to a reference
+     * frame rotated around a single axis intrinsically.
+     * @param axisVector A vector representing the axis in which to rotate around.
      * @param angle The angle in which to rotate in @em degrees.
      * @param rotateVector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateIntrinsic(Vector axisVector, double angle, Vector rotateVector) {
-        return Rotate(getMatrixIntrinsic(axisVector, angle), rotateVector);
+    public static Vector RotateIntrinsicTo(Vector axisVector, double angle, Vector rotateVector) {
+        return RotateTo(getMatrixIntrinsic(axisVector, angle), rotateVector);
+    }
+
+    /** Rotates a vector from a reference frame rotated around a single axis
+     * intrinsically, to an inertial reference frame.
+     * @param axisVector A vector representing the axis in which to rotate around.
+     * @param angle The angle in which to rotate in @em degrees.
+     * @param rotateVector The vector to rotate.
+     * @return The rotated vector.
+     */
+    public static Vector RotateIntrinsicFrom(Vector axisVector, double angle, Vector rotateVector) {
+        return RotateFrom(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
 
 ///@}
@@ -164,26 +196,48 @@ public class Rotation {
     /// Methods that rotate objects from Euler rotations.
 ///@{
 
-    /** Rotates a vector through a series of Euler rotations intrinsically. Behaviour is
-     * identical to getEulerMatrix(order, angles).mult(vector).
+    /** Rotates a vector from an inertial reference frame, to a reference
+     * frame rotated by an Euler rotation intrinsically.
      * @param order The order of rotations.
      * @param angles The angles to rotate, in their rotation order, in @em degrees.
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector Rotate(EulerOrder order, EulerAngles angles, Vector vector) {
-        return Rotate(getEulerMatrix(order, angles), vector);
+    public static Vector RotateTo(EulerOrder order, EulerAngles angles, Vector vector) {
+        return RotateTo(getEulerMatrix(order, angles), vector);
     }
 
-    /** Rotates a vector through a series of Euler rotations extrinsically. Behaviour is
-     * identical to getEulerMatrixExtrinsic(order, angles).mult(vector).
+    /** Rotates a vector from a reference frame rotated by an intrinsic Euler rotation,
+     * to an inertial reference frame.
      * @param order The order of rotations.
      * @param angles The angles to rotate, in their rotation order, in @em degrees.
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateExtrinsic(EulerOrder order, EulerAngles angles, Vector vector) {
-        return Rotate(getEulerMatrixExtrinsic(order, angles), vector);
+    public static Vector RotateFrom(EulerOrder order, EulerAngles angles, Vector vector) {
+        return RotateFrom(getEulerMatrix(order, angles), vector);
+    }
+
+    /** Rotates a vector from an inertial reference frame, to a reference frame
+     * rotated by an Euler rotation extrinsically.
+     * @param order The order of rotations.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
+    public static Vector RotateExtrinsicTo(EulerOrder order, EulerAngles angles, Vector vector) {
+        return RotateTo(getEulerMatrixExtrinsic(order, angles), vector);
+    }
+
+    /** Rotates a vector from a reference frame rotated by an extrinsic Euler rotation,
+     * to an inertial reference frame.
+     * @param order The order of rotations.
+     * @param angles The angles to rotate, in their rotation order, in @em degrees.
+     * @param vector The vector to rotate.
+     * @return The rotated vector.
+     */
+    public static Vector RotateExtrinsicFrom(EulerOrder order, EulerAngles angles, Vector vector) {
+        return RotateFrom(getEulerMatrixExtrinsic(order, angles), vector);
     }
 
     /** Rotates a vector from one reference frame to another.
