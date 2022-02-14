@@ -35,7 +35,7 @@ public class Tracker {
      * @param dt The time of the desired position in solar days.
      * @return The GeoPosition of the satellite.
      */
-    public static GeoPosition getGeoPositionAt(TLE tle, double dt) {
+    public static Coordinates getGeoPositionAt(TLE tle, double dt) {
         return getGeoPositionAt(tle, new JD(tle).Future(dt));
     }
 
@@ -45,11 +45,13 @@ public class Tracker {
      * @param t1 The time to compute the satellites position, in UTC.
      * @return The GeoPosition of the satellite.
      */
-    public static GeoPosition getGeoPositionAt(TLE tle, JD t1) {
-        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
+    public static Coordinates getGeoPositionAt(TLE tle, JD t1) {
+//        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
+        // todo: check which ephemeris model to use before calling
+        StateVectors stateAtT1 = SGP4.Propagate(tle, t1);
         double earthOffsetAngle = SiderealTime.EarthOffsetAngle(t1);
         Vector positionAtT1 = Rotation.RotateFrom(Axis.Direction.Z, -earthOffsetAngle, stateAtT1.Position());
-        return new GeoPosition(positionAtT1);
+        return new Coordinates(positionAtT1);
     }
 
     // may make getGeoPositionAt with COE, JD t0, JD t1 args.
@@ -61,7 +63,7 @@ public class Tracker {
      * @return An array of GeoPositions making up the ground track.
      */
     @SuppressWarnings("unused")
-    public static GeoPosition[] getGroundTrack(TLE tle, double dt, double interval) {
+    public static Coordinates[] getGroundTrack(TLE tle, double dt, double interval) {
         return getGroundTrack(tle, new JD(tle).Future(dt), interval);
     }
 
@@ -71,10 +73,10 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @return An array of GeoPositions making up the ground track.
      */
-    public static GeoPosition[] getGroundTrack(TLE tle, JD t1, double interval) {
+    public static Coordinates[] getGroundTrack(TLE tle, JD t1, double interval) {
         JD startTime = new JD(tle);
         int numIterations = (int)(t1.Difference(startTime) / interval) + 1;
-        GeoPosition[] arrGeoPos = new GeoPosition[numIterations];
+        Coordinates[] arrGeoPos = new Coordinates[numIterations];
 
         for (int i = 0; i < numIterations - 1; i++) {
             JD currentTime = startTime.Future(interval * i);
@@ -111,7 +113,7 @@ public class Tracker {
     public static boolean plotGroundTrack(TLE tle, JD t1, double interval, String filename) throws IOException {
         final int flushLimit = 10; // this is just a guess right now, previous files have been failing a little after 1000
         FileWriter writer = new FileWriter(filename);
-        GeoPosition[] arrGroundTrack = getGroundTrack(tle, t1, interval);
+        Coordinates[] arrGroundTrack = getGroundTrack(tle, t1, interval);
         writer.write("latitude, longitude\n");
         for (int i = 0; i < Array.getLength(arrGroundTrack); i++) {
             writer.write(arrGroundTrack[i].getLatitude() + ", " + arrGroundTrack[i].getLongitude() + '\n');
@@ -120,12 +122,14 @@ public class Tracker {
         return true;
     }
 
-    public static Vector getSEZPosition(TLE tle, double dt, GeoPosition geoPos) {
+    public static Vector getSEZPosition(TLE tle, double dt, Coordinates geoPos) {
         return getSEZPosition(tle, new JD(tle).Future(dt), geoPos);
     }
 
-    public static Vector getSEZPosition(TLE tle, JD t1, GeoPosition geoPos) {
-        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
+    public static Vector getSEZPosition(TLE tle, JD t1, Coordinates geoPos) {
+//        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
+        // todo: check which ephemeris model to use before calling
+        StateVectors stateAtT1 = SGP4.Propagate(tle, t1);
         double localSiderealTime = SiderealTime.LST(t1, geoPos.getLongitude());
         return Rotation.RotateTo(
                 EulerOrderList.ZYX,
@@ -134,13 +138,18 @@ public class Tracker {
         );
     }
 
-    public static AltAz getAltAz(TLE tle, JD t1, GeoPosition geoPos) {
+    public static AltAz getAltAz(TLE tle, JD t1, Coordinates geoPos) {
         Vector sezPosition = getSEZPosition(tle, t1, geoPos);
         double xyMag = Math.sqrt( Math.pow(sezPosition.x(), 2) + Math.pow(sezPosition.y(), 2) );
         return new AltAz(
                 Math.toDegrees( Math.atan2(sezPosition.z(), xyMag) ),
                 Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), sezPosition.x()) )
         );
+    }
+
+    public static Boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
+        AltAz altaz = getAltAz(tle, t, geoPosition);
+        return (altaz.getAltitude() > 0);
     }
 
 }
