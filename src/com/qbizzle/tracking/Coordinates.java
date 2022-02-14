@@ -17,11 +17,11 @@ import static com.qbizzle.math.OrbitalMath.EARTH_POLAR_RADIUS;
  * north and negative being south. Longitudes range from [180, -180), positive
  * being east and negative being west.
  */
-public class GeoPosition {
+public class Coordinates {
     private double[] m_coordinates;
 
     /** Constructs a GeoPosition to default values of 0, 0. */
-    public GeoPosition() {
+    public Coordinates() {
         this(0.0, 0.0);
     }
 
@@ -29,7 +29,7 @@ public class GeoPosition {
      * @param lat Latitude in degrees.
      * @param lng Longitude in degrees.
      */
-    public GeoPosition(double lat, double lng) {
+    public Coordinates(double lat, double lng) {
         m_coordinates = new double[]{lat, lng};
     }
 
@@ -41,7 +41,7 @@ public class GeoPosition {
      * @param lngMinutes Fraction of longitude in minutes.
      * @param lngSeconds Fraction of minutes in seconds.
      */
-    public GeoPosition(int lat, int latMinutes, double latSeconds, int lng, int lngMinutes, double lngSeconds) {
+    public Coordinates(int lat, int latMinutes, double latSeconds, int lng, int lngMinutes, double lngSeconds) {
         this(lat + latMinutes/60.0 + latSeconds/3600.0,
                 lng + lngMinutes/60.0 + lngSeconds/3600.0
         );
@@ -51,7 +51,7 @@ public class GeoPosition {
      * right ascension and declination first.
      * @param position Position vector in IJK reference frame.
      */
-    public GeoPosition(Vector position) {
+    public Coordinates(Vector position) {
         m_coordinates = new double[2];
         double xyMag = Math.sqrt( Math.pow(position.x(), 2) + Math.pow(position.y(), 2) );
         double declination = Math.toDegrees( Math.atan2(position.z(), xyMag) );
