@@ -28,11 +28,10 @@ public class SiderealTime {
      * @return The local sidereal time.
      */
     public static double LST(JD julianDay, double longitude) {
-        double lng2RA = ((longitude % 180.0) / 360.0) * 24.0;
+        if (longitude < 0) longitude += 360.0;
+        double lng2RA = longitude / 360.0 * 24.0;
         double LST = ST(julianDay) + lng2RA;
-        if (LST < 0.0) return LST + 24.0;
-        else if (LST > 24.0) return LST - 24.0;
-        else return LST;
+        return LST % 24.0;
     }
 
     /** Computes the earth offset angle from the celestial reference frame for
