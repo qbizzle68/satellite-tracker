@@ -1,22 +1,22 @@
 package com.qbizzle;
 
 import com.qbizzle.exception.InvalidTLEException;
+import com.qbizzle.math.Matrix;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 import com.qbizzle.orbit.TLE;
+import com.qbizzle.referenceframe.Axis;
+import com.qbizzle.rotation.Rotation;
 import com.qbizzle.time.JD;
+import com.qbizzle.time.SiderealTime;
 import com.qbizzle.tracking.AltAz;
-import com.qbizzle.tracking.GeoPosition;
+import com.qbizzle.tracking.Coordinates;
+import com.qbizzle.tracking.SGP4;
 import com.qbizzle.tracking.Tracker;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
-
-import static com.qbizzle.math.OrbitalMath.EARTH_EQUITORIAL_RADIUS;
-import static com.qbizzle.math.OrbitalMath.EARTH_POLAR_RADIUS;
-import static java.lang.Math.sqrt;
-import static java.lang.Math.toRadians;
 
 public class Main {
 
@@ -25,119 +25,135 @@ public class Main {
     public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidTLEException, IOException {
         String strZarya = """
                 ISS (ZARYA)            \s
-                1 25544U 98067A   22030.51179398  .00005765  00000+0  11002-3 0  9999
-                2 25544  51.6444 298.3935 0006761  77.9892 281.4353 15.49702707323823""";
+                1 25544U 98067A   22047.73152049  .00007798  00000+0  14545-3 0  9998
+                2 25544  51.6427 213.1144 0005767 136.1669 236.9068 15.49802462326501""";
         TLE tleZarya = new TLE(strZarya);
-//        JD currentPosTime = new JD(1, 30, 2022, 23, 42, 0.0); // UTC
-//        StateVectors state = new StateVectors(tleZarya, currentPosTime.Difference(new JD(tleZarya)));
-//        System.out.println(state.Position());
-//        double siderealTime = SiderealTime.siderealTime(currentPosTime, 0.0);
-//        System.out.println("sidereal time: " + siderealTime);
-//        double offsetAngle = siderealTime / 24.0 * 360.0;
-//        System.out.println("offset angle: " + offsetAngle);
-//
-//        Vector issPos = Rotate(state.Position(), -offsetAngle);
-//        System.out.println("iss position: " + issPos.toString());
-//
-//        double [] latlng = toLatLng(issPos);
-//        System.out.println("declination: " + Math.toDegrees(latlng[0]));
-//        System.out.println("lat: " + Math.toDegrees( geocentricToGeodetic(latlng[0]) ));
-//        System.out.println("long: " + Math.toDegrees(latlng[1]));
-//
-//        GeoPosition geo1 = tracker.getPositionAt(tleZarya, 0.47570602);
-//        GeoPosition geo2 = tracker.getPositionAt(tleZarya, currentPosTime);
-//
-//        System.out.println("geo1 lat: " + geo1.getLatitude());
-//        System.out.println("geo1 lng: " + geo1.getLongitude());
-//        System.out.println("geo2 lat: " + geo2.getLatitude());
-//        System.out.println("geo2 lng: " + geo2.getLongitude());
 
-//        double dt = 10 / 86400.0; // days
-//        double timeToPlot = 2.0 / tleZarya.MeanMotion(); // days
-//        int numItr = (int)(timeToPlot / dt);
+//        JD viewTime = new JD(2, 17, 2022, 7, 15, 53, -6);
+//        Vector issPosition = SGP4.Propagate(tleZarya, viewTime).Position();
+//        Vector sunPosition = Sun.Position(viewTime);
+//        Boolean isVisible = !Eclipse.isEclipsed(issPosition.minus(), issPosition.minus().plus(sunPosition));
+//        System.out.println(isVisible);
+
+//        double checkDuration = 14.0;
+//        JD checkTo = new JD(tleZarya).Future(checkDuration);
+//        double interval = 1.0 / 1440.0;
+//        int numIterations = (int)(checkDuration / interval);
 //
+//        for (int i = 0; i < numIterations; i++) {
+//            JD currentTime = new JD(tleZarya).Future(i * interval);
+//        }
+
+        // find position vector in ijk
+        Coordinates hutch = new Coordinates(38.0608, -97.9298);
 //        JD startTime = new JD(tleZarya);
-//        String filename = "output/zarya_2orbit_test1.csv";
-//        FileWriter writer = new FileWriter(filename);
-//        writer.write("latitude, longitude\n");
-//        for (int i = 0; i < numItr; i++) {
-//            JD currentTime = startTime.Future(dt * i);
-//            StateVectors state = new StateVectors(tleZarya, dt * i);
-////            double offsetAngle = ST(currentTime, 0.0) / 24.0 * 360.0;
-//            double offsetAngle = SiderealTime.siderealTime(currentTime, 0.0) / 24.0 * 360.0;
-//            Vector currentPosition = Rotate(state.Position(), -offsetAngle);
-//            double[] latlng = toLatLng(currentPosition);
-//            writer.write(Math.toDegrees(latlng[0]) + ", " + Math.toDegrees(latlng[1]) + '\n');
-//            if (i % 10 == 0) writer.flush();
-//        }
-//
-//        GeoPosition[] zaryaGroundTrack = getGroundTrack(tleZarya, timeToPlot, 10 / 86400.0);
-//        FileWriter writer2 = new FileWriter("output/zarya_2orbit_test2.csv");
-//        writer2.write("latitude, longitude\n");
-//        for (int i = 0; i < Array.getLength(zaryaGroundTrack); i++) {
-//            writer2.write(zaryaGroundTrack[i].getLatitude() + ", " + zaryaGroundTrack[i].getLongitude() + '\n');
-//            if (i % 10 == 0) writer2.flush();
-//        }
+        JD startTime = new JD(2, 16, 2022, 18, 0, 53);
+        Vector pos = SGP4.Propagate(tleZarya, startTime).Position();
+        System.out.println("original position: " + pos);
 
-        GeoPosition geo = Tracker.getGeoPositionAt(tleZarya, 0.0);
-        System.out.println("geo: " + geo);
-        Vector sezPos = Tracker.getSEZPosition(tleZarya, 0.0, geo);
+        // find position vector offset by finding sez origin offset to ijk origin
+        double LST = SiderealTime.LST(startTime, hutch.getLongitude()) * 360.0 / 24.0;
+        Vector hutchPos = new Vector(
+                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(hutch.getLatitude()) ) * Math.cos( Math.toRadians(LST) ),
+                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(hutch.getLatitude()) ) * Math.sin( Math.toRadians(LST) ),
+                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.sin( Math.toRadians(hutch.getLatitude()) )
+        );
+        double st = SiderealTime.ST(startTime);
+//        hutchPos = Rotation.RotateFrom(Axis.Direction.Z, st, hutchPos);
+
+        // find rotation matrix between ijk and sez
+//        double LST = SiderealTime.LST(startTime, hutch.getLongitude()) * 360.0 / 24.0;
+        Matrix sezToIJK = Rotation.getMatrix(Axis.Direction.Z, LST).mult(Rotation.getMatrix(Axis.Direction.Y, 90 - hutch.getLatitude()));
+
+        // rotate from ijk to sez, then add the offset vector
+        Vector sezPos = rotateTranslate(sezToIJK, hutchPos, pos);
+        Vector sezPos2 = Tracker.getSEZPosition(tleZarya, startTime, hutch);
         System.out.println("sezPos: " + sezPos);
-        AltAz altaz = Tracker.getAltAz(tleZarya, new JD(tleZarya), geo);
-        System.out.println("altitude: " + altaz.getAltitude());
-        System.out.println("azimuth: " + altaz.getAzimuth());
+        System.out.println("sezPos2: " + sezPos2);
+
+        // compute alt az
+        AltAz altaz = new AltAz(
+                Math.toDegrees( Math.asin(sezPos.z() / sezPos.mag()) ),
+                Math.toDegrees( OrbitalMath.atan2(sezPos.y(), -sezPos.x()) )
+        );
+        System.out.println("alt: " + altaz.getAltitude() + " az: " + altaz.getAzimuth());
+
+        System.out.println(Tracker.isAboveHorizon(tleZarya, startTime, hutch));
+
+        double declination = OrbitalMath.atan2(pos.z(), pos.mag());
+        System.out.println( Math.toDegrees(declination) );
 
     }
 
-    public static void noaaTest() {
-        String strTLE = """
-                NOAA 20 [+]            \s
-                1 43013U 17073A   22032.53991112  .00000015  00000+0  27859-4 0  9999
-                2 43013  98.7448 332.9363 0001514  88.1570 271.9780 14.19526485217944""";
-        String strFutureTLE = """
-                NOAA 20 [+]            \s
-                1 43013U 17073A   22032.82185385  .00000017  00000+0  28794-4 0  9999
-                2 43013  98.7449 333.2147 0001513  87.9741 272.1608 14.19526540217983""";
-        TLE tle = new TLE(strTLE);
-        TLE futureTLE = new TLE(strFutureTLE);
-        GeoPosition guess = Tracker.getGeoPositionAt(tle, new JD(futureTLE));
-        GeoPosition actual = Tracker.getGeoPositionAt(futureTLE, 0.0);
-        System.out.println("guess: " + guess);
-        System.out.println("actual: " + actual);
-
+    // rotation is from inertial to rotated, offset in inertial frame pointing from inertial origin to translated origin
+    static Vector rotateTranslate(Matrix rot, Vector offset, Vector original) {
+        Vector rotOrig = (rot.transpose()).mult(original);
+        Vector rotOffset = (rot.transpose()).mult(offset);
+        return rotOrig.minus(rotOffset);
     }
 
-    // rotate vector around polar axis
-    public static Vector Rotate(Vector vec, double phi) {
-        double phiRad = toRadians(phi);
-        double v1 = vec.x() * Math.cos(phiRad) - vec.y() * Math.sin(phiRad);
-        double v2 = vec.x() * Math.sin(phiRad) + vec.y() * Math.cos(phiRad);
-        return new Vector(v1, v2, vec.z());
+    // pass a time the satellite is overhead, this will find when the sat crosses above
+    // the horizon, and the time it falls below
+    public static double[] times(TLE tle, Coordinates coords, JD t) {
+
+
+        // find the time of sat-rise
+        // can make way better guesses than 10 minutes but doing for simplicity
+        double riseTime = riseSqueeze(tle, t.Future(-30.0/1440.0), t, coords);
+        double setTime = setSqueeze(tle, t, t.Future(15.0/1440.0), coords);
+        return new double[]{riseTime, setTime};
     }
 
-    public static Vector toIJK(Vector vec, double aop, double inc, double lan) {
-        double v1 = vec.x() * (Math.cos(aop)*Math.cos(lan) - Math.sin(aop)*Math.cos(inc)*Math.sin(lan))
-                - vec.y() * (Math.sin(aop)*Math.cos(lan) + Math.cos(aop)*Math.cos(inc)*Math.sin(lan));
-        double v2 = vec.x() * (Math.cos(aop)*Math.sin(lan) + Math.sin(aop)*Math.cos(inc)*Math.cos(lan))
-                + vec.y() * (Math.cos(aop)*Math.cos(inc)*Math.cos(lan) - Math.sin(aop)*Math.sin(lan));
-        double v3 = vec.x() * (Math.sin(aop)*Math.sin(inc))
-                + vec.y() * (Math.cos(aop)*Math.sin(inc));
-        return new Vector(v1, v2, v3);
+    static double squeezeEpsilon = 1.0 / 864000.0; // 1/10th of a second
+
+    static double riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords) {
+//        System.out.println("rise - lower: " + lower.Value() + " upper: " + upper.Value());
+        if (upper.Difference(lower) <= squeezeEpsilon) return upper.Value();
+        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
+//        System.out.println("biTime: " + biTime.Value());
+//        System.out.println(Tracker.isAboveHorizon(tle, biTime, coords));
+        if (Tracker.isAboveHorizon(tle, biTime, coords)) return riseSqueeze(tle, lower, biTime, coords);
+        else return riseSqueeze(tle, biTime, upper, coords);
     }
 
-    public static double[] toLatLng(Vector position) {
-        double xyMag = sqrt(Math.pow(position.x(), 2) + Math.pow(position.y(), 2));
-        double lat = Math.atan2(position.z(), xyMag);
-        double lng = OrbitalMath.atan2(position.y(), position.x());
-        if (lng > Math.PI) lng -= 2*Math.PI;
-
-        return new double[]{lat, lng};
+    static double setSqueeze(TLE tle, JD lower, JD upper, Coordinates coords) {
+        if (upper.Difference(lower) <= squeezeEpsilon) return lower.Value();
+        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
+        if (Tracker.isAboveHorizon(tle, biTime, coords)) return setSqueeze(tle, biTime, upper, coords);
+        else return setSqueeze(tle, lower, biTime, coords);
     }
 
-    public static double geocentricToGeodetic(double lat) {
-        final double flattening = (EARTH_EQUITORIAL_RADIUS - EARTH_POLAR_RADIUS) / EARTH_EQUITORIAL_RADIUS;
-        double lhs = Math.tan(lat) / Math.pow(1.0 - flattening, 2);
-        return Math.atan(lhs);
+    static String getUTC(JD jd) {
+        int J = jd.Number();
+        int y = 4716;
+        int j = 1401;
+        int m = 2;
+        int n = 12;
+        int r = 4;
+        int p = 1461;
+        int v = 3;
+        int u = 5;
+        int s = 153;
+        int w = 2;
+        int B = 274277;
+        int C = -38;
+        int f = J + j + (((4 * J * B) / 146097) * 3) / 4 + C;
+        int e = r * f + v;
+        int g = (e % p) / r;
+        int h = u * g + w;
+        int D = (h % s) / u + 1;
+        int M = (h / s + m) % n + 1;
+        int Y = (e / p) - y + (n + m - M) / n;
+        double htemp = jd.Fraction() + 0.5;
+        if (htemp > 1) {
+            D++; // this can cause the day to go over the valid number of days in a given month
+            htemp -= 1.0;
+        }
+        int H = (int)(htemp * 24);
+        htemp -= (H / 24.0);
+        int Min = (int)(htemp * 1440.0);
+        htemp -=(Min / 1440.0);
+        return M + "/" + D + "/" + Y + " " + H + ":" + Min + ":" + (htemp * 86400.0);
     }
 
 }
