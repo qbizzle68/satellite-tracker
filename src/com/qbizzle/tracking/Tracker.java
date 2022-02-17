@@ -152,10 +152,6 @@ public class Tracker {
                 Math.toDegrees( Math.asin(sezPosition.z() / sezPosition.mag())),
                 Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), -sezPosition.x()) )
         );
-
-//        return new AltAz(
-//                Math.atan2(sezPosition.z(), )
-//        )
     }
 
     public static Boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
