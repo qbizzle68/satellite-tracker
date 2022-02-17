@@ -5,6 +5,7 @@
 
 package com.qbizzle.tracking;
 
+import com.qbizzle.math.Matrix;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 import com.qbizzle.orbit.StateVectors;
@@ -27,7 +28,7 @@ import java.lang.reflect.Array;
 public class Tracker {
 
     /** Converts an angle in degree notation to hour-minute-seconds notation */
-    private static final double DEGREES_PER_HOUR = 360.0 / 24.0;
+    private static final double HOURS_PER_DEGREE = 360.0 / 24.0;
 
     /** Computes the GeoPosition in which the satellite is directly overhead at
      * time dt in the past/future.
@@ -127,29 +128,46 @@ public class Tracker {
     }
 
     public static Vector getSEZPosition(TLE tle, JD t1, Coordinates geoPos) {
-//        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
         // todo: check which ephemeris model to use before calling
         StateVectors stateAtT1 = SGP4.Propagate(tle, t1);
-        double localSiderealTime = SiderealTime.LST(t1, geoPos.getLongitude());
-        return Rotation.RotateTo(
-                EulerOrderList.ZYX,
-                new EulerAngles(localSiderealTime*DEGREES_PER_HOUR, 90-geoPos.getLatitude(), 0),
-                stateAtT1.Position()
+        double localSiderealTime = SiderealTime.LST(t1, geoPos.getLongitude()) * HOURS_PER_DEGREE;
+        // todo package this into a method
+        Vector geoPosVector = new Vector(
+                // todo get an accurate vector length, dependent on latitude and elevation
+                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(geoPos.getLatitude()) ) * Math.cos( Math.toRadians(localSiderealTime) ),
+                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(geoPos.getLatitude()) ) * Math.sin( Math.toRadians(localSiderealTime) ),
+                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.sin( Math.toRadians(geoPos.getLatitude()) )
         );
+        Matrix sezToIJK = Rotation.getEulerMatrix(
+                EulerOrderList.ZYX,
+                new EulerAngles(localSiderealTime, 90-geoPos.getLatitude(), 0)
+        );
+        return rotateTranslate(sezToIJK, geoPosVector, stateAtT1.Position());
     }
 
     public static AltAz getAltAz(TLE tle, JD t1, Coordinates geoPos) {
         Vector sezPosition = getSEZPosition(tle, t1, geoPos);
         double xyMag = Math.sqrt( Math.pow(sezPosition.x(), 2) + Math.pow(sezPosition.y(), 2) );
         return new AltAz(
-                Math.toDegrees( Math.atan2(sezPosition.z(), xyMag) ),
-                Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), sezPosition.x()) )
+                Math.toDegrees( Math.asin(sezPosition.z() / sezPosition.mag())),
+                Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), -sezPosition.x()) )
         );
+
+//        return new AltAz(
+//                Math.atan2(sezPosition.z(), )
+//        )
     }
 
     public static Boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
         AltAz altaz = getAltAz(tle, t, geoPosition);
         return (altaz.getAltitude() > 0);
+    }
+
+    // rotation is from inertial to rotated, offset in inertial frame pointing from inertial origin to translated origin.
+    static private Vector rotateTranslate(Matrix rot, Vector offset, Vector original) {
+        Vector rotOrig = rot.transpose().mult(original);
+        Vector rotOffset = rot.transpose().mult(offset);
+        return rotOrig.minus(rotOffset);
     }
 
 }
