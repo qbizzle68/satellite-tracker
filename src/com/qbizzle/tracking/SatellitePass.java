@@ -21,6 +21,21 @@ public class SatellitePass {
         maxDirection = setDirections(max.getAzimuth());
     }
 
+    @Override
+    public String toString() {
+        return "SatellitePass{" +
+                "riseTime=" + riseTime +
+                ", riseDirection='" + riseDirection + '\'' +
+                ", riseHeight=" + riseHeight + ",\n\t " +
+                "setTime=" + setTime +
+                ", setDirection='" + setDirection + '\'' +
+                ", setHeight=" + setHeight + ",\n\t " +
+                "maxTime=" + maxTime +
+                ", maxDirection='" + maxDirection + '\'' +
+                ", maxHeight=" + maxHeight +
+                '}';
+    }
+
     public JD getRiseTime() {
         return new JD(riseTime.Value());
     }
