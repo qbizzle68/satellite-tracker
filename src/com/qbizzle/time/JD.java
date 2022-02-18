@@ -21,7 +21,7 @@ import java.util.*;
  * Julian Days is the solar day.
  * @note A solar day is equivalent to 24 hours, 1440 minutes or 86400 seconds.
  */
-public class JD {
+public class JD implements Cloneable {
     private final double m_julianDate;
     /// Number of seconds in a solar day.
     @SuppressWarnings("unused")
@@ -123,6 +123,31 @@ public class JD {
      */
     public JD(int mon, int day, int yr, int hr, int min, double sec, double timeZone) {
         m_julianDate = GetDate(mon, day, yr, hr, min, sec, timeZone);
+    }
+
+    @Override
+    public String toString() {
+        return "JD{" +
+                "m_julianDate=" + m_julianDate +
+                '}';
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        JD jd = (JD) o;
+        return Double.compare(jd.m_julianDate, m_julianDate) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(m_julianDate);
     }
 
     /// @name Getter methods.
