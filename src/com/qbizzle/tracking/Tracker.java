@@ -150,11 +150,13 @@ public class Tracker {
         double xyMag = Math.sqrt( Math.pow(sezPosition.x(), 2) + Math.pow(sezPosition.y(), 2) );
         return new AltAz(
                 Math.toDegrees( Math.asin(sezPosition.z() / sezPosition.mag())),
-                Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), -sezPosition.x()) )
+                Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), -sezPosition.x()) ),
+                t1
         );
     }
 
     public static Boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
+        // todo: wouldn't it be more efficient if we just called for SEZ position and returned (sezPos.z() > 0)
         AltAz altaz = getAltAz(tle, t, geoPosition);
         return (altaz.getAltitude() > 0);
     }

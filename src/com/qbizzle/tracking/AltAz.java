@@ -5,6 +5,8 @@
 
 package com.qbizzle.tracking;
 
+import com.qbizzle.time.JD;
+
 /** Container class for holding altitude and azimuth angles
  * for a position relative to a GeoPosition.
  */
@@ -12,6 +14,7 @@ public class AltAz {
 
     private double altitude;
     private double azimuth;
+    private JD epoch;
 
     /** Constructs an AltAz object with the given parameters.
      * @param altitude The altitude angle of the satellite.
@@ -20,6 +23,13 @@ public class AltAz {
     public AltAz(double altitude, double azimuth) {
         this.azimuth = azimuth;
         this.altitude = altitude;
+        epoch = new JD(0);
+    }
+
+    public AltAz(double altitude, double azimuth, JD epoch) {
+        this.azimuth = azimuth;
+        this.altitude = altitude;
+        this.epoch = epoch;
     }
 
     /** Retrieves the azimuth of this object.
@@ -48,6 +58,14 @@ public class AltAz {
      */
     public void setAltitude(double altitude) {
         this.altitude = altitude;
+    }
+
+    public JD getEpoch() {
+        return new JD(epoch.Value());
+    }
+
+    public void setEpoch(JD epoch) {
+        this.epoch = epoch;
     }
 
 }
