@@ -18,6 +18,7 @@ import static com.qbizzle.math.OrbitalMath.EARTH_POLAR_RADIUS;
  * being east and negative being west.
  */
 public class Coordinates {
+    public static final double flattening = (EARTH_EQUITORIAL_RADIUS - EARTH_POLAR_RADIUS) / EARTH_EQUITORIAL_RADIUS;
     private double[] m_coordinates;
 
     /** Constructs a GeoPosition to default values of 0, 0. */
@@ -104,15 +105,36 @@ public class Coordinates {
         m_coordinates[1] = lng;
     }
 
-    /** Converts a geocentric longitude to a geodetic longitude. Can be used
+    /** Converts a geocentric latitude to a geodetic latitude. Can be used
      * as a declination to geodetic conversion for objects in LEO with minimal error.
      * @param lat The geocentric latitude in degrees.
      * @return The geodetic latitude in degrees.
      */
     public static double geocentricToGeodetic(double lat) {
-        final double flattening = (EARTH_EQUITORIAL_RADIUS - EARTH_POLAR_RADIUS) / EARTH_EQUITORIAL_RADIUS;
+//        final double flattening = (EARTH_EQUITORIAL_RADIUS - EARTH_POLAR_RADIUS) / EARTH_EQUITORIAL_RADIUS;
         double lhs = Math.tan( Math.toRadians(lat) ) / Math.pow(1.0 - flattening, 2);
         return Math.toDegrees( Math.atan(lhs) );
+    }
+
+    /** Converts a geodetic latitude to a geocentric latitude. Can be used as a geodetic
+     * to declination conversion for objects in LEO with minimal error.
+     * @param lat The geodetic latitude in degrees.
+     * @return The geocentric latitude in degrees.
+     */
+    public static double geodeticToGeocentric(double lat) {
+        double coef = Math.pow(1.0 - flattening, 2);
+        double rhs = coef * Math.tan( Math.toRadians(lat) );
+        return Math.toDegrees( Math.atan(rhs) );
+    }
+
+    // convert geodetic latitude to radius (intermediate converts to geocentric)
+    public static double radiusAtLatitude(double geodeticLat) {
+        if (geodeticLat == 0.0) return EARTH_EQUITORIAL_RADIUS;
+        else if (geodeticLat == 90.0) return EARTH_POLAR_RADIUS;
+        double geocentricLat = Math.toRadians( geodeticToGeocentric(geodeticLat) );
+        double bcos2 = Math.pow(EARTH_POLAR_RADIUS * Math.cos(geocentricLat), 2);
+        double asin2 = Math.pow(EARTH_EQUITORIAL_RADIUS * Math.sin(geocentricLat), 2);
+        return (EARTH_POLAR_RADIUS * EARTH_EQUITORIAL_RADIUS) / Math.sqrt(bcos2 + asin2);
     }
 
 }
