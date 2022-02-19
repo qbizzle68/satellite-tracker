@@ -1,127 +1,153 @@
 package com.qbizzle;
 
-import com.qbizzle.exception.InvalidTLEException;
-import com.qbizzle.math.Matrix;
-import com.qbizzle.math.OrbitalMath;
-import com.qbizzle.math.Vector;
 import com.qbizzle.orbit.TLE;
-import com.qbizzle.referenceframe.Axis;
-import com.qbizzle.rotation.Rotation;
 import com.qbizzle.time.JD;
-import com.qbizzle.time.SiderealTime;
-import com.qbizzle.tracking.AltAz;
 import com.qbizzle.tracking.Coordinates;
-import com.qbizzle.tracking.SGP4;
+import com.qbizzle.tracking.SatellitePass;
 import com.qbizzle.tracking.Tracker;
 
-import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
 public class Main {
 
     Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InvalidTLEException, IOException {
+    public static void main(String[] args) {
         String strZarya = """
                 ISS (ZARYA)            \s
-                1 25544U 98067A   22047.73152049  .00007798  00000+0  14545-3 0  9998
-                2 25544  51.6427 213.1144 0005767 136.1669 236.9068 15.49802462326501""";
+                1 25544U 98067A   22049.72913178  .00009079  00000+0  16774-3 0  9997
+                2 25544  51.6430 203.2209 0005652 141.6789 224.1673 15.49843671326816""";
         TLE tleZarya = new TLE(strZarya);
 
-//        JD viewTime = new JD(2, 17, 2022, 7, 15, 53, -6);
-//        Vector issPosition = SGP4.Propagate(tleZarya, viewTime).Position();
-//        Vector sunPosition = Sun.Position(viewTime);
-//        Boolean isVisible = !Eclipse.isEclipsed(issPosition.minus(), issPosition.minus().plus(sunPosition));
-//        System.out.println(isVisible);
+        Coordinates hutch = new Coordinates(38.06084167, -97.92977222);
+        JD viewTime = new JD(2, 18, 2022, 14, 44, 30, -6);
+        Coordinates coords = new Coordinates(30,131);
+        SatellitePass satPass = Tracker.getPassInfo(tleZarya, viewTime, coords);
+        System.out.println(satPass);
 
-//        double checkDuration = 14.0;
-//        JD checkTo = new JD(tleZarya).Future(checkDuration);
-//        double interval = 1.0 / 1440.0;
-//        int numIterations = (int)(checkDuration / interval);
+
+    }
+
+//    public static SatellitePass getPassInfo(TLE tle, JD passTime, Coordinates coords) {
+//        // todo: how to we make a better guess than 10 minutes?
+//        AltAz rise = riseSqueeze(tle, passTime.Future(-10.0 / 1440.0), passTime, coords, null);
+//        AltAz set = setSqueeze(tle, rise.getEpoch(), passTime.Future(10.0 / 1440.0), coords, null);
+//        AltAz first = firstSqueeze(tle, rise.getEpoch(), set.getEpoch(), coords, false, null);
+//        AltAz last = lastSqueeze(tle, first.getEpoch(), set.getEpoch(), coords, null);
+//        AltAz start, finish;
+//        if (rise.getEpoch().Value() < first.getEpoch().Value()) start = first;
+//        else start = rise;
+//        if (set.getEpoch().Value() < last.getEpoch().Value()) finish = set;
+//        else finish = last;
+//        return new SatellitePass(
+//                start,
+//                finish,
+//                new AltAz(0, 0, new JD(0)) // change this when we find the max
+//        );
+//    }
+
+//    // pass a time the satellite is overhead, this will find when the sat crosses above
+//    // the horizon, and the time it falls below
+//    public static double[] times(TLE tle, Coordinates coords, JD t) {
+//        // find the time of sat-rise
+//        // can make way better guesses than 10 minutes but doing for simplicity
+//        double riseTime = riseSqueeze(tle, t.Future(-30.0/1440.0), t, coords);
+//        double setTime = setSqueeze(tle, t, t.Future(15.0/1440.0), coords);
+////        return new double[]{riseTime, setTime};
+//        double[] horizonTimes = {riseTime, setTime};
+//        System.out.println("rise horizon: " + horizonTimes[0] + " set horizon: " + horizonTimes[1]);
 //
-//        for (int i = 0; i < numIterations; i++) {
-//            JD currentTime = new JD(tleZarya).Future(i * interval);
+//        // find the earliest and latest time the sat is in sunlight
+//        double firstVisible = firstSqueeze(tle, new JD(riseTime), new JD(setTime), false);
+//        System.out.println("first lit: " + firstVisible);
+//        double lastVisible = lastSqueeze(tle, new JD(firstVisible), new JD(setTime));
+//        System.out.println("last lit: " + lastVisible);
+//        return new double[]{0, 0};
+//    }
+
+//    static double squeezeEpsilon = 1.0 / 864000.0; // 1/10th of a second
+//
+//    static AltAz riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
+////        if (upper.Difference(lower) <= squeezeEpsilon) return upper.Value();
+//        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+//        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
+//        AltAz altaz = Tracker.getAltAz(tle, biTime, coords);
+//        if (altaz.getAltitude() > 0) return riseSqueeze(tle, lower, biTime, coords, altaz);
+////        if (Tracker.isAboveHorizon(tle, biTime, coords)) return riseSqueeze(tle, lower, biTime, coords);
+//        else return riseSqueeze(tle, biTime, upper, coords, altaz);
+////        else return riseSqueeze(tle, biTime, upper, coords);
+//    }
+//
+//    static AltAz setSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
+////        if (upper.Difference(lower) <= squeezeEpsilon) return lower.Value();
+//        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+//        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
+//        AltAz altaz = Tracker.getAltAz(tle, biTime, coords);
+//        if (altaz.getAltitude() > 0) return setSqueeze(tle, biTime, upper, coords, altaz);
+////        if (Tracker.isAboveHorizon(tle, biTime, coords)) return setSqueeze(tle, biTime, upper, coords);
+//        else return setSqueeze(tle, lower, biTime, coords, altaz);
+////        else return setSqueeze(tle, lower, biTime, coords);
+//    }
+//
+//    static AltAz firstSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, Boolean wasLight, AltAz rtn) {
+//        if (upper.Difference(lower) <= squeezeEpsilon) {
+////            if (wasLight) return upper.Value();
+//            if (wasLight) return rtn;
+////            else return -1;
+//            // todo: else throw exception for sat never being lit
 //        }
-
-        // find position vector in ijk
-        Coordinates hutch = new Coordinates(38.0608, -97.9298);
-//        JD startTime = new JD(tleZarya);
-        JD startTime = new JD(2, 16, 2022, 18, 0, 53);
-        Vector pos = SGP4.Propagate(tleZarya, startTime).Position();
-        System.out.println("original position: " + pos);
-
-        // find position vector offset by finding sez origin offset to ijk origin
-        double LST = SiderealTime.LST(startTime, hutch.getLongitude()) * 360.0 / 24.0;
-        Vector hutchPos = new Vector(
-                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(hutch.getLatitude()) ) * Math.cos( Math.toRadians(LST) ),
-                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(hutch.getLatitude()) ) * Math.sin( Math.toRadians(LST) ),
-                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.sin( Math.toRadians(hutch.getLatitude()) )
-        );
-        double st = SiderealTime.ST(startTime);
-//        hutchPos = Rotation.RotateFrom(Axis.Direction.Z, st, hutchPos);
-
-        // find rotation matrix between ijk and sez
-//        double LST = SiderealTime.LST(startTime, hutch.getLongitude()) * 360.0 / 24.0;
-        Matrix sezToIJK = Rotation.getMatrix(Axis.Direction.Z, LST).mult(Rotation.getMatrix(Axis.Direction.Y, 90 - hutch.getLatitude()));
-
-        // rotate from ijk to sez, then add the offset vector
-        Vector sezPos = rotateTranslate(sezToIJK, hutchPos, pos);
-        Vector sezPos2 = Tracker.getSEZPosition(tleZarya, startTime, hutch);
-        System.out.println("sezPos: " + sezPos);
-        System.out.println("sezPos2: " + sezPos2);
-
-        // compute alt az
-        AltAz altaz = new AltAz(
-                Math.toDegrees( Math.asin(sezPos.z() / sezPos.mag()) ),
-                Math.toDegrees( OrbitalMath.atan2(sezPos.y(), -sezPos.x()) )
-        );
-        System.out.println("alt: " + altaz.getAltitude() + " az: " + altaz.getAzimuth());
-
-        System.out.println(Tracker.isAboveHorizon(tleZarya, startTime, hutch));
-
-        double declination = OrbitalMath.atan2(pos.z(), pos.mag());
-        System.out.println( Math.toDegrees(declination) );
-
-    }
-
-    // rotation is from inertial to rotated, offset in inertial frame pointing from inertial origin to translated origin
-    static Vector rotateTranslate(Matrix rot, Vector offset, Vector original) {
-        Vector rotOrig = (rot.transpose()).mult(original);
-        Vector rotOffset = (rot.transpose()).mult(offset);
-        return rotOrig.minus(rotOffset);
-    }
-
-    // pass a time the satellite is overhead, this will find when the sat crosses above
-    // the horizon, and the time it falls below
-    public static double[] times(TLE tle, Coordinates coords, JD t) {
-
-
-        // find the time of sat-rise
-        // can make way better guesses than 10 minutes but doing for simplicity
-        double riseTime = riseSqueeze(tle, t.Future(-30.0/1440.0), t, coords);
-        double setTime = setSqueeze(tle, t, t.Future(15.0/1440.0), coords);
-        return new double[]{riseTime, setTime};
-    }
-
-    static double squeezeEpsilon = 1.0 / 864000.0; // 1/10th of a second
-
-    static double riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords) {
-//        System.out.println("rise - lower: " + lower.Value() + " upper: " + upper.Value());
-        if (upper.Difference(lower) <= squeezeEpsilon) return upper.Value();
-        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
-//        System.out.println("biTime: " + biTime.Value());
-//        System.out.println(Tracker.isAboveHorizon(tle, biTime, coords));
-        if (Tracker.isAboveHorizon(tle, biTime, coords)) return riseSqueeze(tle, lower, biTime, coords);
-        else return riseSqueeze(tle, biTime, upper, coords);
-    }
-
-    static double setSqueeze(TLE tle, JD lower, JD upper, Coordinates coords) {
-        if (upper.Difference(lower) <= squeezeEpsilon) return lower.Value();
-        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
-        if (Tracker.isAboveHorizon(tle, biTime, coords)) return setSqueeze(tle, biTime, upper, coords);
-        else return setSqueeze(tle, lower, biTime, coords);
-    }
+//        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
+//        Vector sunPosition = Sun.Position(biTime);
+//        Vector satPosition = SGP4.Propagate(tle, biTime).Position();
+//        AltAz altaz = Tracker.getAltAz(satPosition, biTime, geoPos);
+//        if (!Eclipse.isEclipsed(satPosition.minus(), satPosition.minus().plus(sunPosition))) {
+////            return firstSqueeze(tle, lower, biTime, true);
+//            return firstSqueeze(tle, lower, biTime, geoPos, true, altaz);
+//        }
+//        else {
+////            if (wasLight) return firstSqueeze(tle, biTime, upper, true);
+//            if (wasLight) return firstSqueeze(tle, biTime, upper, geoPos, true, altaz);
+////            else return firstSqueeze(tle, lower, biTime, false);
+//            else return firstSqueeze(tle, lower, biTime, geoPos, false, altaz);
+//        }
+//    }
+//
+//    // assume the sat is at one point lit, meaning there is a starting time gotten from firstSqueeze().
+//    // then start at that time squeeze towards the time its not lit
+//    static AltAz lastSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, AltAz rtn) {
+////        if (upper.Difference(lower) <= squeezeEpsilon) return upper.Value();
+//        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+//        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
+//        Vector sunPosition = Sun.Position(biTime);
+//        Vector satPosition = SGP4.Propagate(tle, biTime).Position();
+//        AltAz altaz = Tracker.getAltAz(satPosition, biTime, geoPos);
+//        if (!Eclipse.isEclipsed(satPosition.minus(), satPosition.minus().plus(sunPosition)))
+////            return lastSqueeze(tle, biTime, upper);
+//            return lastSqueeze(tle, biTime, upper, geoPos, altaz);
+////        else return lastSqueeze(tle, lower, biTime);
+//        else return lastSqueeze(tle, lower, biTime, geoPos, altaz);
+//    }
+//
+//    // don't know if this is the best way to do this. it makes some assumptions on the shape of the visible path
+//    // that I'm not sure is always appropriate for different sized orbits...
+//    static AltAz maxSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, AltAz rtn) {
+//        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+//        AltAz lowerAltAz = Tracker.getAltAz(tle, lower, geoPos);
+//        JD biTime = new JD((lower.Value() + upper.Value()) / 2.0);
+//        AltAz biAltAz = Tracker.getAltAz(tle, biTime, geoPos);
+//        AltAz upperAltAz = Tracker.getAltAz(tle, upper, geoPos);
+//        if (biAltAz.getAltitude() >= lowerAltAz.getAltitude()) {
+//            // path goes up and then down
+//            if (biAltAz.getAltitude()  >= upperAltAz.getAltitude()) {
+//                if (lowerAltAz.getAltitude() >= upperAltAz.getAltitude()) return maxSqueeze(tle, lower, biTime, geoPos, biAltAz);
+//                else return maxSqueeze(tle, biTime, upper, geoPos, biAltAz);
+//            }
+//            // only traveling up
+//            else return maxSqueeze(tle, biTime, upper, geoPos, biAltAz);
+//        }
+//        // only traveling down
+//        else return maxSqueeze(tle, lower, biTime, geoPos, biAltAz);
+//    }
 
     static String getUTC(JD jd) {
         int J = jd.Number();
