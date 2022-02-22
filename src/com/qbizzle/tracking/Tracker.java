@@ -5,6 +5,8 @@
 
 package com.qbizzle.tracking;
 
+import com.qbizzle.exception.NoLightException;
+import com.qbizzle.exception.NoPassException;
 import com.qbizzle.math.Matrix;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
@@ -141,13 +143,14 @@ public class Tracker {
 //                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(geoPos.getLatitude()) ) * Math.sin( Math.toRadians(localSiderealTime) ),
 //                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.sin( Math.toRadians(geoPos.getLatitude()) )
 //        );
-        double geocentricLat = Coordinates.geodeticToGeocentric(geoPos.getLatitude());
-        double radiusAtLat = Coordinates.radiusAtLatitude(geoPos.getLatitude());
-        Vector geoPosVector = new Vector(
-                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.cos( Math.toRadians(localSiderealTime) ),
-                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.sin( Math.toRadians(localSiderealTime) ),
-                radiusAtLat * Math.sin( Math.toRadians(geocentricLat) )
-        );
+        Vector geoPosVector = getToposPosition(t1, geoPos);
+//        double geocentricLat = Coordinates.geodeticToGeocentric(geoPos.getLatitude());
+//        double radiusAtLat = Coordinates.radiusAtLatitude(geoPos.getLatitude());
+//        Vector geoPosVector = new Vector(
+//                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.cos( Math.toRadians(localSiderealTime) ),
+//                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.sin( Math.toRadians(localSiderealTime) ),
+//                radiusAtLat * Math.sin( Math.toRadians(geocentricLat) )
+//        );
         Matrix sezToIJK = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
                 new EulerAngles(
@@ -168,13 +171,14 @@ public class Tracker {
 //                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.cos( Math.toRadians(geoPos.getLatitude()) ) * Math.sin( Math.toRadians(localSiderealTime) ),
 //                OrbitalMath.EARTH_EQUITORIAL_RADIUS * Math.sin( Math.toRadians(geoPos.getLatitude()) )
 //        );
-        double radiusAtLat = Coordinates.radiusAtLatitude(geoPos.getLatitude());
-        double geocentricLat = Coordinates.geodeticToGeocentric(geoPos.getLatitude());
-        Vector geoPosVector = new Vector(
-                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.cos( Math.toRadians(localSiderealTime) ),
-                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.sin( Math.toRadians(localSiderealTime) ),
-                radiusAtLat * Math.sin( Math.toRadians(geocentricLat) )
-        );
+        Vector geoPosVector = getToposPosition(t1, geoPos);
+//        double radiusAtLat = Coordinates.radiusAtLatitude(geoPos.getLatitude());
+//        double geocentricLat = Coordinates.geodeticToGeocentric(geoPos.getLatitude());
+//        Vector geoPosVector = new Vector(
+//                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.cos( Math.toRadians(localSiderealTime) ),
+//                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.sin( Math.toRadians(localSiderealTime) ),
+//                radiusAtLat * Math.sin( Math.toRadians(geocentricLat) )
+//        );
         Matrix sezToIJK = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
                 new EulerAngles(
@@ -184,6 +188,18 @@ public class Tracker {
                 )
         );
         return rotateTranslate(sezToIJK, geoPosVector, position);
+    }
+
+    public static Vector getToposPosition(JD t, Coordinates topos) {
+        // todo: account for elevation with this radius
+        double radiusAtLat = Coordinates.radiusAtLatitude(topos.getLatitude());
+        double geocentricLat = Coordinates.geodeticToGeocentric(topos.getLatitude());
+        double localSiderealTime = SiderealTime.LST(t, topos.getLongitude()) * HOURS_PER_DEGREE;
+        return new Vector(
+                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.cos( Math.toRadians(localSiderealTime) ),
+                radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.sin( Math.toRadians(localSiderealTime) ),
+                radiusAtLat * Math.sin( Math.toRadians(geocentricLat) )
+        );
     }
 
     public static AltAz getAltAz(TLE tle, JD t1, Coordinates geoPos) {
@@ -217,8 +233,6 @@ public class Tracker {
         // todo: how to we make a better guess than 10 minutes?
         AltAz rise = riseSqueeze(tle, passTime.Future(-10.0 / 1440.0), passTime, coords, null);
         AltAz set = setSqueeze(tle, rise.getEpoch(), passTime.Future(10.0 / 1440.0), coords, null);
-//        System.out.println(rise.getEpoch());
-//        System.out.println(set.getEpoch());
         AltAz first = firstSqueeze(tle, rise.getEpoch(), set.getEpoch(), coords, false, null);
         AltAz last = lastSqueeze(tle, first.getEpoch(), set.getEpoch(), coords, null);
         AltAz start, finish;
@@ -229,7 +243,6 @@ public class Tracker {
         return new SatellitePass(
                 start,
                 finish,
-//                new AltAz(0, 0, new JD(0)) // change this when we find the max
                 maxSqueeze(tle, start.getEpoch(), finish.getEpoch(), coords, null)
         );
     }
@@ -263,13 +276,18 @@ public class Tracker {
     }
 
     static private AltAz riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
-        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+//        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+        if (upper.Difference(lower) <= squeezeEpsilon) {
+            if (rtn.getAltitude() > 0) return rtn;
+            else throw new NoPassException("No overhead pass at " + upper.Value());
+        }
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
         AltAz altaz = Tracker.getAltAz(tle, biTime, coords);
         if (altaz.getAltitude() > 0) return riseSqueeze(tle, lower, biTime, coords, altaz);
         else return riseSqueeze(tle, biTime, upper, coords, altaz);
     }
 
+    // should be called after riseSqueeze, as riseSqueeze will detect if no pass occurs, also gives lower bound
     static private AltAz setSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
         if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
@@ -286,6 +304,7 @@ public class Tracker {
             // todo: else throw exception for sat never being lit
             // this isn't an error, just a way of notifying calling method that the sat
             // is never lit, therefore this pass test should be skipped
+            else throw new NoLightException("Object is eclipsed at " + upper.Value());
         }
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
         Vector sunPosition = Sun.Position(biTime);
