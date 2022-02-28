@@ -44,26 +44,26 @@ public class TLE {
      * @return String to display the element values of the TLE.
      */
     public String toString() {
-        return "Satellite name: " + m_satelliteName
+        return "Satellite name: " + m_satelliteName + "\n "
             + "Line 1:"
-            + "Catalog number: " + m_catalogNumber
-            + "Classification: " + m_classification
-            + "COSPAR ID: " + m_cosparID
-            + "Epoch year: " + m_epochYear
-            + "Epoch day: " + m_epoch
-            + "Mu Dot: " + m_meanMotionDot
-            + "Mu DDot: " + m_meanMotionDDot
-            + "B*: " + m_BStar
-            + "Ephemeris: " + m_ephemeris
-            + "Set number: " + m_setNumber
+            + " Catalog number: " + m_catalogNumber
+            + " Classification: " + m_classification
+            + " COSPAR ID: " + m_cosparID
+            + " Epoch year: " + m_epochYear
+            + " Epoch day: " + m_epoch
+            + " Mu Dot: " + m_meanMotionDot
+            + " Mu DDot: " + m_meanMotionDDot
+            + " B*: " + m_BStar
+            + " Ephemeris: " + m_ephemeris
+            + "Set number: " + m_setNumber + "\n "
             + "Line 2:"
-            + "Inclination: " + m_inclination
-            + "LAN: " + m_lan
-            + "Eccentricity: " + m_eccentricity
-            + "Argument of Perigee: " + m_argumentOfPerigee
-            + "Mean Anomaly: " + m_meanAnomaly
-            + "Mean Motion: " + m_meanMotion
-            + "Revolution number: " + m_revNumber;
+            + " Inclination: " + m_inclination
+            + " LAN: " + m_lan
+            + " Eccentricity: " + m_eccentricity
+            + " Argument of Perigee: " + m_argumentOfPerigee
+            + " Mean Anomaly: " + m_meanAnomaly
+            + " Mean Motion: " + m_meanMotion
+            + " Revolution number: " + m_revNumber;
     }
 
     /// @name Accessor Methods
