@@ -1,7 +1,5 @@
 package com.qbizzle;
 
-import com.qbizzle.exception.NoLightException;
-import com.qbizzle.exception.NoPassException;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 import com.qbizzle.orbit.TLE;
@@ -10,38 +8,72 @@ import com.qbizzle.tracking.Coordinates;
 import com.qbizzle.tracking.SatellitePass;
 import com.qbizzle.tracking.Tracker;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.Scanner;
 
 public class Main {
 
     Scanner scanner = new Scanner(System.in);
 
-    public static void main(String[] args) {
-        String strZarya = """
-                ISS (ZARYA)            \s
-                1 25544U 98067A   22052.65160095  .00007194  00000+0  13445-3 0  9993
-                2 25544  51.6410 188.7488 0005260 152.5208 330.0202 15.49882275327260""";
-        TLE tleZarya = new TLE(strZarya);
-
+    public static void main(String[] args) throws IOException, InterruptedException {
+//        String strZarya = """
+//                ISS (ZARYA)            \s
+//                1 25544U 98067A   22057.61893286  .00025540  00000+0  46219-3 0  9999
+//                2 25544  51.6422 164.1505 0005487 193.8783 302.2559 15.49481576328039""";
+//        TLE tleZarya = new TLE(strZarya);
         Coordinates hutch = new Coordinates(38.060017, -97.930495);
-        JD viewTime = new JD(2, 20, 2022, 5, 27, 32, -6);
-        Coordinates coords = new Coordinates(30, 131);
+//        JD viewTime = new JD(2, 27, 2022, 10, 43, 0);
+
 //        SatellitePass satPass = Tracker.getPassInfo(tleZarya, viewTime, hutch);
 //        System.out.println(satPass);
 
-        JD riseJD = new JD(2, 22, 2022, 3, 51, 0, -6);
-        try {
-            SatellitePass riseAltAz = Tracker.getPassInfo(tleZarya, riseJD, hutch);
-        } catch (NoPassException e) {
-            System.out.println("NoPassException caught");
-        } catch (NoLightException e) {
-            System.out.println("NoLightException caught");
+        String URL = "https://celestrak.com/NORAD/elements/gp.php?NAME=ISS%20(ZARYA)&FORMAT=TLE";
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+                .GET()
+                .uri(URI.create(URL))
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+//        System.out.println(response.body());
+
+        TLE tle = new TLE(response.body());
+
+        JD startTime = new JD(2, 28, 2022, 0, 0, 0, -6);
+        java.util.Vector<SatellitePass> passList = getPasses2(tle, startTime, startTime.Future(2.0), hutch);
+        System.out.println(passList.size());
+        for (SatellitePass pass :
+                passList) {
+            System.out.println(pass);
         }
 
     }
 
+    static java.util.Vector<SatellitePass> getPasses2(TLE tle, JD startTime, JD endTime, Coordinates geoPos) {
+        final double dt = 10 / 86400.0; // 10 seconds
+        java.util.Vector<SatellitePass> passList = new java.util.Vector<>();
+        JD currentTime = startTime;
+        SatellitePass satPass;
+        do {
+            try {
+                satPass = Tracker.getPassInfo(tle, currentTime, geoPos);
+                passList.add(satPass);
+                // todo: because the next guess is programed to guess 10 minutes into the past, it will find this same pass over and over, unless we jump more than 10 minutes into the future
+                currentTime = satPass.getSetTime().Future(11/1440.0);
+            } catch (Exception e) {
+                //todo: add a step method to move current JD forward or back in time
+                currentTime = currentTime.Future(dt);
+            }
+            //todo: add comparison methods for JD
+        } while(currentTime.Value() < endTime.Value());
+        return passList;
+    }
+
     static public Coordinates getCelestialCoordinates(Vector pos) {//, JD t1, Coordinates coords) {
-//        Vector pos = getSEZPosition(tle, t1, coords);
+//        Vector pos = getSEZPosition(tle/, t1, coords);
 //        pos = Rotation.RotateFrom(
 //                EulerOrderList.ZYX,
 //                new EulerAngles(
@@ -75,39 +107,6 @@ public class Main {
                 dDel * JDCenturies * 100,
                 dAlpha * JDCenturies * 100
         );
-    }
-
-    static String getUTC(JD jd) {
-        int J = jd.Number();
-        int y = 4716;
-        int j = 1401;
-        int m = 2;
-        int n = 12;
-        int r = 4;
-        int p = 1461;
-        int v = 3;
-        int u = 5;
-        int s = 153;
-        int w = 2;
-        int B = 274277;
-        int C = -38;
-        int f = J + j + (((4 * J * B) / 146097) * 3) / 4 + C;
-        int e = r * f + v;
-        int g = (e % p) / r;
-        int h = u * g + w;
-        int D = (h % s) / u + 1;
-        int M = (h / s + m) % n + 1;
-        int Y = (e / p) - y + (n + m - M) / n;
-        double htemp = jd.Fraction() + 0.5;
-        if (htemp > 1) {
-            D++; // this can cause the day to go over the valid number of days in a given month
-            htemp -= 1.0;
-        }
-        int H = (int)(htemp * 24);
-        htemp -= (H / 24.0);
-        int Min = (int)(htemp * 1440.0);
-        htemp -=(Min / 1440.0);
-        return M + "/" + D + "/" + Y + " " + H + ":" + Min + ":" + (htemp * 86400.0);
     }
 
 }
