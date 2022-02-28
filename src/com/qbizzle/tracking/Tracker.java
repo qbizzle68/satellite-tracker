@@ -29,6 +29,7 @@ import java.lang.reflect.Array;
  * of satellites, and use that information to plan overhead passes. Many other methods involved
  * in tracking and determining if satellites are visible can also be found here.
  */
+@SuppressWarnings("unused")
 public class Tracker {
     static private final double squeezeEpsilon = 1.0 / 8640000.0; // 1/10th of a second
 
@@ -41,7 +42,6 @@ public class Tracker {
      * @param dt The time of the desired position in solar days.
      * @return The GeoPosition of the satellite.
      */
-    @SuppressWarnings("unused")
     public static Coordinates getGeoPositionAt(TLE tle, double dt) {
         return getGeoPositionAt(tle, new JD(tle).Future(dt));
     }
@@ -69,7 +69,6 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @return An array of GeoPositions making up the ground track.
      */
-    @SuppressWarnings("unused")
     public static Coordinates[] getGroundTrack(TLE tle, double dt, double interval) {
         return getGroundTrack(tle, new JD(tle).Future(dt), interval);
     }
@@ -102,7 +101,6 @@ public class Tracker {
      * @return True if the print was successful, false if otherwise.
      * @throws IOException From FileWriter.
      */
-    @SuppressWarnings("unused")
     public static boolean plotGroundTrack(TLE tle, double dt, double interval, String filename) throws IOException {
         return plotGroundTrack(tle, new JD(tle).Future(dt), interval, filename);
     }
@@ -129,7 +127,6 @@ public class Tracker {
         return true;
     }
 
-    @SuppressWarnings("unused")
     public static Vector getSEZPosition(TLE tle, double dt, Coordinates geoPos) {
         return getSEZPosition(tle, new JD(tle).Future(dt), geoPos);
     }
@@ -184,7 +181,6 @@ public class Tracker {
         );
     }
 
-    @SuppressWarnings("unused")
     public static boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
         // todo: wouldn't it be more efficient if we just called for SEZ position and returned (sezPos.z() > 0)
         AltAz altaz = getAltAz(tle, t, geoPosition);
@@ -209,7 +205,26 @@ public class Tracker {
         else throw new DaylightPassException("Pass not visible due to sunlight.");
     }
 
-    @SuppressWarnings("unused")
+    public static java.util.Vector<SatellitePass> getPasses(TLE tle, JD startTime, JD endTime, Coordinates geoPos) {
+        final double dt = 10 / 86400.0; // 10 seconds
+        java.util.Vector<SatellitePass> passList = new java.util.Vector<>();
+        JD currentTime = startTime;
+        SatellitePass satPass;
+        do {
+            try {
+                satPass = Tracker.getPassInfo(tle, currentTime, geoPos);
+                passList.add(satPass);
+                // todo: because the next guess is programed to guess 10 minutes into the past, it will find this same pass over and over, unless we jump more than 10 minutes into the future
+                currentTime = satPass.getSetTime().Future(11/1440.0);
+            } catch (Exception e) {
+                //todo: add a step method to move current JD forward or back in time
+                currentTime = currentTime.Future(dt);
+            }
+            //todo: add comparison methods for JD
+        } while(currentTime.Value() < endTime.Value());
+        return passList;
+    }
+
     // returns a Coordinates with declination as latitude and right ascension as longitude in hours
     static public Coordinates getCelestialCoordinates(TLE tle, JD t1, Coordinates coords) {
         Vector pos = getSEZPosition(tle, t1, coords);
@@ -231,7 +246,23 @@ public class Tracker {
         );
     }
 
-    @SuppressWarnings("unused")
+    // RADec being RA in time units and Dec in degrees
+    // this doesn't account for proper motion of stars or planets
+    static public Coordinates adjustRaDec(JD t, Coordinates RaDec) {
+        double JDCenturies = (t.Value() - JD.J2000) / 36525.0;
+        double m = 3.07496 + 0.00186 * JDCenturies;
+        double nra = 1.33621 - 0.00057 * JDCenturies;
+        double ndec = 20.0431 - 0.0085 * JDCenturies;
+        double ra = Math.toRadians( RaDec.getLongitude() * 15 );
+        double dec = Math.toRadians( RaDec.getLatitude() );
+        double dAlpha = m + (nra * Math.sin(ra) * Math.tan(dec));
+        double dDel = ndec * Math.cos( ra );
+        return new Coordinates(
+                dDel * JDCenturies * 100,
+                dAlpha * JDCenturies * 100
+        );
+    }
+
     // rotation is from inertial to rotated, offset in inertial frame pointing from inertial origin to translated origin.
     static private Vector rotateTranslate(Matrix rot, Vector offset, Vector original) {
         Vector rotOrig = rot.transpose().mult(original);
