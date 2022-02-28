@@ -32,7 +32,7 @@ public class Sun {
     }
 
     public static Vector Position2(JD t) {
-        double JC = (t.Number() - JD.J2000) / 36525.0;
+//        double JC = (t.Number() - JD.J2000) / 36525.0;
         double JCE = (t.Value() - JD.J2000) / 36525.0;
         double JME = JCE / 10.0;
         double L = Math.toDegrees( expandTableValues(LTable, JME) ) % 360.0;
@@ -149,6 +149,7 @@ public class Sun {
         return X;
     }
 
+    @SuppressWarnings("unused")
     static private double[] getNutationDeltas(double JCE) {
         double[] arrX = getXArray(JCE);
         double dPsi = 0.0, dEpsilon = 0.0;
@@ -194,25 +195,20 @@ public class Sun {
 
     public static TwilightType getTwilightType(JD t, Coordinates coords) {
         Vector sunPos = Position2(t);
-        double sunAngle = Tracker.getAltAz(sunPos, t, coords).getAltitude();
-//        Vector toposPos = Tracker.getToposPosition(t, coords);
-//        Vector sunTopos = sunPos.minus(toposPos);
-//        Vector sunSEZ = RotateTo(
-//                EulerOrderList.ZYX,
-//                new EulerAngles(
-//                        SiderealTime.LST(t, coords.getLongitude() * 24.0 / 360.0),
-//                        90 - coords.getLatitude(),
-//                        0.0
-//                ),
-//                sunTopos
-//        );
-//        double sunAngle = Math.toDegrees( Math.acos(sunSEZ.z() / sunSEZ.mag()) );
-        System.out.println(sunAngle);
+        Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, coords);
+        double sunAngle = Tracker.getAltAz(sunSEZPos, t).getAltitude();
         if (sunAngle < -18) return TwilightType.Night;
         else if (sunAngle < -12) return TwilightType.Astronomical;
         else if (sunAngle < -6) return TwilightType.Nautical;
         else if (sunAngle < -(5.0 / 6.0)) return TwilightType.Civil;
         else return TwilightType.Day;
+    }
+
+    @SuppressWarnings("unused")
+    public static double getSunAngle(JD t, Coordinates geoPos) {
+        Vector sunPos = Position2(t);
+        Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, geoPos);
+        return Tracker.getAltAz(sunSEZPos, t).getAltitude();
     }
 
     private static final double[][][] LTable = {
