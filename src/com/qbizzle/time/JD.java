@@ -40,16 +40,6 @@ public class JD implements Cloneable {
      *             for using the default Date constructor to compute current satellite positions.
      */
     public JD(Date date) {
-//        String[] strTokens = date.toString().split("[\s]");
-//        m_julianDate = GetDate(
-//                MonthTable(strTokens[1]),
-//                Integer.parseInt(strTokens[2]),
-//                Integer.parseInt(strTokens[5]),
-//                Integer.parseInt(strTokens[3].substring(0, 2)),
-//                Integer.parseInt(strTokens[3].substring(3, 5)),
-//                Integer.parseInt(strTokens[3].substring(6)),
-//                0.0
-//        );
         this(date, 0.0);
     }
 
@@ -176,6 +166,48 @@ public class JD implements Cloneable {
      */
     public double Fraction() {
         return m_julianDate - (int) m_julianDate;
+    }
+
+    public String Date() {
+        return Date(0.0);
+    }
+
+    public String Date(double timeZone) {
+        int Z = (int)(m_julianDate + 0.5 + (timeZone / 24.0));
+        double F = (m_julianDate + 0.5 + (timeZone / 24.0)) - Z;
+        int A;
+        if (Z < 2299161) {
+            A = Z;
+        } else {
+            int B = (int) ((Z - 1867216.25) / 36524.25);
+            A = Z + 1 + B - (B / 4);
+        }
+        int C = A + 1524;
+        int D = (int) ((C - 122.1) / 365.25);
+        int G = (int) (365.25 * D);
+        int I = (int) ((C - G) / 30.6001);
+        double d = C - G - (int)(30.6001 * I) + F;
+        int m;
+        if (I < 14) m = I - 1;
+        else m = I - 13;
+        int y;
+        if (m > 2) y = D - 4716;
+        else y = D - 4715;
+
+        String rtn = m + "/";
+        if (d < 10) rtn += "0";
+        rtn += (int)d + "/" + y + " ";
+
+        double dayFrac = d - (int)d;
+        int h = (int)(dayFrac * 24);
+        int min = (int)((dayFrac - (h / 24.0)) * 1440.0);
+        double s = (dayFrac - (h / 24.0) - (min / 1440.0)) * 86400.0;
+
+        rtn += h + ":";
+        if (min < 10) rtn += "0";
+        rtn += min + ":" + String.format("%.2f", s);
+
+        return rtn;
     }
 
 ///@}*/
