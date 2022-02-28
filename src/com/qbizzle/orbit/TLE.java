@@ -211,12 +211,13 @@ public class TLE {
         String delims = "[\n]";
         String[] tokens = tle.split(delims);
 
+        int token2Length = tokens[2].split("[\s]+").length;
 //        to use regex, split lines with '\s' delimiter then check each token with a specific regex.
 //        rules for tle: check number of lines, then check length of lines, checksum, number of tokens per line, then format of each token.
         if (tokens.length > 3) throw new InvalidTLEException("Too many lines in TLE, check TLE format.");
         else if (tokens.length < 3) throw new InvalidTLEException("Too few lines in TLE, check TLE format.");
         else if (tokens[1].split("[\s]+").length != 9) throw new InvalidTLEException("Line 1 token number mismatch, check TLE format.");
-        else if (tokens[2].split("[\s]+").length != 8) throw new InvalidTLEException("Line 2 token number mismatch, check TLE format.");
+        else if (token2Length < 8 || token2Length > 9) throw new InvalidTLEException("Line 2 token number mismatch, check TLE format.");
     }
 
     /** Method to corroborate the checksum value in each line.
@@ -284,8 +285,15 @@ public class TLE {
         m_eccentricity = Double.parseDouble('.' + line2Tokens[4]);
         m_argumentOfPerigee = Double.parseDouble(line2Tokens[5]);
         m_meanAnomaly = Double.parseDouble(line2Tokens[6]);
-        m_meanMotion = Double.parseDouble(line2Tokens[7].substring(0, line2Tokens[7].length()-6));
-        m_revNumber = Integer.parseInt(line2Tokens[7].substring(line2Tokens[7].length()-6, line2Tokens[7].length()-1));
+        if (line2Tokens.length == 8)
+        {
+            m_meanMotion = Double.parseDouble(line2Tokens[7].substring(0, line2Tokens[7].length()-6));
+            m_revNumber = Integer.parseInt(line2Tokens[7].substring(line2Tokens[7].length()-6, line2Tokens[7].length()-1));
+        }
+        else {
+            m_meanMotion = Double.parseDouble(line2Tokens[7]);
+            m_revNumber = Integer.parseInt(line2Tokens[8].substring(0, line2Tokens[8].length()-1));
+        }
     }
 
 }
