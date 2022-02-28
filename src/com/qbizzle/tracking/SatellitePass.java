@@ -2,37 +2,55 @@ package com.qbizzle.tracking;
 
 import com.qbizzle.time.JD;
 
+@SuppressWarnings("unused")
 public class SatellitePass {
-    private final JD riseTime, setTime, maxTime;
-    private final String riseDirection, setDirection, maxDirection;
-    private final double riseHeight, setHeight, maxHeight;
+    private final JD riseTime, setTime, visibleTime, maxTime, disappearTime;
+    private final String riseDirection, setDirection, visibleDirection, disappearDirection, maxDirection;
+    private final double riseHeight, setHeight, visibleHeight, disappearHeight, maxHeight;
 
 //    public SatellitePass(JD riseTime, AltAz rise, JD setTime, AltAz set, JD maxTime, AltAz max) {
-    public SatellitePass(AltAz rise, AltAz set, AltAz max) {
+    public SatellitePass(AltAz rise, AltAz set, AltAz visible, AltAz disappear, AltAz max) {
         // todo: check if this is good enough or are we creating a shallow copy?
         this.riseTime = rise.getEpoch();
         this.setTime = set.getEpoch();
         this.maxTime = max.getEpoch();
+        this.visibleTime = visible.getEpoch();
+        this.disappearTime = disappear.getEpoch();
+        if (riseTime.Value() <= visibleTime.Value()) {
+            visibleHeight = visible.getAltitude();
+            visibleDirection = setDirections(visible.getAzimuth());
+        } else {
+            visibleHeight = rise.getAltitude();
+            visibleDirection = setDirections(rise.getAzimuth());
+        }
+        if (disappearTime.Value() <= setTime.Value()) {
+            disappearHeight = disappear.getAltitude();
+            disappearDirection = setDirections(disappear.getAzimuth());
+        } else{
+            disappearHeight = set.getAltitude();
+            disappearDirection = setDirections(set.getAzimuth());
+        }
+
+        maxHeight = max.getAltitude();
         riseHeight = rise.getAltitude();
         setHeight = set.getAltitude();
-        maxHeight = max.getAltitude();
+        maxDirection = setDirections(max.getAzimuth());
         riseDirection = setDirections(rise.getAzimuth());
         setDirection = setDirections(set.getAzimuth());
-        maxDirection = setDirections(max.getAzimuth());
     }
 
     @Override
     public String toString() {
         return "SatellitePass{" +
-                "riseTime=" + riseTime +
-                ", riseDirection='" + riseDirection + '\'' +
-                ", riseHeight=" + riseHeight + ",\n\t " +
-                "setTime=" + setTime +
-                ", setDirection='" + setDirection + '\'' +
-                ", setHeight=" + setHeight + ",\n\t " +
-                "maxTime=" + maxTime +
+                "visibleTime=" + visibleTime.Date() +
+                ", visibleDirection='" + visibleDirection + '\'' +
+                ", visibleHeight=" + visibleHeight + ",\n\t " +
+                "maxTime=" + maxTime.Date() +
                 ", maxDirection='" + maxDirection + '\'' +
-                ", maxHeight=" + maxHeight +
+                ", maxHeight=" + maxHeight + ",\n\t " +
+                "disappearTime=" + disappearTime.Date() +
+                ", disappearDirection='" + disappearDirection + '\'' +
+                ", disappearHeight=" + disappearHeight +
                 '}';
     }
 
@@ -42,6 +60,14 @@ public class SatellitePass {
 
     public JD getSetTime() {
         return new JD(setTime.Value());
+    }
+
+    public JD getVisibleTime() {
+        return new JD(visibleTime.Value());
+    }
+
+    public JD getDisappearTime() {
+        return new JD(disappearTime.Value());
     }
 
     public JD getMaxTime() {
@@ -56,6 +82,14 @@ public class SatellitePass {
         return setHeight;
     }
 
+    public double getVisibleHeight() {
+        return visibleHeight;
+    }
+
+    public double getDisappearHeight() {
+        return disappearHeight;
+    }
+
     public double getMaxHeight() {
         return maxHeight;
     }
@@ -66,6 +100,14 @@ public class SatellitePass {
 
     public String getSetDirection() {
         return setDirection;
+    }
+
+    public String getVisibleDirection() {
+        return visibleDirection;
+    }
+
+    public String getDisappearDirection() {
+        return disappearDirection;
     }
 
     public String getMaxDirection() {
