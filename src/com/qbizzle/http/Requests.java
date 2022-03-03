@@ -159,7 +159,7 @@ public class Requests {
     /**
      * Parses the JSON-String returned by {@link #getGeoPositionJSON} to obtain the GeoPosition value.
      * @param jsonString    String representation of the JSON.
-     * @return              The GeoPosition in a {@link Coordinates} object.
+     * @return              The GeoPosition in a {@link com.qbizzle.tracking.Coordinates} object.
      * @throws ParseException
      *                      If there is an error parsing the JSON.
      */
