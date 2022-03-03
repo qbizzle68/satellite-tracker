@@ -6,13 +6,23 @@
 package com.qbizzle.exception;
 
 /**
- * This unchecked exception class is used to signal a bad formatted TLE string.
+ * Signals there was an error while parsing a TLE string.
  * @todo possibly derive more descriptive exceptions that extend this class
  */
 public class InvalidTLEException extends RuntimeException {
 
-    /** Constructs an InvalidTLEException with an error message.
-     * @param errorMessage The error message for this exception.
+    /**
+     * Constructs an {@code InvalidTLEException} with null as its error
+     * detail message.
+     */
+    public InvalidTLEException() {
+        super();
+    }
+
+    /** Constructs an {@code InvalidTLEException} with the specified
+     * detail message.
+     * @param errorMessage
+     *          The detail message.
      */
     public InvalidTLEException(String errorMessage) {
         super(errorMessage);

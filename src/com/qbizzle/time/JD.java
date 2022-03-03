@@ -24,13 +24,10 @@ import java.util.*;
 public class JD implements Cloneable {
     private final double m_julianDate;
     /// Number of seconds in a solar day.
-    @SuppressWarnings("unused")
     public static final double SECONDSPERDAY = 86400.0;
     /// Number of minutes in a solar day.
-    @SuppressWarnings("unused")
     public static final double MINUTESPERDAY = 1440.0;
     /// Number of hours in a solar day.
-    @SuppressWarnings("unused")
     public static final double HOURSPERDAY = 24.0;
     /// Julian Date number of the J2000 epoch of 1/1/2000 12:00:00.
     public static final double J2000 = 2451545.0;
@@ -68,7 +65,6 @@ public class JD implements Cloneable {
      */
     public JD(TLE tle) {
         this(tle, 0.0);
-//        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0, 0.0) + tle.EpochDay();// - 0.5;
     }
 
     /** Constucts the Julian Date from the epoch element of a TLE in GMT. Ideal for computing
@@ -168,10 +164,21 @@ public class JD implements Cloneable {
         return m_julianDate - (int) m_julianDate;
     }
 
+    /**
+     * Generates a string representation of the Julian Day in Gregorian
+     * Calendar elements.
+     * @return  String representation of the date.
+     */
     public String Date() {
         return Date(0.0);
     }
 
+    /**
+     * Generates a string representation of the Julian Day in Gregorian
+     * Calendar elements with an offset for time zones or daylight savings.
+     * @param timeZone  UTC offset, should also account for any daylight savings.
+     * @return          String representation of the date.
+     */
     public String Date(double timeZone) {
         int Z = (int)(m_julianDate + 0.5 + (timeZone / 24.0));
         double F = (m_julianDate + 0.5 + (timeZone / 24.0)) - Z;

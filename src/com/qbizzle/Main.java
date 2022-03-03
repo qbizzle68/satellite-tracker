@@ -14,15 +14,19 @@ import java.util.Date;
 import java.util.Scanner;
 import java.util.Vector;
 
-import static com.qbizzle.Main.LocationMenuOption.GO_BACK;
-
 public class Main {
 
+    /**
+     * Global variables to access in all methods.
+     */
     static Scanner scanner = new Scanner(System.in);
     static Coordinates geoPos = null;
     static TLE satTle = null;
     static double duration = 7.0;
 
+    /**
+     * Global strings for holding menu contents.
+     */
     static String mainMenuHeader;
     static Vector<String> mainMenuList;
     static String locationMenuHeader;
@@ -154,7 +158,7 @@ public class Main {
                     String address = scanner.nextLine();
                     try {
                         geoPos = Requests.getGeoPosition(address);
-                        locationInput = GO_BACK;
+                        locationInput = LocationMenuOption.GO_BACK;
                     } catch (IOException e) {
 //                        todo: find exactly what throws this
                         System.out.println("IOException occurred, try again.");
@@ -169,10 +173,10 @@ public class Main {
                     lat = getNumber("Enter latitude", -90, 90);
                     lng = getNumber("Enter longitude", -180, 180);
                     geoPos = new Coordinates(lat, lng);
-                    locationInput = GO_BACK;
+                    locationInput = LocationMenuOption.GO_BACK;
                 }
             }
-        } while (locationInput != GO_BACK);
+        } while (locationInput != LocationMenuOption.GO_BACK);
     }
 
     static double getNumber(String message, double min, double max) {

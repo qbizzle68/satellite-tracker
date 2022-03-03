@@ -28,6 +28,13 @@ public class AltAz implements Cloneable {
         epoch = new JD(0);
     }
 
+    /**
+     * Constructs an AltAz object with the altitude and azimuth, as well
+     * as an epoch.
+     * @param altitude  The altitude angle of the satellite.
+     * @param azimuth   The azimuth angle of the satellite from north moving clockwise.
+     * @param epoch     The epoch of the given angles.
+     */
     public AltAz(double altitude, double azimuth, JD epoch) {
         this.azimuth = azimuth;
         this.altitude = altitude;
@@ -54,6 +61,19 @@ public class AltAz implements Cloneable {
     @Override
     public int hashCode() {
         return Objects.hash(altitude, azimuth, epoch);
+    }
+
+    @Override
+    public AltAz clone() {
+        try {
+            AltAz clone = (AltAz) super.clone();
+            clone.altitude = this.altitude;
+            clone.azimuth = this.azimuth;
+            clone.epoch = new JD(epoch.Value());
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new AssertionError();
+        }
     }
 
     // add clone once JD is cloneable
@@ -86,10 +106,18 @@ public class AltAz implements Cloneable {
         this.altitude = altitude;
     }
 
+    /**
+     * Retrieves the epoch of this object.
+     * @return  The JD representing the epoch.
+     */
     public JD getEpoch() {
         return new JD(epoch.Value());
     }
 
+    /**
+     * Sets the epoch of this object.
+     * @param epoch The JD of the epoch.
+     */
     public void setEpoch(JD epoch) {
         this.epoch = epoch;
     }

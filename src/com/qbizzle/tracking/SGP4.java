@@ -2,36 +2,91 @@ package com.qbizzle.tracking;
 
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
-import com.qbizzle.orbit.MeanElements;
 import com.qbizzle.orbit.StateVectors;
 import com.qbizzle.orbit.TLE;
 import com.qbizzle.time.JD;
 
+/**
+ * This class functionally works, but it is very inefficient and should be implemented
+ * as an instantiable class that can be initialized to avoid repeatedly computing
+ * non-time dependent values.
+ */
 public class SGP4 {
-    private static double CK2 = 5.413080e-4;
-    private static double CK4 = 0.62098875e-6;
-    private static double E6A = 1E-6;
-    private static double Q0MS2T = 1.88027916e-9;
-    private static double S = 1.01222928;
-    private static double TOTHRD = 2.0 / 3.0;
-    private static double XJ3 = -0.253881e-5;
-    private static double XKE = 0.743669161e-1;
-    private static double XKMPER = 6378.135;
-    private static double XMNPDA = 1440.0;
-    private static double AE = 1.0;
-    private static double DE2RA = 0.174532925e-1;
-    private static double PI = Math.PI;
-    private static double PIO2 = PI / 2.0;
-    private static double TWOPI = PI * 2.0;
-    private static double X3PIO2 = 3.0 * PI / 2.0;
+    /**
+     * Constants used in the propagation model.
+     */
+    private static final double CK2 = 5.413080e-4;
+    private static final double CK4 = 0.62098875e-6;
+    private static final double E6A = 1E-6;
+    private static final double Q0MS2T = 1.88027916e-9;
+    private static final double S = 1.01222928;
+    private static final double TOTHRD = 2.0 / 3.0;
+    private static final double XJ3 = -0.253881e-5;
+    private static final double XKE = 0.743669161e-1;
+    private static final double XKMPER = 6378.135;
+    private static final double XMNPDA = 1440.0;
+    private static final double AE = 1.0;
+    private static final double DE2RA = 0.174532925e-1;
+    private static final double PI = Math.PI;
+    private static final double PIO2 = PI / 2.0;
+    private static final double TWOPI = PI * 2.0;
+    private static final double X3PIO2 = 3.0 * PI / 2.0;
 
-    /** everything seems to be in km and minutes */
+    /**
+     * A container class for handling the mean elements of a TLE in the
+     * appropriate units.
+     */
+    static class MeanElements {
+        public final double n0;
+        public final double e0;
+        public final double i0;
+        public final double M0;
+        public final double w0;
+        public final double L0;
+        public final double ndot0;
+        public final double nddot0;
 
+        /**
+         * Constructs a MeanElements object from the mean elements contained in
+         * a TLE.
+         * @param tle   TLE that contains the desired mean elements.
+         */
+        public MeanElements(TLE tle) {
+            n0 = tle.MeanMotion() * 2 * Math.PI / 1440.0;
+            e0 = tle.Eccentricity();
+            i0 = Math.toRadians( tle.Inclination() );
+            M0 = Math.toRadians( tle.MeanAnomaly() );
+            w0 = Math.toRadians( tle.AOP() );
+            L0 = Math.toRadians( tle.LAN() );
+            ndot0 = tle.MeanMotionDot() * 2 * Math.PI / (1440.0 * 1440.0);
+            nddot0 = tle.MeanMotionDDot() * 2 * Math.PI / (1440.0 * 1440.0 * 1440.0);
+        }
+    }
+
+//    /** everything seems to be in km and minutes */
+
+    /**
+     * Propagates the satellite to a specific time to obtain the position
+     * and velocity vectors.
+     * @param tle   TLE of the satellite.
+     * @param t1    Time to find the state vectors.
+     * @return      A StateVectors object containing the position and velocity
+     *              of the satellite.
+     */
     public static StateVectors Propagate(TLE tle, JD t1) {
         return Propagate(tle, t1.Difference(new JD(tle)));
     }
 
-    // dt in solar days
+    /**
+     * Propagates the satellite forward or backwards by a certain amount of
+     * time to obtain the position and velocity vectors.
+     * @param tle   TLE of the satellite.
+     * @param dt    Amount of time in the future or past to propagate. This
+     *              is relative to the epoch of the @p tle and is measured
+     *              in solar days.
+     * @return      A StateVectors object containing the position and velocity
+     *              of the satellite.
+     */
     public static StateVectors Propagate(TLE tle, double dt) {
         StateVectors state = step(tle, new MeanElements(tle), dt * 1440.0);
         return new StateVectors(
@@ -42,6 +97,13 @@ public class SGP4 {
 
     // TODO: we don't need the MeanElements, just convert them inside the step method
     // dt in minutes
+    /**
+     * Implementation of the SGP4 model.
+     * @param tle       TLE of the satellite.
+     * @param elements  Mean elements of the TLE in appropriate units.
+     * @param dt        Change in time relative to the @p tle epoch.
+     * @return          The state vectors of the satellite.
+     */
     private static StateVectors step(TLE tle, MeanElements elements, double dt) {
         // mean elements
         double xm0 = elements.M0;

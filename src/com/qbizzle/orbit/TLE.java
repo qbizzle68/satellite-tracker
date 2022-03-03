@@ -224,7 +224,6 @@ public class TLE {
      * @param line A line of the TLE which the characters are summed together.
      * @return True if the checksum is correct, false if otherwise.
      */
-    @SuppressWarnings("unused")
     private boolean checksum(String line) {
         int sum = 0;
         for (int i = 0; i < line.length()-1; i++) {

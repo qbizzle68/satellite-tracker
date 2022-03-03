@@ -53,15 +53,12 @@ public class Tracker {
      * @return The GeoPosition of the satellite.
      */
     public static Coordinates getGeoPositionAt(TLE tle, JD t1) {
-//        StateVectors stateAtT1 = new StateVectors(tle, t1.Difference(new JD(tle)));
         // todo: check which ephemeris model to use before calling
         StateVectors stateAtT1 = SGP4.Propagate(tle, t1);
         double earthOffsetAngle = SiderealTime.EarthOffsetAngle(t1);
         Vector positionAtT1 = Rotation.RotateFrom(Axis.Direction.Z, -earthOffsetAngle, stateAtT1.Position());
         return new Coordinates(positionAtT1);
     }
-
-    // may make getGeoPositionAt with COE, JD t0, JD t1 args.
 
     /** Computes an array of GeoPositions of a satellite over a given period.
      * @param tle The TLE of the satellite to track.
@@ -127,10 +124,24 @@ public class Tracker {
         return true;
     }
 
+    /**
+     * Computes the position of a satellite in a topocentric reference frame.
+     * @param tle       TLE of the satellite.
+     * @param dt        Change in time relative to the @p tle epoch.
+     * @param geoPos    GeoPosition which corresponds to the center of the reference frame.
+     * @return          The position vector in SEZ reference frame.
+     */
     public static Vector getSEZPosition(TLE tle, double dt, Coordinates geoPos) {
         return getSEZPosition(tle, new JD(tle).Future(dt), geoPos);
     }
 
+    /**
+     * Computes the position of a satellite in a topocentric reference frame.
+     * @param tle       TLE of the satellite.
+     * @param t1        Time in which to find the satellite position.
+     * @param geoPos    GeoPosition which corresponds to the center of the reference frame.
+     * @return          The position vector in SEZ reference frame.
+     */
     public static Vector getSEZPosition(TLE tle, JD t1, Coordinates geoPos) {
         // todo: check which ephemeris model to use before calling
         return getSEZPosition(
@@ -140,6 +151,15 @@ public class Tracker {
         );
     }
 
+    /**
+     * Converts a position vector from a geocentric reference frame to a topocentric
+     * reference frame.
+     * @param position  Position vector of the satellite in the earth centered reference frame.
+     * @param t1        Time in which the satellite occupies this position. This is needed to find
+     *                  the earth rotation offset from the celestial coordinate system.
+     * @param geoPos    GeoPosition which corresponds to the center of the reference frame.
+     * @return          The position vector in SEZ reference frame.
+     */
     public static Vector getSEZPosition(Vector position, JD t1, Coordinates geoPos) {
         double localSiderealTime = SiderealTime.LST(t1, geoPos.getLongitude()) * HOURS_PER_DEGREE;
         Vector geoPosVector = getToposPosition(t1, geoPos);
@@ -154,6 +174,13 @@ public class Tracker {
         return rotateTranslate(sezToIJK, geoPosVector, position);
     }
 
+    /**
+     * Computes the position vector of a GeoPosition.
+     * @param t     Time the position vector is needed. This is necessary for adjusting
+     *              for the earth's rotation offset.
+     * @param topos The GeoPosition corresponding to the center of the reference frame.
+     * @return      The position vector in earth centric reference frame.
+     */
     public static Vector getToposPosition(JD t, Coordinates topos) {
         // todo: account for elevation with this radius
         double radiusAtLat = Coordinates.radiusAtLatitude(topos.getLatitude());
@@ -166,29 +193,68 @@ public class Tracker {
         );
     }
 
-    public static AltAz getAltAz(TLE tle, JD t1, Coordinates geoPos) {
+    /**
+     * Generates an AltAz object referencing the altitude and azimuth of a satellite at a
+     * given time.
+     * @param tle       TLE of the satellite.
+     * @param t         Time to find the position.
+     * @param geoPos    GeoPosition to find the relative altitude and azimuth for.
+     * @return          An AltAz object with the epoch set as @p t.
+     */
+    public static AltAz getAltAz(TLE tle, JD t, Coordinates geoPos) {
         return getAltAz(
-                getSEZPosition(tle, t1, geoPos),
-                t1
+                getSEZPosition(tle, t, geoPos),
+                t
         );
     }
 
-    public static AltAz getAltAz(Vector sezPosition, JD t1) {
+    /**
+     * Converts a position vector in a topocentric reference frame to a relative
+     * altitude and azimuth.
+     * @param sezPosition   Position vector in SEZ reference frame.
+     * @param t             Time associated with the position.
+     * @return              An AltAz object with the epoch set as @p t.
+     */
+    public static AltAz getAltAz(Vector sezPosition, JD t) {
         return new AltAz(
                 Math.toDegrees( Math.asin(sezPosition.z() / sezPosition.mag())),
                 Math.toDegrees( OrbitalMath.atan2(sezPosition.y(), -sezPosition.x()) ),
-                t1
+                t
         );
     }
 
+    /**
+     * Determines if a satellite is above the horizon for a given GeoPosition and time.
+     * @param tle           TLE for the satellite.
+     * @param t             Time the satellite would be above the horizon.
+     * @param geoPosition   GeoPosition for determining the horizon.
+     * @return              True if the altitude of the satellite is greater than 0,
+     *                      false if otherwise.
+     */
     public static boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
         // todo: wouldn't it be more efficient if we just called for SEZ position and returned (sezPos.z() > 0)
         AltAz altaz = getAltAz(tle, t, geoPosition);
         return (altaz.getAltitude() > 0);
     }
 
+    /**
+     * Computes the pass information for a satellite pass.
+     * @param tle       TLE of the satellite.
+     * @param passTime  If there is a valid pass, this value must be between the pass rise
+     *                  and set times. There may be some marginal error allowed but success
+     *                  cannot be guaranteed.
+     * @param coords    The GeoPosition for the pass.
+     * @return          A SatellitePass object containing the pass info.
+     * @throws NoPassException
+     *                  If the satellite is not above the horizon during this time.
+     * @throws NoLightException
+     *                  If the satellite is never in sunlight during a pass.
+     * @throws DaylightPassException
+     *                  If the pass occurs during daylight and is not visible.
+     */
     public static SatellitePass getPassInfo(TLE tle, JD passTime, Coordinates coords) {
-        // todo: how to we make a better guess than 10 minutes?
+//        todo: how to we make a better guess than 10 minutes?
+//        todo: checking for daylight first should cut this processing time by half when used by getPasses
         AltAz rise = riseSqueeze(tle, passTime.Future(-10.0 / 1440.0), passTime, coords, null);
         AltAz set = setSqueeze(tle, rise.getEpoch(), passTime.Future(10.0 / 1440.0), coords, null);
         AltAz first = firstSqueeze(tle, rise.getEpoch(), set.getEpoch(), coords);
@@ -205,6 +271,23 @@ public class Tracker {
         else throw new DaylightPassException("Pass not visible due to sunlight.");
     }
 
+    /**
+     * Computes pass information for any and all passes over a GeoPosition for a given duration.
+     * @param tle       TLE of the satellite. Note that the TLE becomes less accurate as time
+     *                  moves away from the TLE epoch. This should be kept in mind
+     * @param startTime Time to begin looking for passes.
+     * @param endTime   End of period to look for passes. Note that the TLE becomes less accurate
+     *                  as time move away from the TLE epoch. This should be kept in mind when
+     *                  choosing this value.
+     * @param geoPos    The GeoPosition for the pass.
+     * @return          A SatellitePass object containing the pass info.
+     * @throws NoPassException
+     *                  If the satellite is not above the horizon during this time.
+     * @throws NoLightException
+     *                  If the satellite is never in sunlight during a pass.
+     * @throws DaylightPassException
+     *                  If the pass occurs during daylight and is not visible.
+     */
     public static java.util.Vector<SatellitePass> getPasses(TLE tle, JD startTime, JD endTime, Coordinates geoPos) {
         final double dt = 10 / 86400.0; // 10 seconds
         java.util.Vector<SatellitePass> passList = new java.util.Vector<>();
@@ -225,13 +308,20 @@ public class Tracker {
         return passList;
     }
 
-    // returns a Coordinates with declination as latitude and right ascension as longitude in hours
-    static public Coordinates getCelestialCoordinates(TLE tle, JD t1, Coordinates coords) {
-        Vector pos = getSEZPosition(tle, t1, coords);
+    /**
+     * Computes the right-ascension and declination of a satellite.
+     * @param tle    TLE of the satellite.
+     * @param t      Time to find the satellite's position.
+     * @param coords GeoPosition viewing the satellite.
+     * @return       A Coordinates object where the latitude is the declination
+     *               and the longitude is the right-ascension.
+     */
+    static public Coordinates getCelestialCoordinates(TLE tle, JD t, Coordinates coords) {
+        Vector pos = getSEZPosition(tle, t, coords);
         pos = Rotation.RotateFrom(
                 EulerOrderList.ZYX,
                 new EulerAngles(
-                        SiderealTime.LST(t1, coords.getLongitude()) * HOURS_PER_DEGREE,
+                        SiderealTime.LST(t, coords.getLongitude()) * HOURS_PER_DEGREE,
                         90 - coords.getLatitude(),
                         0
                 ),
@@ -246,8 +336,16 @@ public class Tracker {
         );
     }
 
-    // RADec being RA in time units and Dec in degrees
-    // this doesn't account for proper motion of stars or planets
+    /**
+     * Adjusts right-ascension and declination due to precession and nutation of the
+     * celestial pole. Right-ascension is in time units (hours) and declination in degrees.
+     * If this is used to adjust a star it does not account for proper motion.
+     * @param t     Epoch to convert coordinates to.
+     * @param RaDec Coordinates in J2000 epoch reference frame with right-ascension
+     *              as longitude and declination as latitude.
+     * @return      Adjusted coordinates with right-ascension as longitude and
+     *              declination as latitude.
+     */
     static public Coordinates adjustRaDec(JD t, Coordinates RaDec) {
         double JDCenturies = (t.Value() - JD.J2000) / 36525.0;
         double m = 3.07496 + 0.00186 * JDCenturies;
@@ -263,14 +361,43 @@ public class Tracker {
         );
     }
 
-    // rotation is from inertial to rotated, offset in inertial frame pointing from inertial origin to translated origin.
+    /**
+     * Rotates and then translates said rotated reference frame.
+     * @param rot      Rotation from inertial to rotated reference frame.
+     * @param offset   Vector offset between reference frame origins, with respect to the
+     *                 inertial reference frame, pointing towards the translated origin.
+     * @param original Original vector to rotate and translate.
+     * @return  The rotated and translated vector.
+     */
     static private Vector rotateTranslate(Matrix rot, Vector offset, Vector original) {
         Vector rotOrig = rot.transpose().mult(original);
         Vector rotOffset = rot.transpose().mult(offset);
         return rotOrig.minus(rotOffset);
     }
 
+    /**
+     * Epsilon value for determining if an altitude is considered above the horizon
+     * (since it is difficult to find out exactly when altitude is equal to zero).
+     */
     static private final double altitudeEpsilon = 0.01;
+
+    /**
+     * Finds the time the satellite rises above the horizon. The method is recursive and uses a
+     * bifurcation method to 'squeeze' the bounds towards the correct value. If the satellite
+     * position at the upper bound is not above the horizon then there is not a valid pass
+     * at that time.
+     * @param tle    TLE of the satellite.
+     * @param lower  Lower bound of the possible rise times, should be below the actual rise time
+     *               or else the recursion will converge to this time and not be correct.
+     * @param upper  Upper bound of the possible rise times, should be during the overhead pass or
+     *               else the pass will not be valid and an exception will be thrown.
+     * @param coords GeoPosition of the pass.
+     * @param rtn    Value of the previous computation passed to the next call, initial is excepted
+     *               to be {@code null}.
+     * @return  An AltAz object corresponding to the rise time of the interested pass.
+     * @throws NoPassException
+     *              Signals if the satellite never rises during the original lower-upper time frame.
+     */
     static private AltAz riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
         if (upper.Difference(lower) <= squeezeEpsilon) {
             if (rtn.getAltitude() + altitudeEpsilon > 0) return rtn;
@@ -282,7 +409,21 @@ public class Tracker {
         else return riseSqueeze(tle, biTime, upper, coords, altaz);
     }
 
-    // should be called after riseSqueeze, as riseSqueeze will detect if no pass occurs, also gives lower bound
+    /**
+     * Finds the time the satellite sets below the horizon. The method is recursive and uses a
+     * bifurcation method to 'squeeze' the bounds towards the correct value. {@link #riseSqueeze(TLE, JD, JD, Coordinates, AltAz)}
+     * should be called beforehand, since that method will detect if no pass occurs, as well as gives the best
+     * initial lower bounds to the recursion call.
+     * @param tle    TLE of the satellite.
+     * @param lower  Lower bound of the possible set times, initial value should be the answer from
+     *               {@link #riseSqueeze(TLE, JD, JD, Coordinates, AltAz)}.
+     * @param upper  Upper bound of the possible set times, should be later than the actual set time or
+     *               else the recursion will converge to this time and not be correct.
+     * @param coords GeoPosition of the pass.
+     * @param rtn    Value of the previous computation passed to the next call, initial is excepted
+     *               to be {@code null}.
+     * @return  An AltAz object corresponding to the set time of the interested pass.
+     */
     static private AltAz setSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
         if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
@@ -291,6 +432,21 @@ public class Tracker {
         else return setSqueeze(tle, lower, biTime, coords, altaz);
     }
 
+    /**
+     * Finds the time the satellite first becomes visible due to sunlight. The method is recursive and uses a
+     * bifurcation method to 'squeeze' the bounds towards the correct value. {@link #riseSqueeze(TLE, JD, JD, Coordinates, AltAz)}
+     * and {@link #setSqueeze(TLE, JD, JD, Coordinates, AltAz)} should provide the initial bounds.
+     * @param tle    TLE of the satellite.
+     * @param lower  Lower bound of the possible first times, initial value should be the answer from
+     *               {@link #riseSqueeze(TLE, JD, JD, Coordinates, AltAz)} and the method shouldn't
+     *               be used if a value wasn't returned.
+     * @param upper  Upper bound of the possible first times, initial value should be the answer from
+     *               {@link #setSqueeze(TLE, JD, JD, Coordinates, AltAz)}.
+     * @param geoPos GeoPosition of the pass.
+     * @return  An AltAz object corresponding to the first visible time of the interested pass.
+     * @throws NoLightException
+     *              Signals if the satellite doesn't encounter any sunlight during a pass.
+     */
     static private AltAz firstSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos) {
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
         Vector lowerSunPosition = Sun.Position(lower);
@@ -312,8 +468,22 @@ public class Tracker {
         }
     }
 
-    // should call firstSqueeze first to get the initial lower time, as well as to be sure
-    // the lower time is initially lit
+    /**
+     * Finds the time the satellite is last visible due to sunlight. The method is recursive and uses
+     * a bifurcation method to 'squeeze' the bounds towards the correct value. {@link #firstSqueeze(TLE, JD, JD, Coordinates)}
+     * should be called before this method to ensure there is a valid lower bound for the time-frame
+     * the satellite is lit, as well as provide the initial lower bound.
+     * @param tle    The TLE of the satellite.
+     * @param lower  Lower bound of the possible last times, initial value should be the answer from
+     *               {@link #firstSqueeze(TLE, JD, JD, Coordinates)} and the method shouldn't be
+     *               used if  a value wasn't returned.
+     * @param upper  Upper bound of the possible last times, initial value should be the value returned
+     *               by {@link #setSqueeze(TLE, JD, JD, Coordinates, AltAz)}.
+     * @param geoPos GeoPosition of the pass.
+     * @param rtn    Value of the previous computation passed to the next call, initial is excepted
+     *               to be {@code null}.
+     * @return  An AltAz object corresponding to the last visible time of the interested pass.
+     */
     static private AltAz lastSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, AltAz rtn) {
         if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
@@ -328,8 +498,21 @@ public class Tracker {
         else return lastSqueeze(tle, lower, biTime, geoPos, altaz);
     }
 
-    // don't know if this is the best way to do this. it makes some assumptions on the shape of the visible path
-    // that I'm not sure is always appropriate for different sized orbits...
+//    todo: there's gotta be a better/more accurate way to compute this
+    /**
+     * This method computes the time the satellite achieves its maximum altitude
+     * during a pass. Lower and Upper bounds should not be outside the bounds
+     * of the values returned by {@link #riseSqueeze(TLE, JD, JD, Coordinates, AltAz)}
+     * and {@link #setSqueeze(TLE, JD, JD, Coordinates, AltAz)}.
+     * @param tle    TLE of the satellite.
+     * @param lower  Lower bound of the possible max times.
+     * @param upper  Upper bound of the possible max times.
+     * @param geoPos GeoPosition of the pass.
+     * @param rtn    Value of the previous computation passed to the next call, initial is expected
+     *               to be {@code null}.
+     * @return  An AltAz object corresponding to the time the satellite achieves its
+     *          maximum altitude.
+     */
     static AltAz maxSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, AltAz rtn) {
         if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
         AltAz lowerAltAz = Tracker.getAltAz(tle, lower, geoPos);

@@ -1,28 +1,28 @@
+/**
+ * @file
+ * Contains Eclipse class with methods for determining if objects are eclipsed.
+ */
+
 package com.qbizzle.orbit;
 
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 
+/**
+ * Eclipse class is a static class with methods pertaining to objects in
+ * relation to other bodies and their shadows.
+ */
 public class Eclipse {
-    private static final double earthRadius = OrbitalMath.EARTH_EQUITORIAL_RADIUS;
-    private static final double sunRadius = 6.957E8; // meters
 
-//    // positions are relative to the satellite
-//    public static boolean isEclipsed(Vector satPosition, Vector sunPosition) {
-////        semi-diameters of earth and sun
-//        double thetaE = Math.asin(earthRadius / satPosition.mag());
-//        double thetaS = Math.asin(sunRadius / sunPosition.mag());
-////        angle between earth and sun centers
-//        double theta = Math.acos(satPosition.dot(sunPosition) / (satPosition.mag() * sunPosition.mag()));
-//
-//        // umbral eclipse
-//        if (thetaE > thetaS && theta < (thetaE - thetaS)) return true;
-//        // penumbral eclipse
-//        if (Math.abs(thetaE - thetaS) < theta && theta < (thetaE + thetaS)) return true;
-//        // annular eclipse
-//        if (thetaS > thetaE && theta < (thetaS - thetaE)) return true;
-//        return false;
-//    }
+    /**
+     * Radius of the Earth in meters.
+     */
+    private static final double earthRadius = OrbitalMath.EARTH_EQUITORIAL_RADIUS;
+
+    /**
+     * Radius of the Sun in meters.
+     */
+    private static final double sunRadius = 6.957E8; // meters
 
     /** Determines if an object is currently eclipsed by the earths shadow.
      * @param satPosition Position of the object relative to the Earth in IJK coordinates.
@@ -46,7 +46,6 @@ public class Eclipse {
 //        penumbral eclipse
         if (Math.abs(thetaE - thetaS) < theta && theta < (thetaE + thetaS)) return true;
 //        annular eclipse
-        if (thetaS > thetaE && theta < (thetaS - thetaE)) return true;
-        return false;
+        return thetaS > thetaE && theta < (thetaS - thetaE);
     }
 }

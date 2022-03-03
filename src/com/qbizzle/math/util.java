@@ -18,7 +18,4 @@ public class util {
     /** Identity 3x3 matrix. */
     public final static Matrix I3 = new Matrix(e1, e2, e3);
 
-    // dont need this if we have the static field inside the JD class
-//    /** Julian day of the J2000 epoch, January 1st, 2000, 12:00:00 UTC. */
-//    public final static JD J2000 = new JD(1, 1, 2000, 12, 0, 0.0);
 }

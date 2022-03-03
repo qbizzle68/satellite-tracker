@@ -1,12 +1,31 @@
+/**
+ * @file
+ * Contains methods for computations relating to the Sun.
+ */
+
 package com.qbizzle.tracking;
 
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 import com.qbizzle.time.JD;
 
+/**
+ * A static class with methods for computing the Sun's position and
+ * phase of day/night.
+ */
 public class Sun {
+    /**
+     * Astronomical unit in meters.
+     */
     public static final double AU = 1.495978707e11; // meters
 
+    /**
+     * Computes the position of the Sun in an earth-centered reference frame, from the
+     * <a href="https://en.wikipedia.org/wiki/Position_of_the_Sun#:~:text=The%20position%20of%20the%20Sun,circular%20path%20called%20the%20ecliptic.">
+     * algorithm</a> found on Wikipedia.
+     * @param t UTC time for finding the Sun's position.
+     * @return  An earth centered position vector of the Sun.
+     */
     public static Vector Position(JD t) {
 //         time since noon TT on 1, jan ,2000
         double n = t.Value() - 2451545.0;
@@ -16,8 +35,6 @@ public class Sun {
         double g = 6.240040768 + 0.0172019703 * n;
 //         ecliptic longitude of the Sun
         double lambda = L + 0.0334230552 * Math.sin(g) + 0.00034906585 * Math.sin(2 * g);
-//        ecliptic latitude of the Sun never exceeds 0.00033 degrees
-        double beta = 0.0;
 //        distance of the Sun from the Earth
         double R = 1.00014 - 0.01671 * Math.cos(g) - 0.00014 * Math.cos(2 * g);
 //        obliquity of the ecliptic (axial tilt)
@@ -31,6 +48,13 @@ public class Sun {
         );
     }
 
+    /**
+     * Computes the position of the Sun in an earth-centric reference frame using a
+     * more accurate model from the paper "Solar Position Algorithm for Solar Radiation
+     * Applications".
+     * @param t UTC time for finding the Sun's position.
+     * @return  An earth centered position vector of the Sun.
+     */
     public static Vector Position2(JD t) {
 //        double JC = (t.Number() - JD.J2000) / 36525.0;
         double JCE = (t.Value() - JD.J2000) / 36525.0;
@@ -69,7 +93,7 @@ public class Sun {
 //        if (H < 0.0) H += 360.0;
 //        double ksi = 8.794 / (3600.0 * R);
 //        double u = Math.atan(0.99664719 * Math.tan( Math.toRadians(coords.getLatitude()) ));
-//        // todo: adjust for elevation when adding it to Coordiantes
+//        // todo: adjust for elevation when adding it to Coordinates
 //        double E = 1830.14;
 //        double x = Math.cos(u) + (E * Math.cos(Math.toRadians(coords.getLatitude())) / 6378140.0);
 //        double y = 0.99664719 * Math.sin(u) + (E * Math.sin(Math.toRadians(coords.getLatitude())) / 6378140.0);
@@ -104,14 +128,6 @@ public class Sun {
                 R * (Math.cos(latRad) * Math.sin(lngRad) * Math.cos(epsRad) - Math.sin(latRad) * Math.sin(epsRad)),
                 R * (Math.cos(latRad) * Math.sin(lngRad) * Math.sin(epsRad) + Math.sin(latRad) * Math.cos(epsRad))
         ).scale(AU);
-    }
-
-    static public double[] test(double JME) {
-        double[] rtn = new double[3];
-        rtn[0] = expandTableValues(LTable, JME);
-        rtn[1] = expandTableValues(BTable, JME);
-        rtn[2] = expandTableValues(RTable, JME);
-        return rtn;
     }
 
     static private double tableSum(double[][] table, double JME) {
@@ -164,6 +180,13 @@ public class Sun {
     }
 
     // x value is RA and y value is declination
+
+    /**
+     * Computes right-ascension and declination of the sun at given time.
+     * @param t UTC time to find the Sun's position.
+     * @return  A vector whose x-coordinate is right-ascension and
+     *          y-coordinate is declination.
+     */
     public static Vector Coordinates(JD t) {
 //         time since noon TT on 1, jan ,2000
         double n = t.Value() - 2451545.0;
@@ -173,10 +196,6 @@ public class Sun {
         double g = 6.240040768 + 0.0172019703 * n;
 //         ecliptic longitude of the Sun
         double lambda = L + 0.0334230552 * Math.sin(g) + 0.00034906585 * Math.sin(2 * g);
-//        ecliptic latitude of the Sun never exceeds 0.00033 degrees
-        double beta = 0.0;
-//        distance of the Sun from the Earth
-        double R = 1.00014 - 0.01671 * Math.cos(g) - 0.00014 * Math.cos(2 * g);
 //        obliquity of the ecliptic (axial tilt)
         double e = 0.4090877234 - 6.981317008e-9 * n;
         return new Vector(
@@ -189,10 +208,22 @@ public class Sun {
     }
 
 //     better name for this?
+    /**
+     * An enum containing the possible day/night 'phases'. This doesn't differentiate
+     * from morning or evening twilight's, because they're currently not of importance
+     * in regard to the Sun's altitude below the horizon.
+     */
     public enum TwilightType {
         Day, Civil, Nautical, Astronomical, Night
     }
 
+    /**
+     * Computes the altitude of the Sun's position and converts that to its
+     * related twilight type.
+     * @param t         Time to find Sun's position.
+     * @param coords    GeoPosition of location.
+     * @return          The TwilightType relating to the Sun's altitude.
+     */
     public static TwilightType getTwilightType(JD t, Coordinates coords) {
         Vector sunPos = Position2(t);
         Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, coords);
@@ -202,13 +233,6 @@ public class Sun {
         else if (sunAngle < -6) return TwilightType.Nautical;
         else if (sunAngle < -(5.0 / 6.0)) return TwilightType.Civil;
         else return TwilightType.Day;
-    }
-
-    @SuppressWarnings("unused")
-    public static double getSunAngle(JD t, Coordinates geoPos) {
-        Vector sunPos = Position2(t);
-        Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, geoPos);
-        return Tracker.getAltAz(sunSEZPos, t).getAltitude();
     }
 
     private static final double[][][] LTable = {

@@ -111,7 +111,6 @@ public class Coordinates {
      * @return The geodetic latitude in degrees.
      */
     public static double geocentricToGeodetic(double lat) {
-//        final double flattening = (EARTH_EQUITORIAL_RADIUS - EARTH_POLAR_RADIUS) / EARTH_EQUITORIAL_RADIUS;
         double lhs = Math.tan( Math.toRadians(lat) ) / Math.pow(1.0 - flattening, 2);
         return Math.toDegrees( Math.atan(lhs) );
     }
@@ -127,7 +126,12 @@ public class Coordinates {
         return Math.toDegrees( Math.atan(rhs) );
     }
 
-    // convert geodetic latitude to radius (intermediate converts to geocentric)
+    /**
+     * Computes the geocentric radius for a given @em geodetic latitude.
+     * @param geodeticLat   Geodetic latitude in degrees, north direction being
+     *                      positive, south being negative.
+     * @return              Radius in meters.
+     */
     public static double radiusAtLatitude(double geodeticLat) {
         if (geodeticLat == 0.0) return EARTH_EQUITORIAL_RADIUS;
         else if (geodeticLat == 90.0) return EARTH_POLAR_RADIUS;

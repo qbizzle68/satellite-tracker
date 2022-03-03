@@ -99,32 +99,26 @@ public class Matrix implements Cloneable {
 ///@{
 
     /** Retrieves a certain component of the matrix by index (starting at 0).
-     * @param row Row index of desired element.
-     * @param col Column index of desired element.
-     * @return The value at the indexed position.
-     * @throws ArrayIndexOutOfBoundsException if either of the indexes are out
-     * of range (indexing starts at 0).
+     * @param row   Row index of desired element.
+     * @param col   Column index of desired element.
+     * @return      The value at the indexed position.
      */
     public double get(int row, int col) {
         return m_data[row][col];
     }
 
     /** Sets a certain component of the matrix by index (starting at 0).
-     * @param row Row index of element to modify.
-     * @param col Column index of element to modify.
+     * @param row   Row index of element to modify.
+     * @param col   Column index of element to modify.
      * @param value Value to set the desired component to.
-     * @throws ArrayIndexOutOfBoundsException if either of the indexes are out
-     * of range (indexing starts at 0).
      */
     public void set(int row, int col, double value) {
         m_data[row][col] = value;
     }
 
     /** Retrieves a certain column of the matrix by index (starting at 0).
-     * @param col Column index of desired column vector.
-     * @return The desired column vector of the matrix.
-     * @throws ArrayIndexOutOfBoundsException if column index is out of range
-     * (indexing starts at 0).
+     * @param col   Column index of desired column vector.
+     * @return      The desired column vector of the matrix.
      */
     @SuppressWarnings("UnusedReturnValue")
     public Vector getColumn(int col) {
@@ -273,7 +267,6 @@ public class Matrix implements Cloneable {
      * @param rhs Matrix to compound this rotation by.
      * @return A clone of this matrix after it has been multiplied.
      */
-    @SuppressWarnings("UnusedReturnValue")
     public Matrix multEquals(Matrix rhs) {
         Matrix tmp = this.mult(rhs);
         for (int i = 0; i < 3; i++) {
