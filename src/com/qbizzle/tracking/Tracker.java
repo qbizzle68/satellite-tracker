@@ -401,7 +401,7 @@ public class Tracker {
     static private AltAz riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
         if (upper.Difference(lower) <= squeezeEpsilon) {
             if (rtn.getAltitude() + altitudeEpsilon > 0) return rtn;
-            else throw new NoPassException("No overhead pass at " + upper.Date());
+            else throw new NoPassException("No overhead pass at " + upper.date());
         }
         JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
         AltAz altaz = Tracker.getAltAz(tle, biTime, coords);

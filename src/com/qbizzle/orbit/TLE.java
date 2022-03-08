@@ -15,6 +15,7 @@ import com.qbizzle.exception.InvalidTLEException;
  */
 // maybe store all these data in a map?
 public class TLE {
+    private String line0, line1, line2;
     private String m_satelliteName;
 //    line 1
     private int m_catalogNumber, m_epochYear, m_ephemeris, m_setNumber;
@@ -69,6 +70,18 @@ public class TLE {
     /// @name Accessor Methods
     /// Methods used to access the elements of a TLE.
 ///@{
+
+    public String getLine0() {
+        return line0;
+    }
+
+    public String getLine1() {
+        return line1;
+    }
+
+    public String getLine2() {
+        return line2;
+    }
 
     /** Gets the name of the satellite, the 0th line of the TLE.
      * @return String with the name of the satellite.
@@ -249,6 +262,9 @@ public class TLE {
         for (int i = 0; i < 3; i++) lines[i] = lines[i].trim();
         String[] line1Tokens = lines[1].split("[\s]+");
         String[] line2Tokens = lines[2].split("[\s]+");
+        line0 = lines[0];
+        line1 = lines[1];
+        line2 = lines[2];
 
         m_satelliteName = lines[0];
 //        parsing line 1

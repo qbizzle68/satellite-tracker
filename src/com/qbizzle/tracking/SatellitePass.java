@@ -78,13 +78,13 @@ public class SatellitePass {
     @Override
     public String toString() {
         return "SatellitePass{" +
-                "visibleTime=" + visibleTime.Date() +
+                "visibleTime=" + visibleTime.date() +
                 ", visibleDirection='" + visibleDirection + '\'' +
                 ", visibleHeight=" + visibleHeight + ",\n\t " +
-                "maxTime=" + maxTime.Date() +
+                "maxTime=" + maxTime.date() +
                 ", maxDirection='" + maxDirection + '\'' +
                 ", maxHeight=" + maxHeight + ",\n\t " +
-                "disappearTime=" + disappearTime.Date() +
+                "disappearTime=" + disappearTime.date() +
                 ", disappearDirection='" + disappearDirection + '\'' +
                 ", disappearHeight=" + disappearHeight +
                 '}';

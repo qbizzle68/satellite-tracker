@@ -169,8 +169,8 @@ public class JD implements Cloneable {
      * Calendar elements.
      * @return  String representation of the date.
      */
-    public String Date() {
-        return Date(0.0);
+    public String date() {
+        return date(0.0);
     }
 
     /**
@@ -179,7 +179,7 @@ public class JD implements Cloneable {
      * @param timeZone  UTC offset, should also account for any daylight savings.
      * @return          String representation of the date.
      */
-    public String Date(double timeZone) {
+    public String date(double timeZone) {
         int Z = (int)(m_julianDate + 0.5 + (timeZone / 24.0));
         double F = (m_julianDate + 0.5 + (timeZone / 24.0)) - Z;
         int A;
@@ -201,20 +201,38 @@ public class JD implements Cloneable {
         if (m > 2) y = D - 4716;
         else y = D - 4715;
 
-        String rtn = m + "/";
-        if (d < 10) rtn += "0";
-        rtn += (int)d + "/" + y + " ";
+        StringBuilder str = new StringBuilder(m)
+                .append("/");
+        if (d < 10) str.append("0");
+        str.append((int)d)
+                .append("/")
+                .append(y)
+                .append(" ");
 
         double dayFrac = d - (int)d;
         int h = (int)(dayFrac * 24);
         int min = (int)((dayFrac - (h / 24.0)) * 1440.0);
         double s = (dayFrac - (h / 24.0) - (min / 1440.0)) * 86400.0;
 
-        rtn += h + ":";
-        if (min < 10) rtn += "0";
-        rtn += min + ":" + String.format("%.2f", s);
+        if (h < 10) str.append("0");
+        str.append(h).append(":");
+        if (min < 10) str.append("0");
+        str.append(min).append(":");
+        int roundS = (int)Math.round(s);
+        if (roundS < 10) str.append("0");
+        str.append(roundS);
 
-        return rtn;
+        return str.toString();
+    }
+
+    public String day(double timeZone) {
+        String date = this.date(timeZone);
+        return date.substring(0, date.indexOf(' '));
+    }
+
+    public String time(double timeZone) {
+        String date = this.date(timeZone);
+        return date.substring(date.indexOf(' ') + 1);
     }
 
 ///@}*/

@@ -7,8 +7,6 @@ package com.qbizzle.tracking;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 
-import java.util.Arrays;
-
 import static com.qbizzle.math.OrbitalMath.EARTH_EQUITORIAL_RADIUS;
 import static com.qbizzle.math.OrbitalMath.EARTH_POLAR_RADIUS;
 
@@ -19,7 +17,8 @@ import static com.qbizzle.math.OrbitalMath.EARTH_POLAR_RADIUS;
  */
 public class Coordinates {
     public static final double flattening = (EARTH_EQUITORIAL_RADIUS - EARTH_POLAR_RADIUS) / EARTH_EQUITORIAL_RADIUS;
-    private double[] m_coordinates;
+    private double latitude;
+    private double longitude;
 
     /** Constructs a GeoPosition to default values of 0, 0. */
     public Coordinates() {
@@ -31,7 +30,8 @@ public class Coordinates {
      * @param lng Longitude in degrees.
      */
     public Coordinates(double lat, double lng) {
-        m_coordinates = new double[]{lat, lng};
+        latitude = lat;
+        longitude = lng;
     }
 
     /** Constructs a GeoPosition, with minutes and seconds arguments.
@@ -53,12 +53,14 @@ public class Coordinates {
      * @param position Position vector in IJK reference frame.
      */
     public Coordinates(Vector position) {
-        m_coordinates = new double[2];
+//        m_coordinates = new double[2];
         double xyMag = Math.sqrt( Math.pow(position.x(), 2) + Math.pow(position.y(), 2) );
         double declination = Math.toDegrees( Math.atan2(position.z(), xyMag) );
-        m_coordinates[0] = geocentricToGeodetic(declination);
+//        m_coordinates[0] = geocentricToGeodetic(declination);
+        latitude = geocentricToGeodetic(declination);
         double lng = OrbitalMath.atan2(position.y(), position.x());
-        m_coordinates[1] = Math.toDegrees( (lng > Math.PI) ? lng - 2*Math.PI : lng );
+//        m_coordinates[1] = Math.toDegrees( (lng > Math.PI) ? lng - 2*Math.PI : lng );
+        longitude = Math.toDegrees( (lng > Math.PI) ? lng - 2 * Math.PI : lng);
     }
 
     /// @name Overridden methods
@@ -70,10 +72,12 @@ public class Coordinates {
      */
     @Override
     public String toString() {
-        return "GeoPosition{" +
-               "m_coordinates=" + Arrays.toString(m_coordinates) +
-               '}';
+        return "Coordinates{" +
+                "latitude=" + latitude +
+                ", longitude=" + longitude +
+                '}';
     }
+
 
 ///@}
 
@@ -81,28 +85,28 @@ public class Coordinates {
      * @return The latitude in degrees.
      */
     public double getLatitude() {
-        return m_coordinates[0];
+        return latitude;
     }
 
     /** Sets the latitude of this position.
      * @param lat The latitude in degrees.
      */
     public void setLatitude(double lat) {
-        m_coordinates[0] = lat;
+        latitude = lat;
     }
 
     /** Retrieves the longitude of this position.
      * @return The longitude in degrees.
      */
     public double getLongitude() {
-        return m_coordinates[1];
+        return longitude;
     }
 
     /** Sets the longitude of this position.
      * @param lng The longitude in degrees.
      */
     public void setLongitude(double lng) {
-        m_coordinates[1] = lng;
+        longitude = lng;
     }
 
     /** Converts a geocentric latitude to a geodetic latitude. Can be used

@@ -125,19 +125,19 @@ public class Main {
                 SatellitePass satPass = passList.get(i-1);
                 String strPass = "Pass " + i +
                         "\nfirst visible: " +
-                        satPass.getVisibleTime().Date() + // can add time zone here if we set it up
+                        satPass.getVisibleTime().date() + // can add time zone here if we set it up
                         " | direction: " +
                         satPass.getVisibleDirection() +
                         " | height: " +
                         satPass.getVisibleHeight() +
                         "\nmax time: " +
-                        satPass.getMaxTime().Date() +
+                        satPass.getMaxTime().date() +
                         " | direction: " +
                         satPass.getMaxDirection() +
                         " | height: " +
                         satPass.getMaxHeight() +
                         "\ndisappear time: " +
-                        satPass.getDisappearTime().Date() +
+                        satPass.getDisappearTime().date() +
                         " | direction: " +
                         satPass.getDisappearDirection() +
                         " | height: " +
