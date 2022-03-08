@@ -6,53 +6,49 @@ import com.qbizzle.tracking.SatellitePass;
 import com.qbizzle.tracking.Tracker;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Date;
 import java.util.Vector;
 
 public class SatelliteTracker extends JFrame {
     private JPanel mainPanel;
     private JTextPane tleViewPanel;
-    private JLabel tleLabel;
-    private JLabel locationLabel;
     private JRadioButton locationManual;
-    private JLabel latitudeLabel;
     private JSpinner latitudeDegreeSpinner;
-    private JLabel latDegreeSymbol;
     private JSpinner latitudeMinuteSpinner;
     private JSpinner latitudeSecondSpinner;
-    private JLabel latMinuteSymbol;
-    private JLabel latSecondSymbol;
-    private JLabel longitudeLabel;
     private JSpinner longDegreeSpinner;
     private JSpinner longMinuteSpinner;
     private JSpinner longSecondSpinner;
-    private JLabel longSecondSymbol;
-    private JLabel longMinuteSymbol;
-    private JLabel longDegreeSymbol;
     private JRadioButton locationLookup;
     private JTextField locationSearchText;
-    private JSeparator tleLocationSeparator;
-    private JSeparator locationTleSeparator;
-    private JLabel tleLookupLabel;
     private JRadioButton tleLookupManual;
     private JTextArea tleImportText;
     private JRadioButton tleLookupSearch;
     private JButton locationSearchButton;
     private JTextField tleSearchText;
     private JButton tleSearchButton;
-    private JSeparator tleLookupPassSeparator;
-    private JLabel passLabel;
     private JTable passTable;
     private JButton tleManualImport;
     private JButton generatePassesButton;
     private JScrollPane passScrollPane;
-    private JButton button1;
+    //    unused components
+//    private JLabel tleLabel;
+//    private JLabel locationLabel;
+//    private JLabel latitudeLabel;
+//    private JLabel latDegreeSymbol;
+//    private JLabel latMinuteSymbol;
+//    private JLabel latSecondSymbol;
+//    private JLabel longitudeLabel;
+//    private JLabel longSecondSymbol;
+//    private JLabel longMinuteSymbol;
+//    private JLabel longDegreeSymbol;
+//    private JSeparator tleLocationSeparator;
+//    private JSeparator locationTleSeparator;
+//    private JLabel tleLookupLabel;
+//    private JSeparator tleLookupPassSeparator;
+//    private JLabel passLabel;
 
     private static TLE tle;
     private static Coordinates geoPos;
@@ -80,187 +76,145 @@ public class SatelliteTracker extends JFrame {
         tleLookupSearch.setSelected(true);
         displayGeoPosition();
         displayTLE();
-//        mainPanel.setMinimumSize(new Dimension(616, 750));
         this.setSize(new Dimension(616, 750));
 
 
-        locationManual.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                latitudeDegreeSpinner.setEnabled(true);
-                latitudeMinuteSpinner.setEnabled(true);
-                latitudeSecondSpinner.setEnabled(true);
-                longDegreeSpinner.setEnabled(true);
-                longMinuteSpinner.setEnabled(true);
-                longSecondSpinner.setEnabled(true);
-                locationSearchText.setEnabled(false);
-                locationSearchButton.setEnabled(false);
-            }
+        locationManual.addActionListener(e -> {
+            latitudeDegreeSpinner.setEnabled(true);
+            latitudeMinuteSpinner.setEnabled(true);
+            latitudeSecondSpinner.setEnabled(true);
+            longDegreeSpinner.setEnabled(true);
+            longMinuteSpinner.setEnabled(true);
+            longSecondSpinner.setEnabled(true);
+            locationSearchText.setEnabled(false);
+            locationSearchButton.setEnabled(false);
         });
-        locationLookup.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                locationSearchText.setEnabled(true);
-                locationSearchButton.setEnabled(true);
-                latitudeDegreeSpinner.setEnabled(false);
-                latitudeMinuteSpinner.setEnabled(false);
-                latitudeSecondSpinner.setEnabled(false);
-                longDegreeSpinner.setEnabled(false);
-                longMinuteSpinner.setEnabled(false);
-                longSecondSpinner.setEnabled(false);
-            }
+        locationLookup.addActionListener(e -> {
+            locationSearchText.setEnabled(true);
+            locationSearchButton.setEnabled(true);
+            latitudeDegreeSpinner.setEnabled(false);
+            latitudeMinuteSpinner.setEnabled(false);
+            latitudeSecondSpinner.setEnabled(false);
+            longDegreeSpinner.setEnabled(false);
+            longMinuteSpinner.setEnabled(false);
+            longSecondSpinner.setEnabled(false);
         });
-        tleLookupManual.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tleImportText.setEnabled(true);
-                tleManualImport.setEnabled(true);
-                tleSearchText.setEnabled(false);
-                tleSearchButton.setEnabled(false);
-            }
+        tleLookupManual.addActionListener(e -> {
+            tleImportText.setEnabled(true);
+            tleManualImport.setEnabled(true);
+            tleSearchText.setEnabled(false);
+            tleSearchButton.setEnabled(false);
         });
-        tleLookupSearch.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                tleImportText.setEnabled(false);
-                tleManualImport.setEnabled(false);
-                tleSearchText.setEnabled(true);
-                tleSearchButton.setEnabled(true);
-            }
+        tleLookupSearch.addActionListener(e -> {
+            tleImportText.setEnabled(false);
+            tleManualImport.setEnabled(false);
+            tleSearchText.setEnabled(true);
+            tleSearchButton.setEnabled(true);
         });
-        latitudeDegreeSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int) latitudeDegreeSpinner.getValue();
-                if (value == 91) latitudeDegreeSpinner.setValue(-90);
-                else if (value == -91) latitudeDegreeSpinner.setValue(90);
-                else if (value < -91 || value > 91) latitudeDegreeSpinner.setValue(0);
-                updateGeoPosition();
-            }
+        latitudeDegreeSpinner.addChangeListener(e -> {
+            int value = (int) latitudeDegreeSpinner.getValue();
+            if (value == 91) latitudeDegreeSpinner.setValue(-90);
+            else if (value == -91) latitudeDegreeSpinner.setValue(90);
+            else if (value < -91 || value > 91) latitudeDegreeSpinner.setValue(0);
+            updateGeoPosition();
         });
-        longDegreeSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int) longDegreeSpinner.getValue();
-                if (value == 181) longDegreeSpinner.setValue(-180);
-                else if (value == -181) longDegreeSpinner.setValue(180);
-                else if (value < -181 || value > 181) longDegreeSpinner.setValue(0);
-                updateGeoPosition();
-            }
+        longDegreeSpinner.addChangeListener(e -> {
+            int value = (int) longDegreeSpinner.getValue();
+            if (value == 181) longDegreeSpinner.setValue(-180);
+            else if (value == -181) longDegreeSpinner.setValue(180);
+            else if (value < -181 || value > 181) longDegreeSpinner.setValue(0);
+            updateGeoPosition();
         });
-        latitudeMinuteSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int) latitudeMinuteSpinner.getValue();
-                if (value == 60) latitudeMinuteSpinner.setValue(0);
-                else if (value == -1) latitudeMinuteSpinner.setValue(59);
-                else if (value < -1 || value > 60) latitudeMinuteSpinner.setValue(0);
-                updateGeoPosition();
-            }
+        latitudeMinuteSpinner.addChangeListener(e -> {
+            int value = (int) latitudeMinuteSpinner.getValue();
+            if (value == 60) latitudeMinuteSpinner.setValue(0);
+            else if (value == -1) latitudeMinuteSpinner.setValue(59);
+            else if (value < -1 || value > 60) latitudeMinuteSpinner.setValue(0);
+            updateGeoPosition();
         });
-        latitudeSecondSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int) latitudeSecondSpinner.getValue();
-                if (value == 60) latitudeSecondSpinner.setValue(0);
-                else if (value == -1) latitudeSecondSpinner.setValue(59);
-                else if (value < -1 || value > 60) latitudeSecondSpinner.setValue(0);
-                updateGeoPosition();
-            }
+        latitudeSecondSpinner.addChangeListener(e -> {
+            int value = (int) latitudeSecondSpinner.getValue();
+            if (value == 60) latitudeSecondSpinner.setValue(0);
+            else if (value == -1) latitudeSecondSpinner.setValue(59);
+            else if (value < -1 || value > 60) latitudeSecondSpinner.setValue(0);
+            updateGeoPosition();
         });
-        longMinuteSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int) longMinuteSpinner.getValue();
-                if (value == 60) longMinuteSpinner.setValue(0);
-                else if (value == -1) longMinuteSpinner.setValue(59);
-                else if (value < -1 || value > 60) longMinuteSpinner.setValue(0);
-                updateGeoPosition();
-            }
+        longMinuteSpinner.addChangeListener(e -> {
+            int value = (int) longMinuteSpinner.getValue();
+            if (value == 60) longMinuteSpinner.setValue(0);
+            else if (value == -1) longMinuteSpinner.setValue(59);
+            else if (value < -1 || value > 60) longMinuteSpinner.setValue(0);
+            updateGeoPosition();
         });
-        longSecondSpinner.addChangeListener(new ChangeListener() {
-            @Override
-            public void stateChanged(ChangeEvent e) {
-                int value = (int) longSecondSpinner.getValue();
-                if (value == 60) longSecondSpinner.setValue(0);
-                else if (value == -1) longSecondSpinner.setValue(59);
-                else if (value < -1 || value > 60) longSecondSpinner.setValue(0);
-                updateGeoPosition();
-            }
+        longSecondSpinner.addChangeListener(e -> {
+            int value = (int) longSecondSpinner.getValue();
+            if (value == 60) longSecondSpinner.setValue(0);
+            else if (value == -1) longSecondSpinner.setValue(59);
+            else if (value < -1 || value > 60) longSecondSpinner.setValue(0);
+            updateGeoPosition();
         });
-        locationSearchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Coordinates fetchedGeoPos = null;
-                try {
-                    fetchedGeoPos = Requests.getGeoPosition(locationSearchText.getText());
-                } catch (Exception ex) {
-                    latitudeDegreeSpinner.setValue(0);
-                    latitudeMinuteSpinner.setValue(0);
-                    latitudeSecondSpinner.setValue(0);
-                    longDegreeSpinner.setValue(0);
-                    longMinuteSpinner.setValue(0);
-                    longSecondSpinner.setValue(0);
-                    return;
-                }
-                geoPos.setLatitude(fetchedGeoPos.getLatitude());
-                geoPos.setLongitude((fetchedGeoPos.getLongitude()));
-                displayGeoPosition();
+        locationSearchButton.addActionListener(e -> {
+            Coordinates fetchedGeoPos;
+            try {
+                fetchedGeoPos = Requests.getGeoPosition(locationSearchText.getText());
+            } catch (Exception ex) {
+                latitudeDegreeSpinner.setValue(0);
+                latitudeMinuteSpinner.setValue(0);
+                latitudeSecondSpinner.setValue(0);
+                longDegreeSpinner.setValue(0);
+                longMinuteSpinner.setValue(0);
+                longSecondSpinner.setValue(0);
+                return;
             }
+            geoPos.setLatitude(fetchedGeoPos.getLatitude());
+            geoPos.setLongitude((fetchedGeoPos.getLongitude()));
+            displayGeoPosition();
         });
-        tleSearchButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                Vector<TLE> tleList = null;
-                try {
-                    tleList = Requests.getTLEList(tleSearchText.getText());
-                } catch (Exception ex) {
-                    // need a way to signal error here
-                    return;
-                }
-                tle = tleList.get(0);
-                displayTLE();
+        tleSearchButton.addActionListener(e -> {
+            Vector<TLE> tleList;
+            try {
+                tleList = Requests.getTLEList(tleSearchText.getText());
+            } catch (Exception ex) {
+                // need a way to signal error here
+                return;
             }
+            tle = tleList.get(0);
+            displayTLE();
         });
-        tleManualImport.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
+        tleManualImport.addActionListener(e -> {
 //                need to catch all exceptions here
-                tle = new TLE(tleImportText.getText());
-                displayTLE();
-            }
+            tle = new TLE(tleImportText.getText());
+            displayTLE();
         });
-        generatePassesButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                var now = new JD(new Date());
-                Vector<SatellitePass> passList = Tracker.getPasses(
-                        tle, now, now.Future(14.0), geoPos
-                );
+        generatePassesButton.addActionListener(e -> {
+            var now = new JD(new Date());
+            Vector<SatellitePass> passList = Tracker.getPasses(
+                    tle, now, now.Future(duration), geoPos
+            );
 
-                DefaultTableModel model = new DefaultTableModel(tableHeader, 0);
-                for (SatellitePass pass :
-                        passList) {
-                    model.addRow(new Object[] {
-                            pass.getVisibleTime().day(-6),
-                            pass.getVisibleTime().time(-6),
-                            Math.round( pass.getVisibleHeight() ),
-                            pass.getVisibleDirection(),
-                            pass.getMaxTime().time(-6),
-                            Math.round( pass.getMaxHeight() ),
-                            pass.getMaxDirection(),
-                            pass.getDisappearTime().time(-6),
-                            Math.round( pass.getDisappearHeight() ),
-                            pass.getDisappearDirection()
-                    });
-                }
-                passTable.setModel(model);
+            DefaultTableModel model = new DefaultTableModel(tableHeader, 0);
+            for (SatellitePass pass :
+                    passList) {
+                model.addRow(new Object[] {
+                        pass.getVisibleTime().day(-6),
+                        pass.getVisibleTime().time(-6),
+                        Math.round( pass.getVisibleHeight() ),
+                        pass.getVisibleDirection(),
+                        pass.getMaxTime().time(-6),
+                        Math.round( pass.getMaxHeight() ),
+                        pass.getMaxDirection(),
+                        pass.getDisappearTime().time(-6),
+                        Math.round( pass.getDisappearHeight() ),
+                        pass.getDisappearDirection()
+                });
             }
+            passTable.setModel(model);
         });
     }
 
     public static void main(String[] args) {
         geoPos = new Coordinates(38.0608, -97.9298);
+        duration = 14.0;
 //        either do this, lookup with http request everytime, or save the most recent tle before exiting
         tle = new TLE("""
                 ISS (ZARYA)            \s
