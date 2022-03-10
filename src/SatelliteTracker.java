@@ -34,21 +34,21 @@ public class SatelliteTracker extends JFrame {
     private JButton generatePassesButton;
     private JScrollPane passScrollPane;
     //    unused components
-//    private JLabel tleLabel;
-//    private JLabel locationLabel;
-//    private JLabel latitudeLabel;
-//    private JLabel latDegreeSymbol;
-//    private JLabel latMinuteSymbol;
-//    private JLabel latSecondSymbol;
-//    private JLabel longitudeLabel;
-//    private JLabel longSecondSymbol;
-//    private JLabel longMinuteSymbol;
-//    private JLabel longDegreeSymbol;
-//    private JSeparator tleLocationSeparator;
-//    private JSeparator locationTleSeparator;
-//    private JLabel tleLookupLabel;
-//    private JSeparator tleLookupPassSeparator;
-//    private JLabel passLabel;
+    private JLabel tleLabel;
+    private JLabel locationLabel;
+    private JLabel latitudeLabel;
+    private JLabel latDegreeSymbol;
+    private JLabel latMinuteSymbol;
+    private JLabel latSecondSymbol;
+    private JLabel longitudeLabel;
+    private JLabel longSecondSymbol;
+    private JLabel longMinuteSymbol;
+    private JLabel longDegreeSymbol;
+    private JSeparator tleLocationSeparator;
+    private JSeparator locationTleSeparator;
+    private JLabel tleLookupLabel;
+    private JSeparator tleLookupPassSeparator;
+    private JLabel passLabel;
 
     private static TLE tle;
     private static Coordinates geoPos;
