@@ -24,6 +24,7 @@ import com.qbizzle.time.SiderealTime;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.Iterator;
 
 /** This is a static class with methods that will compute current or predict future positions
  * of satellites, and use that information to plan overhead passes. Many other methods involved
@@ -305,6 +306,55 @@ public class Tracker {
             }
             //todo: add comparison methods for JD
         } while(currentTime.Value() < endTime.Value());
+        return passList;
+    }
+
+//    todo: does this affect passList in the larger scope?
+    public static java.util.Vector<SatellitePass> filterPasses(java.util.Vector<SatellitePass> passList, PassFilter filter) {
+        Iterator<SatellitePass> iter = passList.iterator();
+        while (iter.hasNext()) {
+            SatellitePass pass = iter.next();
+
+            switch (filter.getFilterType()) {
+                case MINIMUM_HEIGHT -> {
+                    if (pass.getMaxHeight() < filter.getMinimumHeight())
+//                        passList.remove(pass);
+                        iter.remove();
+                }
+                case MINIMUM_DURATION -> {
+                    if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
+//                        passList.remove(pass);
+                        iter.remove();
+                }
+                case MINIMUM_HEIGHT_DURATION -> {
+                    if (pass.getMaxHeight() < filter.getMinimumHeight())
+//                        passList.remove(pass);
+                        iter.remove();
+                    else if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
+//                        passList.remove(pass);
+                        iter.remove();
+                }
+            }
+        }
+//        for (SatellitePass pass :
+//                passList) {
+//            switch (filter.getFilterType()) {
+//                case MINIMUM_HEIGHT -> {
+//                    if (pass.getMaxHeight() < filter.getMinimumHeight())
+//                        passList.remove(pass);
+//                }
+//                case MINIMUM_DURATION -> {
+//                    if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
+//                        passList.remove(pass);
+//                }
+//                case MINIMUM_HEIGHT_DURATION -> {
+//                    if (pass.getMaxHeight() < filter.getMinimumHeight())
+//                        passList.remove(pass);
+//                    else if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
+//                        passList.remove(pass);
+//                }
+//            }
+//        }
         return passList;
     }
 

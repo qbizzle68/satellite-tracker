@@ -2,11 +2,15 @@ package com.qbizzle;
 
 import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.http.Requests;
+import com.qbizzle.math.Matrix;
+import com.qbizzle.orbit.StateVectors;
 import com.qbizzle.orbit.TLE;
+import com.qbizzle.referenceframe.EulerAngles;
+import com.qbizzle.referenceframe.EulerOrderList;
+import com.qbizzle.rotation.Rotation;
 import com.qbizzle.time.JD;
-import com.qbizzle.tracking.Coordinates;
-import com.qbizzle.tracking.SatellitePass;
-import com.qbizzle.tracking.Tracker;
+import com.qbizzle.time.SiderealTime;
+import com.qbizzle.tracking.*;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -91,29 +95,80 @@ public class Main {
         do {
             menuInput = MainMenuOption.fromID(displayMenu(mainMenuHeader, mainMenuList));
             switch (menuInput) {
-                case GET_PASSES:
-                    getPassesHandler();
-                    break;
-                case SET_LOCATION:
-                    setLocationHandler();
-                    break;
-                case SET_SATELLITE:
+                case GET_PASSES -> getPassesHandler();
+                case SET_LOCATION -> setLocationHandler();
+                case SET_SATELLITE -> {
                     setSatelliteHandler();
                     System.out.println(satTle);
-                    break;
-                case SET_DURATION:
-                    duration = getNumber("Enter a duration in days to calculate passes (max 14)", 0, 14);
-                    break;
-                case GET_DETAILS:
+                }
+                case SET_DURATION -> duration = getNumber("Enter a duration in days to calculate passes (max 14)", 0, 14);
+                case GET_DETAILS -> {
                     System.out.println("Location: " + geoPos);
                     System.out.println("TLE: " + satTle);
                     System.out.println("Duration: " + duration);
-                    break;
-                default:
-                    break;
+                }
+                default -> {
+                }
             }
         } while (menuInput != MainMenuOption.EXIT);
 
+    }
+
+    static double epsilon = 1e-4;
+    static JD getSetTime(TLE tle, JD t, Coordinates geoPos) {
+        StateVectors state = SGP4.Propagate(tle, t);
+        Matrix rotationMatrix = Rotation.getEulerMatrix(
+                EulerOrderList.ZYX,
+                new EulerAngles(
+                        SiderealTime.LST(t, geoPos.getLongitude()) * 15.0,
+                        90 - geoPos.getLatitude(),
+                        0.0
+                )
+        );
+        StateVectors sezState = new StateVectors(
+                Tracker.getSEZPosition(state.Position(), t, geoPos),
+                Rotation.RotateTo(rotationMatrix, state.Velocity().exclude(state.Position()))
+        );
+        AltAz altaz = Tracker.getAltAz(tle, t, geoPos);
+        System.out.println("time: " + t.Date(-6) + " alt: " + altaz.getAltitude());
+        if (Math.abs(altaz.getAltitude()) < epsilon) return t;
+        else {
+            double angVelocity = sezState.Velocity().mag() / sezState.Position().mag(); // radians / s
+            double timeToHorizon = Math.toRadians(altaz.getAltitude()) / angVelocity;
+            return getSetTime(
+                    tle,
+                    t.Future(timeToHorizon / 86400.0),
+                    geoPos
+            );
+        }
+    }
+
+    static JD getRiseTime(TLE tle, JD t, Coordinates geoPos) {
+        StateVectors state = SGP4.Propagate(tle, t);
+        Matrix rotationMatrix = Rotation.getEulerMatrix(
+                EulerOrderList.ZYX,
+                new EulerAngles(
+                        SiderealTime.LST(t, geoPos.getLongitude()) * 15.0,
+                        90 - geoPos.getLatitude(),
+                        0.0
+                )
+        );
+        StateVectors sezState = new StateVectors(
+                Tracker.getSEZPosition(state.Position(), t, geoPos),
+                Rotation.RotateTo(rotationMatrix, state.Velocity().exclude(state.Position()))
+        );
+        AltAz altaz = Tracker.getAltAz(tle, t, geoPos);
+        System.out.println("time: " + t.Date(-6) + " alt: " + altaz.getAltitude());
+        if (Math.abs(altaz.getAltitude()) < epsilon) return t;
+        else {
+            double angVelocity = sezState.Velocity().mag() / sezState.Position().mag(); // radians / s
+            double timeToHorizon = Math.toRadians(altaz.getAltitude()) / angVelocity;
+            return getRiseTime(
+                    tle,
+                    t.Future(-timeToHorizon / 86400.0),
+                    geoPos
+            );
+        }
     }
 
     static void getPassesHandler() {

@@ -255,6 +255,14 @@ public class Vector implements Cloneable {
         return rtn;
     }
 
+    public Vector exclude(Vector vec) {
+        return this.minus(
+                vec.scale(
+                        this.dot(vec) / Math.pow( vec.mag(), 2)
+                )
+        );
+    }
+
 ///@}
 
     /// @name Accessor methods
