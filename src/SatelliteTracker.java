@@ -1,7 +1,7 @@
+import com.qbizzle.coordinates.GeoPosition;
 import com.qbizzle.http.Requests;
 import com.qbizzle.orbit.TLE;
 import com.qbizzle.time.JD;
-import com.qbizzle.tracking.Coordinates;
 import com.qbizzle.tracking.SatellitePass;
 import com.qbizzle.tracking.Tracker;
 
@@ -51,7 +51,7 @@ public class SatelliteTracker extends JFrame {
     private JLabel passLabel;
 
     private static TLE tle;
-    private static Coordinates geoPos;
+    private static GeoPosition geoPos;
     private static double duration;
     private final String[] tableHeader = {
             "Date",
@@ -154,7 +154,7 @@ public class SatelliteTracker extends JFrame {
             updateGeoPosition();
         });
         locationSearchButton.addActionListener(e -> {
-            Coordinates fetchedGeoPos;
+            GeoPosition fetchedGeoPos;
             try {
                 fetchedGeoPos = Requests.getGeoPosition(locationSearchText.getText());
             } catch (Exception ex) {
@@ -213,7 +213,7 @@ public class SatelliteTracker extends JFrame {
     }
 
     public static void main(String[] args) {
-        geoPos = new Coordinates(38.0608, -97.9298);
+        geoPos = new GeoPosition(38.0608, -97.9298);
         duration = 14.0;
 //        either do this, lookup with http request everytime, or save the most recent tle before exiting
         tle = new TLE("""

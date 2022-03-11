@@ -5,6 +5,7 @@
 
 package com.qbizzle.tracking;
 
+import com.qbizzle.coordinates.GeoPosition;
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
 import com.qbizzle.time.JD;
@@ -221,12 +222,14 @@ public class Sun {
      * Computes the altitude of the Sun's position and converts that to its
      * related twilight type.
      * @param t         Time to find Sun's position.
-     * @param coords    GeoPosition of location.
+     * @param geoPosition
+     *                  GeoPosition of location.
      * @return          The TwilightType relating to the Sun's altitude.
      */
-    public static TwilightType getTwilightType(JD t, Coordinates coords) {
+//    public static TwilightType getTwilightType(JD t, Coordinates coords) {
+    public static TwilightType getTwilightType(JD t, GeoPosition geoPosition) {
         Vector sunPos = Position2(t);
-        Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, coords);
+        Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, geoPosition);
         double sunAngle = Tracker.getAltAz(sunSEZPos, t).getAltitude();
         if (sunAngle < -18) return TwilightType.Night;
         else if (sunAngle < -12) return TwilightType.Astronomical;

@@ -1,5 +1,6 @@
 package com.qbizzle;
 
+import com.qbizzle.coordinates.GeoPosition;
 import com.qbizzle.exception.InvalidTLEException;
 import com.qbizzle.http.Requests;
 import com.qbizzle.math.Matrix;
@@ -24,7 +25,7 @@ public class Main {
      * Global variables to access in all methods.
      */
     static Scanner scanner = new Scanner(System.in);
-    static Coordinates geoPos = null;
+    static GeoPosition geoPos = null;
     static TLE satTle = null;
     static double duration = 7.0;
 
@@ -115,7 +116,7 @@ public class Main {
     }
 
     static double epsilon = 1e-4;
-    static JD getSetTime(TLE tle, JD t, Coordinates geoPos) {
+    static JD getSetTime(TLE tle, JD t, GeoPosition geoPos) {
         StateVectors state = SGP4.Propagate(tle, t);
         Matrix rotationMatrix = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
@@ -130,7 +131,7 @@ public class Main {
                 Rotation.RotateTo(rotationMatrix, state.Velocity().exclude(state.Position()))
         );
         AltAz altaz = Tracker.getAltAz(tle, t, geoPos);
-        System.out.println("time: " + t.Date(-6) + " alt: " + altaz.getAltitude());
+        System.out.println("time: " + t.date(-6) + " alt: " + altaz.getAltitude());
         if (Math.abs(altaz.getAltitude()) < epsilon) return t;
         else {
             double angVelocity = sezState.Velocity().mag() / sezState.Position().mag(); // radians / s
@@ -143,7 +144,7 @@ public class Main {
         }
     }
 
-    static JD getRiseTime(TLE tle, JD t, Coordinates geoPos) {
+    static JD getRiseTime(TLE tle, JD t, GeoPosition geoPos) {
         StateVectors state = SGP4.Propagate(tle, t);
         Matrix rotationMatrix = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
@@ -158,7 +159,7 @@ public class Main {
                 Rotation.RotateTo(rotationMatrix, state.Velocity().exclude(state.Position()))
         );
         AltAz altaz = Tracker.getAltAz(tle, t, geoPos);
-        System.out.println("time: " + t.Date(-6) + " alt: " + altaz.getAltitude());
+        System.out.println("time: " + t.date(-6) + " alt: " + altaz.getAltitude());
         if (Math.abs(altaz.getAltitude()) < epsilon) return t;
         else {
             double angVelocity = sezState.Velocity().mag() / sezState.Position().mag(); // radians / s
@@ -227,7 +228,7 @@ public class Main {
                     double lat, lng;
                     lat = getNumber("Enter latitude", -90, 90);
                     lng = getNumber("Enter longitude", -180, 180);
-                    geoPos = new Coordinates(lat, lng);
+                    geoPos = new GeoPosition(lat, lng);
                     locationInput = LocationMenuOption.GO_BACK;
                 }
             }
@@ -302,7 +303,7 @@ public class Main {
     }
 
     static void initialize() throws IOException, InterruptedException {
-        geoPos = new Coordinates(38.060017, -97.930495);
+        geoPos = new GeoPosition(38.060017, -97.930495);
         satTle = Requests.getTLEList("ISS (ZARYA").get(0);
         mainMenuHeader = "===== Sat-Trak =====";
         mainMenuList = new Vector<>(6);

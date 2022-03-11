@@ -7,8 +7,8 @@
 
 package com.qbizzle.http;
 
+import com.qbizzle.coordinates.GeoPosition;
 import com.qbizzle.orbit.TLE;
-import com.qbizzle.tracking.Coordinates;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -55,7 +55,8 @@ public class Requests {
      * @throws InterruptedException If the thread is interrupted.
      * @throws ParseException       If there is an error parsing the JSON response.
      */
-    public static double getElevation(Coordinates geoPosition) throws IOException, InterruptedException, ParseException {
+//    public static double getElevation(Coordinates geoPosition) throws IOException, InterruptedException, ParseException {
+    public static double getElevation(GeoPosition geoPosition) throws IOException, InterruptedException, ParseException {
         return getElevationFromJSON(
                 getElevationJSON(geoPosition)
         );
@@ -81,7 +82,7 @@ public class Requests {
      * @throws ParseException
      *                  If there is an error parsing JSON response by json-simple.
      */
-    public static Coordinates getGeoPosition(String location) throws IOException, InterruptedException, ParseException {
+    public static GeoPosition getGeoPosition(String location) throws IOException, InterruptedException, ParseException {
         return getGeoPositionFromJSON(
                 getGeoPositionJSON(location)
         );
@@ -92,17 +93,19 @@ public class Requests {
      * <p>
      * This requests the Open version of Map Quest's APIs, therefore the accuracy and probability
      * of finding an answer is lower.
-     * @param geoPos    The GeoPosition of where the elevation is being inquired.
+     * @param geoPosition
+     *                  The GeoPosition of where the elevation is being inquired.
      * @return          A String representation of the response which is in JSON form.
      * @throws IOException
      *                  If there is an I/O error while sending or receiving.
      * @throws InterruptedException
      *                  If the HTTP request is interrupted.
      */
-    public static String getElevationJSON(Coordinates geoPos) throws IOException, InterruptedException {
+//    public static String getElevationJSON(Coordinates geoPos) throws IOException, InterruptedException {
+    public static String getElevationJSON(GeoPosition geoPosition) throws IOException, InterruptedException {
         String URL = OPEN_MAPQUEST_ELEVATION_URL
                 .replace("KEY", OPEN_MAPQUEST_KEY) +
-                geoPos.getLatitude() + "," + geoPos.getLongitude();
+                geoPosition.getLatitude() + "," + geoPosition.getLongitude();
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .GET()
@@ -159,17 +162,17 @@ public class Requests {
     /**
      * Parses the JSON-String returned by {@link #getGeoPositionJSON} to obtain the GeoPosition value.
      * @param jsonString    String representation of the JSON.
-     * @return              The GeoPosition in a {@link com.qbizzle.tracking.Coordinates} object.
+     * @return              The GeoPosition of the address.
      * @throws ParseException
      *                      If there is an error parsing the JSON.
      */
-    public static Coordinates getGeoPositionFromJSON(String jsonString) throws ParseException {
+    public static GeoPosition getGeoPositionFromJSON(String jsonString) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject json = (JSONObject) parser.parse(jsonString);
         JSONObject resultsObj = (JSONObject)((JSONArray) json.get("results")).get(0);
         JSONObject locationsObj = (JSONObject)((JSONArray) resultsObj.get("locations")).get(0);
         JSONObject latlng = (JSONObject) locationsObj.get("latLng");
-        return  new Coordinates(
+        return  new GeoPosition(
                 ((Number) latlng.get("lat")).doubleValue(),
                 ((Number) latlng.get("lng")).doubleValue()
         );
