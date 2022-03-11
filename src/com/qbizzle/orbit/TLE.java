@@ -86,21 +86,21 @@ public class TLE {
     /** Gets the name of the satellite, the 0th line of the TLE.
      * @return String with the name of the satellite.
      */
-    public String Name() {
+    public String name() {
         return m_satelliteName;
     }
 
     /** Gets the classification of the satellite, Unclassified, Classified or Secret.
      * @return A character with the classification of the satellite.
      */
-    public char Classification() {
+    public char classification() {
         return m_classification;
     }
 
     /** Gets the five digit catalog number of the satellite.
      * @return The catalog number of the satellite.
      */
-    public int CatalogNumber() {
+    public int catalogNumber() {
         return m_catalogNumber;
     }
 
@@ -108,49 +108,49 @@ public class TLE {
      * launch number of the year and the piece of the launch.
      * @return A string representation of the COSPAR ID.
      */
-    public String CosparID() {
+    public String cosparID() {
         return m_cosparID;
     }
 
     /** Gets the year of the TLE epoch or time the TLE was created.
      * @return Year the TLE was created.
      */
-    public int EpochYear() {
+    public int epochYear() {
         return m_epochYear;
     }
 
     /** Gets the day number of the TLE epoch.
      * @return The day number in solar days in which the TLE was created.
      */
-    public double EpochDay() {
+    public double epochDay() {
         return m_epoch;
     }
 
     /** Gets the inclination of the orbit in @em degrees.
      * @return The inclination of the orbit.
      */
-    public double Inclination() {
+    public double inclination() {
         return m_inclination;
     }
 
     /** Gets the Longitude of the Ascending Node (or RAAN) of the orbit in @em degrees.
      * @return The LAN of the orbit.
      */
-    public double LAN() {
+    public double lan() {
         return m_lan;
     }
 
     /** Gets the eccentricity of the orbit.
      * @return The eccentricity of the orbit.
      */
-    public double Eccentricity() {
+    public double eccentricity() {
         return m_eccentricity;
     }
 
     /** Gets the Argument Of Periapsis of the orbit in @em degrees.
      * @return The argument of periapsis of the orbit.
      */
-    public double AOP() {
+    public double aop() {
         return m_argumentOfPerigee;
     }
 
@@ -158,7 +158,7 @@ public class TLE {
      * true anomaly of the orbit.
      * @return The mean anomaly of the orbit.
      */
-    public double MeanAnomaly() {
+    public double meanAnomaly() {
         return m_meanAnomaly;
     }
 
@@ -166,28 +166,28 @@ public class TLE {
      * semi-major axis of the orbit.
      * @return The mean motion of the orbit.
      */
-    public double MeanMotion() {
+    public double meanMotion() {
         return m_meanMotion;
     }
 
     /** Gets the first derivative of mean motion / 2 in rev / day^2.
      * @return Half the first derivative of mean motion.
      */
-    public double MeanMotionDot() {
+    public double meanMotionDot() {
         return m_meanMotionDot;
     }
 
     /** Gets the second derivative of mean motion / 6 in rev / day^3.
      * @return A sixth of the second derivative of mean motion.
      */
-    public double MeanMotionDDot() {
+    public double meanMotionDDot() {
         return m_meanMotionDDot;
     }
 
     /** Gets the B* coefficient also known as the drag term.
      * @return The B* value of the tle.
      */
-    public double BStar() {
+    public double bStar() {
         return m_BStar;
     }
 
@@ -195,21 +195,21 @@ public class TLE {
      * a different model used to propagate drag.
      * @return The ephemeris type of the TLE.
      */
-    public int Ephemeris() {
+    public int ephemeris() {
         return m_ephemeris;
     }
 
     /** Gets the TLE set number, which is incremented whenever a new TLE is generated for this satellite.
      * @return The TLE set number.
      */
-    public int TLESetNumber() {
+    public int tleSetNumber() {
         return m_setNumber;
     }
 
     /** Gets the revolution number of the satellite at the epoch.
      * @return The revolution number of the satellite.
      */
-    public int RevolutionNumber() {
+    public int revolutionNumber() {
         return m_revNumber;
     }
 

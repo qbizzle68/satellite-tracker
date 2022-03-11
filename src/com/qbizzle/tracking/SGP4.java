@@ -52,14 +52,14 @@ public class SGP4 {
          * @param tle   TLE that contains the desired mean elements.
          */
         public MeanElements(TLE tle) {
-            n0 = tle.MeanMotion() * 2 * Math.PI / 1440.0;
-            e0 = tle.Eccentricity();
-            i0 = Math.toRadians( tle.Inclination() );
-            M0 = Math.toRadians( tle.MeanAnomaly() );
-            w0 = Math.toRadians( tle.AOP() );
-            L0 = Math.toRadians( tle.LAN() );
-            ndot0 = tle.MeanMotionDot() * 2 * Math.PI / (1440.0 * 1440.0);
-            nddot0 = tle.MeanMotionDDot() * 2 * Math.PI / (1440.0 * 1440.0 * 1440.0);
+            n0 = tle.meanMotion() * 2 * Math.PI / 1440.0;
+            e0 = tle.eccentricity();
+            i0 = Math.toRadians( tle.inclination() );
+            M0 = Math.toRadians( tle.meanAnomaly() );
+            w0 = Math.toRadians( tle.aop() );
+            L0 = Math.toRadians( tle.lan() );
+            ndot0 = tle.meanMotionDot() * 2 * Math.PI / (1440.0 * 1440.0);
+            nddot0 = tle.meanMotionDDot() * 2 * Math.PI / (1440.0 * 1440.0 * 1440.0);
         }
     }
 
@@ -112,7 +112,7 @@ public class SGP4 {
         double e0 = elements.e0;
         double xincl = elements.i0;
         double xn0 = elements.n0;
-        double bstar = tle.BStar();
+        double bstar = tle.bStar();
 
         // recover original mean motion (xn0dp (n0'') and semimajor axis (a0dp (a0'') from input elements
         double a1 = Math.pow(XKE / xn0, TOTHRD);

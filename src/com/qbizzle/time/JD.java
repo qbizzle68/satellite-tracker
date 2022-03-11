@@ -74,7 +74,7 @@ public class JD implements Cloneable {
      * @param timeZone The timezone relative to UTC.
      */
     public JD(TLE tle, double timeZone) {
-        m_julianDate = GetDate(12, 31, tle.EpochYear()-1, 0, 0, 0, timeZone) + tle.EpochDay();
+        m_julianDate = GetDate(12, 31, tle.epochYear()-1, 0, 0, 0, timeZone) + tle.epochDay();
     }
 
     /** Constructs the Julian Date directly from a known Julian Date number

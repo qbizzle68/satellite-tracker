@@ -79,33 +79,33 @@ public class COE {
      * @param dt - Time since the epoch of the TLE, measured in Julian Days.
      */
     public COE(TLE tle, double dt) {
-        inc = tle.Inclination();
+        inc = tle.inclination();
         @SuppressWarnings("SpellCheckingInspection")
-        double nconvert = tle.MeanMotion() * 2 * Math.PI / 86400.0;
+        double nconvert = tle.meanMotion() * 2 * Math.PI / 86400.0;
         double a0 = Math.pow( OrbitalMath.MU / Math.pow(nconvert, 2), 1.0/3.0 );
-        double dM = (tle.MeanMotion() * dt // these are in rev / day
-                + tle.MeanMotionDot() * dt * dt
-                + tle.MeanMotionDDot() * dt * dt * dt) * 2 * Math.PI;
-        double M1 = (2 * Math.PI * (tle.MeanAnomaly() / 360.0) + dM) % (2 * Math.PI);// mean anomaly at t1 in rad
-        ta = Math.toDegrees( OrbitalMath.Mean2True(M1, tle.Eccentricity()) ); // true anomaly at t1 in deg
-        double n0 = tle.MeanMotion();
-        double n0dot = tle.MeanMotionDot() * 2;
+        double dM = (tle.meanMotion() * dt // these are in rev / day
+                + tle.meanMotionDot() * dt * dt
+                + tle.meanMotionDDot() * dt * dt * dt) * 2 * Math.PI;
+        double M1 = (2 * Math.PI * (tle.meanAnomaly() / 360.0) + dM) % (2 * Math.PI);// mean anomaly at t1 in rad
+        ta = Math.toDegrees( OrbitalMath.Mean2True(M1, tle.eccentricity()) ); // true anomaly at t1 in deg
+        double n0 = tle.meanMotion();
+        double n0dot = tle.meanMotionDot() * 2;
         @SuppressWarnings("SpellCheckingInspection")
         double adot = -2.0 * a0 * n0dot / (3.0 * n0);
         sma = a0 + adot * dt;
         @SuppressWarnings("SpellCheckingInspection")
-        double edot = -2.0 * (1 - tle.Eccentricity()) * n0dot / (3.0 * n0);
-        ecc = tle.Eccentricity() + edot * dt;
+        double edot = -2.0 * (1 - tle.eccentricity()) * n0dot / (3.0 * n0);
+        ecc = tle.eccentricity() + edot * dt;
         @SuppressWarnings("SpellCheckingInspection")
         double lanj2dot = CJ2 * Math.pow(a0, -3.5)
-                * Math.pow( (1 - Math.pow(tle.Eccentricity(), 2)), -2)
+                * Math.pow( (1 - Math.pow(tle.eccentricity(), 2)), -2)
                 * Math.cos( Math.toRadians(inc) );
-        lan = tle.LAN() + lanj2dot * dt;
+        lan = tle.lan() + lanj2dot * dt;
         @SuppressWarnings("SpellCheckingInspection")
         double aopj2dot = (CJ2 / 2.0) * Math.pow(a0, -3.5)
-                * Math.pow( (1 - Math.pow(tle.Eccentricity(), 2)), -2)
+                * Math.pow( (1 - Math.pow(tle.eccentricity(), 2)), -2)
                 * Math.cos( Math.toRadians(inc) );
-        aop = tle.AOP() + aopj2dot * dt;
+        aop = tle.aop() + aopj2dot * dt;
     }
 
     /** Constructs a set of orbital elements from a known set of state vectors.
