@@ -27,9 +27,9 @@ public class Sun {
      * @param t UTC time for finding the Sun's position.
      * @return  An earth centered position vector of the Sun.
      */
-    public static Vector Position(JD t) {
+    public static Vector position(JD t) {
 //         time since noon TT on 1, jan ,2000
-        double n = t.Value() - 2451545.0;
+        double n = t.value() - 2451545.0;
 //         mean longitude of the Sun
         double L = 4.89495042 + 0.0172027924 * n;
 //         mean anomaly of the Sun
@@ -56,9 +56,9 @@ public class Sun {
      * @param t UTC time for finding the Sun's position.
      * @return  An earth centered position vector of the Sun.
      */
-    public static Vector Position2(JD t) {
+    public static Vector position2(JD t) {
 //        double JC = (t.Number() - JD.J2000) / 36525.0;
-        double JCE = (t.Value() - JD.J2000) / 36525.0;
+        double JCE = (t.value() - JD.J2000) / 36525.0;
         double JME = JCE / 10.0;
         double L = Math.toDegrees( expandTableValues(LTable, JME) ) % 360.0;
         double B = Math.toDegrees( expandTableValues(BTable, JME) ) % 360.0;
@@ -188,9 +188,9 @@ public class Sun {
      * @return  A vector whose x-coordinate is right-ascension and
      *          y-coordinate is declination.
      */
-    public static Vector Coordinates(JD t) {
+    public static Vector coordinates(JD t) {
 //         time since noon TT on 1, jan ,2000
-        double n = t.Value() - 2451545.0;
+        double n = t.value() - 2451545.0;
 //         mean longitude of the Sun
         double L = 4.89495042 + 0.0172027924 * n;
 //         mean anomaly of the Sun
@@ -228,7 +228,7 @@ public class Sun {
      */
 //    public static TwilightType getTwilightType(JD t, Coordinates coords) {
     public static TwilightType getTwilightType(JD t, GeoPosition geoPosition) {
-        Vector sunPos = Position2(t);
+        Vector sunPos = position2(t);
         Vector sunSEZPos = Tracker.getSEZPosition(sunPos, t, geoPosition);
         double sunAngle = Tracker.getAltAz(sunSEZPos, t).getAltitude();
         if (sunAngle < -18) return TwilightType.Night;

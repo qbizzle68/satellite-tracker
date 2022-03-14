@@ -73,8 +73,8 @@ public class SGP4 {
      * @return      A StateVectors object containing the position and velocity
      *              of the satellite.
      */
-    public static StateVectors Propagate(TLE tle, JD t1) {
-        return Propagate(tle, t1.Difference(new JD(tle)));
+    public static StateVectors propagate(TLE tle, JD t1) {
+        return propagate(tle, t1.difference(new JD(tle)));
     }
 
     /**
@@ -87,11 +87,11 @@ public class SGP4 {
      * @return      A StateVectors object containing the position and velocity
      *              of the satellite.
      */
-    public static StateVectors Propagate(TLE tle, double dt) {
+    public static StateVectors propagate(TLE tle, double dt) {
         StateVectors state = step(tle, new MeanElements(tle), dt * 1440.0);
         return new StateVectors(
-                state.Position().scale(1000.0 * XKMPER),
-                state.Velocity().scale(1000.0 * XKMPER / 60.0)
+                state.position().scale(1000.0 * XKMPER),
+                state.velocity().scale(1000.0 * XKMPER / 60.0)
         );
     }
 
@@ -319,236 +319,5 @@ public class SGP4 {
                 )
         );
     }
-
-//    // dt in minutes
-//    private static StateVectors step(TLE tle, COE coe, double dt) {
-//        boolean ISIMP = false;
-//        // recover original mean motion and semimajor axis
-//        double n0 = tle.MeanMotion() * 2 * PI / XMNPDA;
-//        double a1 = Math.pow(XKE / n0, TOTHRD);
-//        double cosi0 = Math.cos(coe.inc);
-//        double theta2 = cosi0 * cosi0;
-//        double x3thm1 = 3.0 * theta2 - 1;
-//        double e0sq = coe.ecc * coe.ecc;
-//        double beta02 = 1 - e0sq;
-//        double beta0 = Math.sqrt(beta02);
-//        double del1 = 1.5 * CK2 * x3thm1 / (a1 * a1 * beta0 * beta02);
-//        double a0 = a1 * (1.0 - del1 * (0.5 * TOTHRD + del1 * (1.0 + 134.0 / 81.0 * del1)));
-//        double del0 = 1.5 * CK2 * x3thm1 / (a0 * a0 * beta0 * beta02);
-//        double xn0dp = n0 / (1.0 + del0);
-//        double a0dp = a0 / (1.0 - del0);
-//
-//        // initialization
-//
-//        // for perigee less than 220 km, equations are truncated to linear variation in sqrt A and
-//        // quadratic variation in mean anomaly. Also, the C3 term, the delta omega term, and the
-//        // delta M term are dropped
-//        if ((a0dp * (1 - coe.ecc) / AE) < (200 / XKMPER + AE)) ISIMP = true;
-//        System.out.println("ISIMP = " + ISIMP);
-//
-//        // for perigee below 156 km, the values of S and qoms2t are altered
-//        double s4 = S;
-//        double q0ms24 = Q0MS2T;
-//        double perige = (a0dp * (1 - coe.ecc) - AE) * XKMPER;
-//        if (perige < 156.0) {
-//            //todo remove the redundant assignment of s4 once the model works
-//            if (perige > 98) s4 = perige - 78.0;
-//            else s4 = 20;
-////            s4 = perige - 78.0;
-////            if (perige <= 98) s4 = 20;
-//            q0ms24 = Math.pow(((120.0 - s4) * AE / XKMPER), 4);
-//            s4 = s4 / XKMPER + AE;
-//        }
-//        double pinvsq = 1.0 / (a0dp*a0dp*beta02*beta02);
-//        double tsi = 1.0 / (a0dp - s4);
-//        double eta = a0dp * coe.ecc * tsi;
-//        double etasq = eta * eta;
-//        double eeta = coe.ecc * eta;
-//        double psisq = Math.abs(1 - etasq);
-//        double coef = Math.pow(q0ms24 * tsi, 4);
-//        double coef1 = Math.pow(coef / psisq, 3.5);
-//        double c2 = coef1 * xn0dp * (a0dp  * ( 1 + 1.5 * etasq + eeta * (4 + etasq)) +
-//                .75 * (CK2 * tsi / psisq) * x3thm1 * (8 + 3 * etasq * (8 + etasq)));
-//        double c1 = tle.BStar() * c2;
-//        double sini0 = Math.sin( Math.toRadians(coe.inc) );
-//        double a30vk2 = -XJ3 / CK2 * Math.pow(AE, 3); // could be an error
-//        double c3 = coef * tsi * a30vk2 * xn0dp * AE * sini0 / coe.ecc;
-//        double x1mth2 = - theta2;
-//        double c4 = 2 * xn0dp * coef1 * a0dp * beta02 * (eta * (2 + 0.5 * etasq) + coe.ecc
-//                * (0.5 + 2 * etasq) - 2 * CK2 * tsi / (a0dp * psisq) * (-3 * x3thm1 * (1 - 2
-//                * eeta + etasq * (1.5 - 0.5 * eeta)) + 0.75 * x1mth2 * (2 * etasq - eeta
-//                * (1 + etasq)) * Math.cos( Math.toRadians(2 * coe.aop) )));
-//        double C5 = 2 * coef1 * a0dp * beta02 * (1 + 2.75 * (etasq + eeta) + eeta * etasq);
-//        double theta4 = theta2 * theta2;
-//        double temp1 = 3 * CK2 * pinvsq * xn0dp;
-//        double temp2 = temp1 * CK2 * pinvsq;
-//        double temp3 = 1.25 * CK4 * pinvsq * pinvsq * xn0dp;
-//        double xmdot = xn0dp + 0.5 * temp1 * beta0 * x3thm1 + 0.0625 * temp2 * beta0 * (13 - 78 * theta2 + 137 * theta4);
-//        double x1m5th = 1 - 5 * theta2;
-//        double omgdot = -0.5 * temp1 * x1m5th + 0.0625 * temp2 * (7 - 114 * theta2 + 395 * theta4) + temp3
-//                * (3 - 36 * theta2 + 49 * theta4);
-//        double xhdot1 = -temp1 * cosi0;
-//        double xn0dot = xhdot1 + (0.5 * temp2 * (4 - 19 * theta2) + 2 * temp3 * (3 - 7 * theta2)) * cosi0;
-//        double omgcof = tle.BStar() * c3 * Math.cos( Math.toRadians(coe.aop) );
-//        double xmcof = -TOTHRD * coef * tle.BStar() * AE / eeta;
-//        double xn0dcf = 3.5 * beta02 * xhdot1 * c1;
-//        double t2cof = 1.5 * c1;
-//        double xlcof = 0.125 * a30vk2 * sini0 * (3 + 5 * cosi0) / (1 + cosi0);
-//        double aycof = 0.25 * a30vk2 * sini0;
-//        double xm0 = OrbitalMath.True2Mean( Math.toRadians(coe.ta), coe.ecc);
-//        double delm0 = Math.pow(1 + eta * Math.cos( xm0 ), 3);
-//        double sinm0 = Math.sin( xm0 );
-//        double x7thm1 = 7 * theta2 - 1;
-////        if (!ISIMP) {
-////            double c1sq = c1 * c1;
-////            double d2 = 4 * a0dp * tsi * c1sq;
-////            double temp = d2 * tsi * c1 / 3.0;
-////            double d3 = (17 * a0dp + s4) * temp;
-////            double d4 = 0.5 * temp * a0dp * tsi * (221 * a0dp + 31 * s4) * c1;
-////            double t3cof = d2 + 2 * c1sq;
-////            double t4cof = 0.25 * (3 * d3 + c1 * (12 * d2 + 10 * c1sq));
-////            double t5cof = 0.2 * (3 * d4 + 12 * c1 * d3 + 6 * d2 * d2 + 15 * c1sq * (2 * d2 + c1sq));
-////        }
-//
-//        // update for secular gravity and atmospheric drag
-//
-//        double xmdf = xm0 + xmdot * dt;
-//        double omgadf = Math.toRadians(coe.aop) + omgdot * dt;
-//        double xn0ddf = Math.toRadians(coe.lan) + xn0dot * dt;
-//        double omega = omgadf;
-//        double xmp = xmdf;
-//        double tsq = dt * dt;
-//        double xnode = xn0ddf + xn0dcf * tsq;
-//        double tempa = 1 - c1 * dt;
-//        double tempe = tle.BStar() * c4 * dt;
-//        double templ = t2cof * tsq;
-//        if (!ISIMP) {
-//            // from previous jump statement
-//            double c1sq = c1 * c1;
-//            double d2 = 4 * a0dp * tsi * c1sq;
-//            double prevtemp = d2 * tsi * c1 / 3.0;
-//            double d3 = (17 * a0dp + s4) * prevtemp;
-//            double d4 = 0.5 * prevtemp * a0dp * tsi * (221 * a0dp + 31 * s4) * c1;
-//            double t3cof = d2 + 2 * c1sq;
-//            double t4cof = 0.25 * (3 * d3 + c1 * (12 * d2 + 10 * c1sq));
-//            double t5cof = 0.2 * (3 * d4 + 12 * c1 * d3 + 6 * d2 * d2 + 15 * c1sq * (2 * d2 + c1sq));
-//
-//            // current jump statement
-//            double delomg = omgcof * dt;
-//            double delm = xmcof * (Math.pow(1 + eta * Math.cos(xmdf), 3) - delm0);
-//            double temp = delomg + delm;
-//            xmp = xmdf + temp;
-//            omega = omgadf - temp;
-//            double tcube = tsq * dt;
-//            double tfour = tcube * dt;
-//            tempa = tempa - d2 * tsq - d3 * tcube - d4 * tfour;
-//            tempe = tempe + tle.BStar() * C5 * (Math.sin(xmp) - sinm0);
-//            templ = templ = templ + t3cof * tcube + tfour * (t4cof + dt * t5cof);
-//        }
-//
-//        // 110
-//        double a = a0dp * tempa * tempa;
-//        double e = coe.ecc - tempe;
-//        double xl = xmp + omega + xnode + xn0dp * templ;
-//        double beta = Math.sqrt(1 - e * e);
-//        double xn = XKE / Math.pow(a, 1.5);
-//
-//        // long period periodics
-//
-//        double axn = e * Math.cos(omega);
-//        double temp = 1 / (a * beta * beta);
-//        double xll = temp * xlcof * axn;
-//        double aynl = temp * aycof;
-//        double xlt = xl + xll;
-//        double ayn = e * Math.sin(omega) + aynl;
-//
-//        // solve kepler's equation
-//
-//        double capu = (xlt - xnode) % (2 * PI);
-//        temp2 = capu;
-//        double temp4 = 0;
-//        double temp5 = 0;
-//        double temp6 = 0;
-//        double sinepw = 0;
-//        double cosepw = 0;
-//        for (int i = 0; i < 10; i++) {
-//            System.out.println("i = " + i);
-//            sinepw = Math.sin(temp2);
-//            cosepw = Math.cos(temp2);
-//            temp3 = axn * sinepw;
-//            temp4 = ayn * cosepw;
-//            temp5 = axn * cosepw;
-//            temp6 = ayn * sinepw;
-//            double epw = (capu - temp4 + temp3 - temp2) / (1 - temp5 - temp6) + temp2;
-//            if (Math.abs(epw - temp2) <= E6A) break;
-//            temp2 = epw;
-//        }
-//
-//        // short period preliminary quantities
-//
-//        // 140
-//        double ecose = temp5 + temp6;
-//        double esine = temp3 - temp4;
-//        double elsq = axn * axn + ayn * ayn;
-//        temp = 1 - elsq;
-//        double pl = a * temp;
-//        double r = a * (1 - ecose);
-//        temp1 = 1 / r;
-//        double rdot = XKE * Math.sqrt(a) * esine * temp1;
-//        double rfdot = XKE * Math.sqrt(pl) * temp1;
-//        temp2 = a * temp1;
-//        double betal = Math.sqrt(temp);
-//        temp3 = 1 / (1 + betal);
-//        double cosu = temp2 * (cosepw =-axn + ayn * esine * temp3);
-//        double sinu = temp2 * (sinepw - ayn - axn * esine * temp3);
-//        double u = OrbitalMath.atan2(sinu, cosu);
-//        double sin2u = 2 * sinu * cosu;
-//        double cos2u = 2 * cosu * cosu - 1;
-//        temp = 1 / pl;
-//        temp1 = CK2 * temp;
-//        temp2 = temp1 * temp;
-//
-//        // update for short periodics
-//
-//        double rk = r * (1 - 1.5 * temp2 * betal * x3thm1) + .5 * temp1 * x1mth2 * cos2u;
-//        double uk = u - .25 * temp2 * x7thm1 * sin2u;
-//        double xnodek = xnode + 1.5 * temp2 * cosi0 * sin2u;
-//        double xinck = Math.toRadians(coe.inc) + 1.5 * temp2 * cosi0 * sini0 * cos2u;
-//        double rdotk = rdot - xn * temp1 * x1mth2 * sin2u;
-//        double rfdotk = rfdot + xn * temp1 * (x1mth2 * cos2u + 1.5 * x3thm1);
-//
-//        // orientation vectors
-//
-//        double sinuk = Math.sin(uk);
-//        double cosuk = Math.cos(uk);
-//        double sinik = Math.sin(xinck);
-//        double cosik = Math.cos(xinck);
-//        double sinnok = Math.sin(xnodek);
-//        double cosnok = Math.cos(xnodek);
-//        double xmx = -sinnok * cosik;
-//        double xmy = cosnok * cosik;
-//        double ux = xmx * sinuk + cosnok * cosuk;
-//        double uy = xmy * sinuk + sinnok * cosuk;
-//        double uz = sinik * sinuk;
-//        double vx = xmx * cosuk - cosnok * sinuk;
-//        double vy = xmy * cosuk - sinnok * sinuk;
-//        double vz = sinik * cosuk;
-//
-//        // position and velocity
-//
-//        return new StateVectors(
-//                new Vector(
-//                        (rk * ux) * XKMPER * 1000,
-//                        (rk * uy) * XKMPER * 1000,
-//                        (rk * uz) * XKMPER * 1000
-//                ),
-//                new Vector(
-//                        (rdotk * ux + rfdotk * vx) * XKMPER * 1000 / 60.0,
-//                        (rdotk * uy + rfdotk * vy) * XKMPER * 1000 / 60.0,
-//                        (rdotk * uz + rfdotk * vz) * XKMPER * 1000 / 60.0
-//                )
-//        );
-//
-//    }
 
 }

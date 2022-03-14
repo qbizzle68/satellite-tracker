@@ -46,8 +46,7 @@ public class Tracker {
      * @return The GeoPosition of the satellite.
      */
     public static GeoPosition getGeoPositionAt(TLE tle, double dt) {
-//    public static Coordinates getGeoPositionAt(TLE tle, double dt) {
-        return getGeoPositionAt(tle, new JD(tle).Future(dt));
+        return getGeoPositionAt(tle, new JD(tle).future(dt));
     }
 
     /** Computes the GeoPosition in which the satellite is directly overhead in the
@@ -56,13 +55,11 @@ public class Tracker {
      * @param t The time to compute the satellites position, in UTC.
      * @return The GeoPosition of the satellite.
      */
-//    public static Coordinates getGeoPositionAt(TLE tle, JD t1) {
     public static GeoPosition getGeoPositionAt(TLE tle, JD t) {
         // todo: check which ephemeris model to use before calling
-        StateVectors stateAtT1 = SGP4.Propagate(tle, t);
-        double earthOffsetAngle = SiderealTime.EarthOffsetAngle(t);
-        Vector positionAtT1 = Rotation.RotateFrom(Axis.Direction.Z, -earthOffsetAngle, stateAtT1.Position());
-//        return new Coordinates(positionAtT1);
+        StateVectors stateAtT1 = SGP4.propagate(tle, t);
+        double earthOffsetAngle = SiderealTime.earthOffsetAngle(t);
+        Vector positionAtT1 = Rotation.rotateFrom(Axis.Direction.Z, -earthOffsetAngle, stateAtT1.position());
         return new GeoPosition(positionAtT1);
     }
 
@@ -72,9 +69,8 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @return An array of GeoPositions making up the ground track.
      */
-//    public static Coordinates[] getGroundTrack(TLE tle, double dt, double interval) {
     public static GeoPosition[] getGroundTrack(TLE tle, double dt, double interval) {
-        return getGroundTrack(tle, new JD(tle).Future(dt), interval);
+        return getGroundTrack(tle, new JD(tle).future(dt), interval);
     }
 
     /** Computes an array of GeoPositions of a satellite over a given period.
@@ -83,15 +79,13 @@ public class Tracker {
      * @param interval The interval of time between successive tracks in solar days.
      * @return An array of GeoPositions making up the ground track.
      */
-//    public static Coordinates[] getGroundTrack(TLE tle, JD t1, double interval) {
     public static GeoPosition[] getGroundTrack(TLE tle, JD t, double interval) {
         JD startTime = new JD(tle);
-        int numIterations = (int)(t.Difference(startTime) / interval) + 1;
+        int numIterations = (int)(t.difference(startTime) / interval) + 1;
         GeoPosition[] arrGeoPos = new GeoPosition[numIterations];
-//        Coordinates[] arrGeoPos = new Coordinates[numIterations];
 
         for (int i = 0; i < numIterations - 1; i++) {
-            JD currentTime = startTime.Future(interval * i);
+            JD currentTime = startTime.future(interval * i);
             arrGeoPos[i] = getGeoPositionAt(tle, currentTime);
         }
         // The last interval will most likely not be of length interval, but should still be iterated.
@@ -108,7 +102,7 @@ public class Tracker {
      * @throws IOException From FileWriter.
      */
     public static boolean plotGroundTrack(TLE tle, double dt, double interval, String filename) throws IOException {
-        return plotGroundTrack(tle, new JD(tle).Future(dt), interval, filename);
+        return plotGroundTrack(tle, new JD(tle).future(dt), interval, filename);
     }
 
     /** Prints an array of GeoPositions of a satellite track to a CSV file.
@@ -124,7 +118,6 @@ public class Tracker {
     public static boolean plotGroundTrack(TLE tle, JD t, double interval, String filename) throws IOException {
         final int flushLimit = 10; // this is just a guess right now, previous files have been failing a little after 1000
         FileWriter writer = new FileWriter(filename);
-//        Coordinates[] arrGroundTrack = getGroundTrack(tle, t1, interval);
         GeoPosition[] arrGroundTrack = getGroundTrack(tle, t, interval);
         writer.write("latitude, longitude\n");
         for (int i = 0; i < Array.getLength(arrGroundTrack); i++) {
@@ -142,10 +135,8 @@ public class Tracker {
      *                  GeoPosition which corresponds to the center of the reference frame.
      * @return          The position vector in SEZ reference frame.
      */
-//    public static Vector getSEZPosition(TLE tle, double dt, Coordinates geoPos) {
     public static Vector getSEZPosition(TLE tle, double dt, GeoPosition geoPosition) {
-//        return getSEZPosition(tle, new JD(tle).Future(dt), geoPos);
-        return getSEZPosition(tle, new JD(tle).Future(dt), geoPosition);
+        return getSEZPosition(tle, new JD(tle).future(dt), geoPosition);
     }
 
     /**
@@ -156,11 +147,10 @@ public class Tracker {
      *                  GeoPosition which corresponds to the center of the reference frame.
      * @return          The position vector in SEZ reference frame.
      */
-//    public static Vector getSEZPosition(TLE tle, JD t1, Coordinates geoPos) {
     public static Vector getSEZPosition(TLE tle, JD t, GeoPosition geoPosition) {
         // todo: check which ephemeris model to use before calling
         return getSEZPosition(
-                SGP4.Propagate(tle, t).Position(),
+                SGP4.propagate(tle, t).position(),
                 t,
                 geoPosition
         );
@@ -175,11 +165,8 @@ public class Tracker {
      * @param geoPosition   GeoPosition which corresponds to the center of the reference frame.
      * @return              The position vector in SEZ reference frame.
      */
-//    public static Vector getSEZPosition(Vector position, JD t1, Coordinates geoPos) {
     public static Vector getSEZPosition(Vector position, JD t, GeoPosition geoPosition) {
-//        double localSiderealTime = SiderealTime.LST(t1, geoPos.getLongitude()) * HOURS_PER_DEGREE;
-        double localSiderealTime = SiderealTime.LST(t, geoPosition.getLongitude()) * DEGREES_PER_HOUR;
-//        Vector geoPosVector = getToposPosition(t1, geoPos);
+        double localSiderealTime = SiderealTime.getLocalSiderealTime(t, geoPosition.getLongitude()) * DEGREES_PER_HOUR;
         Vector geoPositionVector = getToposPosition(t, geoPosition);
         Matrix sezToIJK = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
@@ -199,15 +186,11 @@ public class Tracker {
      * @param geoPosition   The GeoPosition corresponding to the center of the reference frame.
      * @return              The position vector in earth centric reference frame.
      */
-//    public static Vector getToposPosition(JD t, Coordinates topos) {
     public static Vector getToposPosition(JD t, GeoPosition geoPosition) {
         // todo: account for elevation with this radius
-//        double radiusAtLat = Coordinates.radiusAtLatitude(topos.getLatitude());
         double radiusAtLat = GeoPosition.radiusAtLatitude(geoPosition.getLatitude());
-//        double geocentricLat = Coordinates.geodeticToGeocentric(topos.getLatitude());
         double geocentricLat = GeoPosition.geodeticToGeocentric(geoPosition.getLatitude());
-//        double localSiderealTime = SiderealTime.LST(t, topos.getLongitude()) * HOURS_PER_DEGREE;
-        double localSiderealTime = SiderealTime.LST(t, geoPosition.getLongitude()) * DEGREES_PER_HOUR;
+        double localSiderealTime = SiderealTime.getLocalSiderealTime(t, geoPosition.getLongitude()) * DEGREES_PER_HOUR;
         return new Vector(
                 radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.cos( Math.toRadians(localSiderealTime) ),
                 radiusAtLat * Math.cos( Math.toRadians(geocentricLat) ) * Math.sin( Math.toRadians(localSiderealTime) ),
@@ -223,7 +206,6 @@ public class Tracker {
      * @param geoPosition   GeoPosition to find the relative altitude and azimuth for.
      * @return              An AltAz object with the epoch set as @p t.
      */
-//    public static AltAz getAltAz(TLE tle, JD t, Coordinates geoPos) {
     public static AltAz getAltAz(TLE tle, JD t, GeoPosition geoPosition) {
         return getAltAz(
                 getSEZPosition(tle, t, geoPosition),
@@ -254,7 +236,6 @@ public class Tracker {
      * @return              True if the altitude of the satellite is greater than 0,
      *                      false if otherwise.
      */
-//    public static boolean isAboveHorizon(TLE tle, JD t, Coordinates geoPosition) {
         public static boolean isAboveHorizon(TLE tle, JD t, GeoPosition geoPosition) {
         // todo: wouldn't it be more efficient if we just called for SEZ position and returned (sezPos.z() > 0)
         AltAz altaz = getAltAz(tle, t, geoPosition);
@@ -277,17 +258,16 @@ public class Tracker {
      * @throws DaylightPassException
      *                  If the pass occurs during daylight and is not visible.
      */
-//    public static SatellitePass getPassInfo(TLE tle, JD passTime, Coordinates coords) {
     public static SatellitePass getPassInfo(TLE tle, JD passTime, GeoPosition geoPosition) {
 //        todo: how to we make a better guess than 10 minutes?
 //        todo: checking for daylight first should cut this processing time by half when used by getPasses
-        AltAz rise = riseSqueeze(tle, passTime.Future(-10.0 / 1440.0), passTime, geoPosition, null);
-        AltAz set = setSqueeze(tle, rise.getEpoch(), passTime.Future(10.0 / 1440.0), geoPosition, null);
+        AltAz rise = riseSqueeze(tle, passTime.future(-10.0 / 1440.0), passTime, geoPosition, null);
+        AltAz set = setSqueeze(tle, rise.getEpoch(), passTime.future(10.0 / 1440.0), geoPosition, null);
         AltAz first = firstSqueeze(tle, rise.getEpoch(), set.getEpoch(), geoPosition);
         AltAz last = lastSqueeze(tle, first.getEpoch(), set.getEpoch(), geoPosition, null);
 
-        JD startEpoch = (rise.getEpoch().Value() < first.getEpoch().Value()) ? first.getEpoch() : rise.getEpoch();
-        JD finishEpoch = (set.getEpoch().Value() < last.getEpoch().Value()) ? set.getEpoch() : last.getEpoch();
+        JD startEpoch = (rise.getEpoch().value() < first.getEpoch().value()) ? first.getEpoch() : rise.getEpoch();
+        JD finishEpoch = (set.getEpoch().value() < last.getEpoch().value()) ? set.getEpoch() : last.getEpoch();
         if (Sun.getTwilightType(passTime, geoPosition).ordinal() >= Sun.TwilightType.Nautical.ordinal()) {
             return new SatellitePass(
                     rise, set, first, last,
@@ -315,7 +295,6 @@ public class Tracker {
      * @throws DaylightPassException
      *                  If the pass occurs during daylight and is not visible.
      */
-//    public static java.util.Vector<SatellitePass> getPasses(TLE tle, JD startTime, JD endTime, Coordinates geoPos) {
     public static java.util.Vector<SatellitePass> getPasses(TLE tle, JD startTime, JD endTime, GeoPosition geoPosition) {
         final double dt = 10 / 86400.0; // 10 seconds
         java.util.Vector<SatellitePass> passList = new java.util.Vector<>();
@@ -326,13 +305,13 @@ public class Tracker {
                 satPass = Tracker.getPassInfo(tle, currentTime, geoPosition);
                 passList.add(satPass);
                 // todo: because the next guess is programed to guess 10 minutes into the past, it will find this same pass over and over, unless we jump more than 10 minutes into the future
-                currentTime = satPass.getSetTime().Future(11/1440.0);
+                currentTime = satPass.getSetTime().future(11/1440.0);
             } catch (Exception e) {
                 //todo: add a step method to move current JD forward or back in time
-                currentTime = currentTime.Future(dt);
+                currentTime = currentTime.future(dt);
             }
             //todo: add comparison methods for JD
-        } while(currentTime.Value() < endTime.Value());
+        } while(currentTime.value() < endTime.value());
         return passList;
     }
 
@@ -345,43 +324,21 @@ public class Tracker {
             switch (filter.getFilterType()) {
                 case MINIMUM_HEIGHT -> {
                     if (pass.getMaxHeight() < filter.getMinimumHeight())
-//                        passList.remove(pass);
                         iter.remove();
                 }
                 case MINIMUM_DURATION -> {
-                    if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
-//                        passList.remove(pass);
+                    if (pass.getDisappearTime().difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
                         iter.remove();
                 }
                 case MINIMUM_HEIGHT_DURATION -> {
                     if (pass.getMaxHeight() < filter.getMinimumHeight())
-//                        passList.remove(pass);
                         iter.remove();
-                    else if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
-//                        passList.remove(pass);
+                    else if (pass.getDisappearTime().difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
                         iter.remove();
                 }
             }
         }
-//        for (SatellitePass pass :
-//                passList) {
-//            switch (filter.getFilterType()) {
-//                case MINIMUM_HEIGHT -> {
-//                    if (pass.getMaxHeight() < filter.getMinimumHeight())
-//                        passList.remove(pass);
-//                }
-//                case MINIMUM_DURATION -> {
-//                    if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
-//                        passList.remove(pass);
-//                }
-//                case MINIMUM_HEIGHT_DURATION -> {
-//                    if (pass.getMaxHeight() < filter.getMinimumHeight())
-//                        passList.remove(pass);
-//                    else if (pass.getDisappearTime().Difference(pass.getRiseTime()) < filter.getMinimumDuration() / 1440.0)
-//                        passList.remove(pass);
-//                }
-//            }
-//        }
+
         return passList;
     }
 
@@ -393,13 +350,12 @@ public class Tracker {
      * @return              A Coordinates object where the latitude is the declination
      *                      and the longitude is the right-ascension.
      */
-//    static public Coordinates getCelestialCoordinates(TLE tle, JD t, Coordinates coords) {
     static public CelestialCoordinates getCelestialCoordinates(TLE tle, JD t, GeoPosition geoPosition) {
         Vector pos = getSEZPosition(tle, t, geoPosition);
-        pos = Rotation.RotateFrom(
+        pos = Rotation.rotateFrom(
                 EulerOrderList.ZYX,
                 new EulerAngles(
-                        SiderealTime.LST(t, geoPosition.getLongitude()) * DEGREES_PER_HOUR,
+                        SiderealTime.getLocalSiderealTime(t, geoPosition.getLongitude()) * DEGREES_PER_HOUR,
                         90 - geoPosition.getLatitude(),
                         0
                 ),
@@ -407,12 +363,6 @@ public class Tracker {
         );
         double ra = OrbitalMath.atan2(pos.y(), pos.x());
         final double HOURS_PER_RADIAN = 24.0 * (2.0 * Math.PI);
-//        if (ra < 0) ra += (2 * Math.PI);
-//        ra = (ra / (2 * Math.PI) * 24.0);
-//        return new Coordinates(
-//                ra,
-//                Math.toDegrees( Math.asin(pos.z() / pos.mag()) )
-//        );
         return new CelestialCoordinates(
                 ra * HOURS_PER_RADIAN,
                 Math.toDegrees( Math.asin(pos.z() / pos.mag()) )
@@ -429,9 +379,8 @@ public class Tracker {
      * @return      Adjusted coordinates with right-ascension as longitude and
      *              declination as latitude.
      */
-//    static public Coordinates adjustRaDec(JD t, Coordinates RaDec) {
     static public CelestialCoordinates adjustRaDec(JD t, CelestialCoordinates RaDec) {
-        double JDCenturies = (t.Value() - JD.J2000) / 36525.0;
+        double JDCenturies = (t.value() - JD.J2000) / 36525.0;
         double m = 3.07496 + 0.00186 * JDCenturies;
         double nra = 1.33621 - 0.00057 * JDCenturies;
         double ndec = 20.0431 - 0.0085 * JDCenturies;
@@ -443,10 +392,6 @@ public class Tracker {
                 dDel * JDCenturies * 100,
                 dAlpha * JDCenturies * 100
         );
-//        return new Coordinates(
-//                dDel * JDCenturies * 100,
-//                dAlpha * JDCenturies * 100
-//        );
     }
 
     /**
@@ -487,18 +432,14 @@ public class Tracker {
      * @throws NoPassException
      *              Signals if the satellite never rises during the original lower-upper time frame.
      */
-//    static private AltAz riseSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
         static private AltAz riseSqueeze(TLE tle, JD lower, JD upper, GeoPosition geoPosition, AltAz rtn) {
-        if (upper.Difference(lower) <= squeezeEpsilon) {
+        if (upper.difference(lower) <= squeezeEpsilon) {
             if (rtn.getAltitude() + altitudeEpsilon > 0) return rtn;
             else throw new NoPassException("No overhead pass at " + upper.date());
         }
-        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
-//        AltAz altaz = Tracker.getAltAz(tle, biTime, coords);
+        JD biTime = lower.future((upper.value() - lower.value()) / 2.0);
             AltAz altaz = Tracker.getAltAz(tle, biTime, geoPosition);
-//            if (altaz.getAltitude() > 0) return riseSqueeze(tle, lower, biTime, coords, altaz);
             if (altaz.getAltitude() > 0) return riseSqueeze(tle, lower, biTime, geoPosition, altaz);
-//            else return riseSqueeze(tle, biTime, upper, coords, altaz);
             else return riseSqueeze(tle, biTime, upper, geoPosition, altaz);
         }
 
@@ -518,15 +459,11 @@ public class Tracker {
      *               to be {@code null}.
      * @return  An AltAz object corresponding to the set time of the interested pass.
      */
-//    static private AltAz setSqueeze(TLE tle, JD lower, JD upper, Coordinates coords, AltAz rtn) {
     static private AltAz setSqueeze(TLE tle, JD lower, JD upper, GeoPosition geoPosition, AltAz rtn) {
-        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
-        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
-//        AltAz altaz = Tracker.getAltAz(tle, biTime, coords);
+        if (upper.difference(lower) <= squeezeEpsilon) return rtn;
+        JD biTime = lower.future((upper.value() - lower.value()) / 2.0);
         AltAz altaz = Tracker.getAltAz(tle, biTime, geoPosition);
-//        if (altaz.getAltitude() > 0) return setSqueeze(tle, biTime, upper, coords, altaz);
         if (altaz.getAltitude() > 0) return setSqueeze(tle, biTime, upper, geoPosition, altaz);
-//        else return setSqueeze(tle, lower, biTime, coords, altaz);
         else return setSqueeze(tle, lower, biTime, geoPosition, altaz);
     }
 
@@ -546,22 +483,21 @@ public class Tracker {
      * @throws NoLightException
      *              Signals if the satellite doesn't encounter any sunlight during a pass.
      */
-//    static private AltAz firstSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos) {
     static private AltAz firstSqueeze(TLE tle, JD lower, JD upper, GeoPosition geoPosition) {
-        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
-        Vector lowerSunPosition = Sun.Position(lower);
-        Vector biSunPosition = Sun.Position(biTime);
-        Vector upperSunPosition = Sun.Position(upper);
-        Vector lowerSatPosition = SGP4.Propagate(tle, lower).Position();
-        Vector biSatPosition = SGP4.Propagate(tle, biTime).Position();
-        Vector upperSatPosition = SGP4.Propagate(tle, upper).Position();
+        JD biTime = lower.future((upper.value() - lower.value()) / 2.0);
+        Vector lowerSunPosition = Sun.position(lower);
+        Vector biSunPosition = Sun.position(biTime);
+        Vector upperSunPosition = Sun.position(upper);
+        Vector lowerSatPosition = SGP4.propagate(tle, lower).position();
+        Vector biSatPosition = SGP4.propagate(tle, biTime).position();
+        Vector upperSatPosition = SGP4.propagate(tle, upper).position();
         boolean lowerEclipsed = Eclipse.isEclipsed(lowerSatPosition, lowerSunPosition);
         boolean biEclipsed = Eclipse.isEclipsed(biSatPosition, biSunPosition);
         boolean upperEclipsed = Eclipse.isEclipsed(upperSatPosition, upperSunPosition);
 
-        if (upper.Difference(lower) <= squeezeEpsilon) {
+        if (upper.difference(lower) <= squeezeEpsilon) {
             if (!upperEclipsed) return Tracker.getAltAz(tle, upper, geoPosition);
-            else throw new NoLightException("Object is eclipsed at " + upper.Value());
+            else throw new NoLightException("Object is eclipsed at " + upper.value());
         } else {
             if (lowerEclipsed && biEclipsed && !upperEclipsed) return firstSqueeze(tle, biTime, upper, geoPosition);
             else return firstSqueeze(tle, lower, biTime, geoPosition);
@@ -585,12 +521,11 @@ public class Tracker {
      *               to be {@code null}.
      * @return  An AltAz object corresponding to the last visible time of the interested pass.
      */
-//    static private AltAz lastSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, AltAz rtn) {
     static private AltAz lastSqueeze(TLE tle, JD lower, JD upper, GeoPosition geoPosition, AltAz rtn) {
-        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
-        JD biTime = lower.Future((upper.Value() - lower.Value()) / 2.0);
-        Vector sunPosition = Sun.Position(biTime);
-        Vector satPosition = SGP4.Propagate(tle, biTime).Position();
+        if (upper.difference(lower) <= squeezeEpsilon) return rtn;
+        JD biTime = lower.future((upper.value() - lower.value()) / 2.0);
+        Vector sunPosition = Sun.position(biTime);
+        Vector satPosition = SGP4.propagate(tle, biTime).position();
         AltAz altaz = Tracker.getAltAz(
                 getSEZPosition(satPosition, biTime, geoPosition),
                 biTime
@@ -616,11 +551,10 @@ public class Tracker {
      * @return  An AltAz object corresponding to the time the satellite achieves its
      *          maximum altitude.
      */
-//    static AltAz maxSqueeze(TLE tle, JD lower, JD upper, Coordinates geoPos, AltAz rtn) {
     static AltAz maxSqueeze(TLE tle, JD lower, JD upper, GeoPosition geoPosition, AltAz rtn) {
-        if (upper.Difference(lower) <= squeezeEpsilon) return rtn;
+        if (upper.difference(lower) <= squeezeEpsilon) return rtn;
         AltAz lowerAltAz = Tracker.getAltAz(tle, lower, geoPosition);
-        JD biTime = new JD((lower.Value() + upper.Value()) / 2.0);
+        JD biTime = new JD((lower.value() + upper.value()) / 2.0);
         AltAz biAltAz = Tracker.getAltAz(tle, biTime, geoPosition);
         AltAz upperAltAz = Tracker.getAltAz(tle, upper, geoPosition);
         if (biAltAz.getAltitude() >= lowerAltAz.getAltitude()) {

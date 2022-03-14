@@ -69,7 +69,7 @@ public class AltAz implements Cloneable {
             AltAz clone = (AltAz) super.clone();
             clone.altitude = this.altitude;
             clone.azimuth = this.azimuth;
-            clone.epoch = new JD(epoch.Value());
+            clone.epoch = new JD(epoch.value());
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new AssertionError();
@@ -111,7 +111,7 @@ public class AltAz implements Cloneable {
      * @return  The JD representing the epoch.
      */
     public JD getEpoch() {
-        return new JD(epoch.Value());
+        return new JD(epoch.value());
     }
 
     /**

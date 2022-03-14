@@ -47,8 +47,8 @@ public class JD implements Cloneable {
      */
     public JD(Date date, double timeZone) {
         String[] strTokens = date.toString().split("[\s]");
-        m_julianDate = GetDate(
-                MonthTable(strTokens[1]),
+        m_julianDate = getDate(
+                monthTable(strTokens[1]),
                 Integer.parseInt(strTokens[2]),
                 Integer.parseInt(strTokens[5]),
                 Integer.parseInt(strTokens[3].substring(0, 2)),
@@ -74,7 +74,7 @@ public class JD implements Cloneable {
      * @param timeZone The timezone relative to UTC.
      */
     public JD(TLE tle, double timeZone) {
-        m_julianDate = GetDate(12, 31, tle.epochYear()-1, 0, 0, 0, timeZone) + tle.epochDay();
+        m_julianDate = getDate(12, 31, tle.epochYear()-1, 0, 0, 0, timeZone) + tle.epochDay();
     }
 
     /** Constructs the Julian Date directly from a known Julian Date number
@@ -94,7 +94,7 @@ public class JD implements Cloneable {
      * @note Parameter values that are out of their normal range may not behave as expected.
      */
     public JD(int mon, int day, int yr, int hr, int min, double sec) {
-        m_julianDate = GetDate(mon, day, yr, hr, min, sec, 0.0);
+        m_julianDate = getDate(mon, day, yr, hr, min, sec, 0.0);
     }
 
     /** Construct the Julian Date from Gregorian Date components for GMT.
@@ -108,7 +108,7 @@ public class JD implements Cloneable {
      * @note Parameter values that are out of their normal range may not behave as expected.
      */
     public JD(int mon, int day, int yr, int hr, int min, double sec, double timeZone) {
-        m_julianDate = GetDate(mon, day, yr, hr, min, sec, timeZone);
+        m_julianDate = getDate(mon, day, yr, hr, min, sec, timeZone);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class JD implements Cloneable {
     /** Getter method for retrieving the Julian Date value.
      * @return The Julian Date value associated with this instance.
      */
-    public double Value() {
+    public double value() {
         return m_julianDate;
     }
 
@@ -151,7 +151,7 @@ public class JD implements Cloneable {
      * @return The Julian Day number associated with this instance.
      * @note This is the integer portion of @link com.qbizzle.time.JD#Value Value(). @endlink
      */
-    public int Number() {
+    public int number() {
         return (int) m_julianDate;
     }
 
@@ -160,7 +160,7 @@ public class JD implements Cloneable {
      * @note This is not the fractional time of the day, but the fractional portion of the
      * 24-hour period following 12pm of the associated day.
      */
-    public double Fraction() {
+    public double fraction() {
         return m_julianDate - (int) m_julianDate;
     }
 
@@ -247,7 +247,7 @@ public class JD implements Cloneable {
      * @note A negative return value indicates the @p jd parameter date occurs before
      * this instance date.
      */
-    public double Difference(JD jd) {
+    public double difference(JD jd) {
         return m_julianDate - jd.m_julianDate;
     }
 
@@ -257,7 +257,7 @@ public class JD implements Cloneable {
      * @note A negative value for @p days will return a Julian Date that precedes
      * the date of the current instance.
      */
-    public JD Future(double days) {
+    public JD future(double days) {
         return new JD(m_julianDate + days);
     }
 
@@ -270,7 +270,7 @@ public class JD implements Cloneable {
      *            <a href="https://docs.oracle.com/javase/8/docs/api/java/util/Date.html#toString--">Date.toString()</a> method.
      * @return The integer number of the month referring to the @p str parameter.
      */
-    private static int MonthTable(String str) {
+    private static int monthTable(String str) {
         return switch (str) {
             case "Feb" -> 2;
             case "Mar" -> 3;
@@ -300,7 +300,7 @@ public class JD implements Cloneable {
      *     <a href="https://en.wikipedia.org/wiki/Julian_day#Converting_Gregorian_calendar_date_to_Julian_Day_Number">
      *     here</a>.
      */
-    private static double GetDate(int mon, int day, int yr, int hr, int min, double sec, double timeZone) {
+    private static double getDate(int mon, int day, int yr, int hr, int min, double sec, double timeZone) {
         int julianNumber = (1461 * (yr + 4800 + (mon - 14)/12))/4 + (367 * (mon - 2 - 12 * ((mon - 14)/12)))/12 - (3 * ((yr + 4900 + (mon - 14)/12)/100))/4 + day - 32075;
         return (double)julianNumber + ((hr - 12) / 24.0) + (min / 1440.0) + (sec / 86400.0) - (timeZone / 24.0);
     }

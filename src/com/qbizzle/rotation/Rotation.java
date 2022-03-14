@@ -132,7 +132,7 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateTo(Matrix rotMatrix, Vector vector) {
+    public static Vector rotateTo(Matrix rotMatrix, Vector vector) {
         return rotMatrix.transpose().mult(vector);
     }
 
@@ -142,7 +142,7 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateFrom(Matrix rotMatrix, Vector vector) {
+    public static Vector rotateFrom(Matrix rotMatrix, Vector vector) {
         return rotMatrix.mult(vector);
     }
 
@@ -153,8 +153,8 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateTo(Axis.Direction axis, double angle, Vector vector) {
-        return RotateTo(getMatrix(axis, angle), vector);
+    public static Vector rotateTo(Axis.Direction axis, double angle, Vector vector) {
+        return rotateTo(getMatrix(axis, angle), vector);
     }
 
     /** Rotates a vector from a reference frame rotated by a single axis
@@ -164,8 +164,8 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateFrom(Axis.Direction axis, double angle, Vector vector) {
-        return RotateFrom(getMatrix(axis, angle), vector);
+    public static Vector rotateFrom(Axis.Direction axis, double angle, Vector vector) {
+        return rotateFrom(getMatrix(axis, angle), vector);
     }
 
     /** Rotates a vector from an inertial reference frame, to a reference
@@ -175,8 +175,8 @@ public class Rotation {
      * @param rotateVector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateIntrinsicTo(Vector axisVector, double angle, Vector rotateVector) {
-        return RotateTo(getMatrixIntrinsic(axisVector, angle), rotateVector);
+    public static Vector rotateIntrinsicTo(Vector axisVector, double angle, Vector rotateVector) {
+        return rotateTo(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
 
     /** Rotates a vector from a reference frame rotated around a single axis
@@ -187,8 +187,8 @@ public class Rotation {
      * @return The rotated vector.
      */
     @SuppressWarnings("unused")
-    public static Vector RotateIntrinsicFrom(Vector axisVector, double angle, Vector rotateVector) {
-        return RotateFrom(getMatrixIntrinsic(axisVector, angle), rotateVector);
+    public static Vector rotateIntrinsicFrom(Vector axisVector, double angle, Vector rotateVector) {
+        return rotateFrom(getMatrixIntrinsic(axisVector, angle), rotateVector);
     }
 
 ///@}
@@ -204,8 +204,8 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateTo(EulerOrder order, EulerAngles angles, Vector vector) {
-        return RotateTo(getEulerMatrix(order, angles), vector);
+    public static Vector rotateTo(EulerOrder order, EulerAngles angles, Vector vector) {
+        return rotateTo(getEulerMatrix(order, angles), vector);
     }
 
     /** Rotates a vector from a reference frame rotated by an intrinsic Euler rotation,
@@ -215,8 +215,8 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector RotateFrom(EulerOrder order, EulerAngles angles, Vector vector) {
-        return RotateFrom(getEulerMatrix(order, angles), vector);
+    public static Vector rotateFrom(EulerOrder order, EulerAngles angles, Vector vector) {
+        return rotateFrom(getEulerMatrix(order, angles), vector);
     }
 
     /** Rotates a vector from an inertial reference frame, to a reference frame
@@ -227,8 +227,8 @@ public class Rotation {
      * @return The rotated vector.
      */
     @SuppressWarnings("unused")
-    public static Vector RotateExtrinsicTo(EulerOrder order, EulerAngles angles, Vector vector) {
-        return RotateTo(getEulerMatrixExtrinsic(order, angles), vector);
+    public static Vector rotateExtrinsicTo(EulerOrder order, EulerAngles angles, Vector vector) {
+        return rotateTo(getEulerMatrixExtrinsic(order, angles), vector);
     }
 
     /** Rotates a vector from a reference frame rotated by an extrinsic Euler rotation,
@@ -239,8 +239,8 @@ public class Rotation {
      * @return The rotated vector.
      */
     @SuppressWarnings("unused")
-    public static Vector RotateExtrinsicFrom(EulerOrder order, EulerAngles angles, Vector vector) {
-        return RotateFrom(getEulerMatrixExtrinsic(order, angles), vector);
+    public static Vector rotateExtrinsicFrom(EulerOrder order, EulerAngles angles, Vector vector) {
+        return rotateFrom(getEulerMatrixExtrinsic(order, angles), vector);
     }
 
     /** Rotates a vector from one reference frame to another.
@@ -249,7 +249,7 @@ public class Rotation {
      * @param vector The vector to rotate.
      * @return The rotated vector.
      */
-    public static Vector Rotate(ReferenceFrame from, ReferenceFrame to, Vector vector) {
+    public static Vector rotate(ReferenceFrame from, ReferenceFrame to, Vector vector) {
         return to.toMatrix().transpose().mult(from.toMatrix()).mult(vector);
     }
 

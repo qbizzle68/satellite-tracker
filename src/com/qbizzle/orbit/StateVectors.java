@@ -48,10 +48,10 @@ public class StateVectors implements Cloneable {
      * @note A negative value of @p dt constructs a state @em before the current epoch.
      */
     public StateVectors(COE coe, double dt) {
-        double Mt = OrbitalMath.True2Mean( Math.toRadians(coe.ta), coe.ecc )
-                + dt * OrbitalMath.SMA2MMotion(coe.sma);
-        double Et = OrbitalMath.Mean2Eccentric(Mt, coe.ecc);
-        double Vt = OrbitalMath.Eccentric2True(Et, coe.ecc);
+        double Mt = OrbitalMath.true2Mean( Math.toRadians(coe.ta), coe.ecc )
+                + dt * OrbitalMath.sma2MMotion(coe.sma);
+        double Et = OrbitalMath.mean2Eccentric(Mt, coe.ecc);
+        double Vt = OrbitalMath.eccentric2True(Et, coe.ecc);
         double radius = coe.sma * (1 - coe.ecc * Math.cos( Math.toRadians(Et) ));
         Vector posOrbitFrame = new Vector( Math.cos(Vt), Math.sin(Vt), 0 ).scale(radius);
         Vector velOrbitFrame = new Vector(
@@ -60,12 +60,12 @@ public class StateVectors implements Cloneable {
                 0
         ).scale(Math.sqrt(OrbitalMath.MU * coe.sma) / radius);
 //        now rotate state vectors from orbital reference frame, to inertial IJK reference frame
-        m_position = Rotation.RotateFrom(
+        m_position = Rotation.rotateFrom(
                 EulerOrderList.ZXZ,
                 new EulerAngles(coe.lan, coe.inc, coe.aop),
                 posOrbitFrame
         );
-        m_velocity = Rotation.RotateFrom(
+        m_velocity = Rotation.rotateFrom(
                 EulerOrderList.ZXZ,
                 new EulerAngles(coe.lan, coe.inc, coe.aop),
                 velOrbitFrame
@@ -152,14 +152,14 @@ public class StateVectors implements Cloneable {
     /** Gets the position state vector.
      * @return A Vector with the satellites position.
      */
-    public Vector Position() {
+    public Vector position() {
         return m_position;
     }
 
     /** Gets the velocity state vector.
      * @return A Vector with the satellite's velocity.
      */
-    public Vector Velocity() {
+    public Vector velocity() {
         return m_velocity;
     }
 

@@ -26,7 +26,7 @@ public class OrbitalMathTest {
     @DisplayName("SMA to mean motion test")
     public void smaToMeanMotionTest() {
         assertEquals(0.00114,
-                Math.round(SMA2MMotion(6727170.439)*100000)/100000.0);
+                Math.round(sma2MMotion(6727170.439)*100000)/100000.0);
     }
 
     @Nested
@@ -37,7 +37,7 @@ public class OrbitalMathTest {
         @CsvFileSource(files = "src/test/resources/mean-to-ecc-arguments.csv", numLinesToSkip = 1)
         public void meanAnomalyToEccAnomalyByQuadrants(double q, double exp) {
             assertEquals(exp,
-                    Math.round(Mean2Eccentric(q, ecc) * CRND) / CRND);
+                    Math.round(mean2Eccentric(q, ecc) * CRND) / CRND);
         }
     }
 
@@ -49,7 +49,7 @@ public class OrbitalMathTest {
         @CsvFileSource(files = "src/test/resources/ecc-to-true-arguments.csv", numLinesToSkip = 1)
         public void eccAnomalyToTrueAnomalyByQuadrants(double q, double exp) {
             assertEquals(exp,
-                    Math.round(Eccentric2True(q, ecc) * CRND) / CRND);
+                    Math.round(eccentric2True(q, ecc) * CRND) / CRND);
         }
     }
 
@@ -61,7 +61,7 @@ public class OrbitalMathTest {
         @CsvFileSource(files = "src/test/resources/mean-to-true-arguments.csv", numLinesToSkip = 1)
         public void meanAnomalyToTrueAnomalyByQuadrants(double q, double exp) {
             assertEquals(exp,
-                    Math.round(Mean2True(q, ecc) * CRND) / CRND);
+                    Math.round(mean2True(q, ecc) * CRND) / CRND);
         }
 
     }
@@ -74,7 +74,7 @@ public class OrbitalMathTest {
         @CsvFileSource(files = "src/test/resources/true-to-ecc-arguments.csv", numLinesToSkip = 1)
         public void trueAnomalyToEccentricAnomalyByQuadrants(double q, double exp) {
             assertEquals(exp,
-                    Math.round(True2Eccentric(q, ecc) * CRND) / CRND);
+                    Math.round(true2Eccentric(q, ecc) * CRND) / CRND);
         }
     }
 
@@ -86,7 +86,7 @@ public class OrbitalMathTest {
         @CsvFileSource(files = "src/test/resources/ecc-to-mean-arguments.csv", numLinesToSkip = 1)
         public void eccAnomalyToMeanAnomalyByQuadrants(double q, double exp) {
             assertEquals(exp,
-                    Math.round(Eccentric2Mean(q, ecc) * CRND) / CRND);
+                    Math.round(eccentric2Mean(q, ecc) * CRND) / CRND);
         }
     }
 
@@ -98,7 +98,7 @@ public class OrbitalMathTest {
         @CsvFileSource(files = "src/test/resources/true-to-mean-arguments.csv", numLinesToSkip = 1)
         public void trueAnomalyToMeanAnomalyByQuadrants(double q, double exp) {
             assertEquals(exp,
-                    Math.round(True2Mean(q, ecc) * CRND) / CRND);
+                    Math.round(true2Mean(q, ecc) * CRND) / CRND);
         }
     }
 

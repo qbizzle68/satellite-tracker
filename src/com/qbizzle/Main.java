@@ -117,56 +117,56 @@ public class Main {
 
     static double epsilon = 1e-4;
     static JD getSetTime(TLE tle, JD t, GeoPosition geoPos) {
-        StateVectors state = SGP4.Propagate(tle, t);
+        StateVectors state = SGP4.propagate(tle, t);
         Matrix rotationMatrix = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
                 new EulerAngles(
-                        SiderealTime.LST(t, geoPos.getLongitude()) * 15.0,
+                        SiderealTime.getLocalSiderealTime(t, geoPos.getLongitude()) * 15.0,
                         90 - geoPos.getLatitude(),
                         0.0
                 )
         );
         StateVectors sezState = new StateVectors(
-                Tracker.getSEZPosition(state.Position(), t, geoPos),
-                Rotation.RotateTo(rotationMatrix, state.Velocity().exclude(state.Position()))
+                Tracker.getSEZPosition(state.position(), t, geoPos),
+                Rotation.rotateTo(rotationMatrix, state.velocity().exclude(state.position()))
         );
         AltAz altaz = Tracker.getAltAz(tle, t, geoPos);
         System.out.println("time: " + t.date(-6) + " alt: " + altaz.getAltitude());
         if (Math.abs(altaz.getAltitude()) < epsilon) return t;
         else {
-            double angVelocity = sezState.Velocity().mag() / sezState.Position().mag(); // radians / s
+            double angVelocity = sezState.velocity().mag() / sezState.position().mag(); // radians / s
             double timeToHorizon = Math.toRadians(altaz.getAltitude()) / angVelocity;
             return getSetTime(
                     tle,
-                    t.Future(timeToHorizon / 86400.0),
+                    t.future(timeToHorizon / 86400.0),
                     geoPos
             );
         }
     }
 
     static JD getRiseTime(TLE tle, JD t, GeoPosition geoPos) {
-        StateVectors state = SGP4.Propagate(tle, t);
+        StateVectors state = SGP4.propagate(tle, t);
         Matrix rotationMatrix = Rotation.getEulerMatrix(
                 EulerOrderList.ZYX,
                 new EulerAngles(
-                        SiderealTime.LST(t, geoPos.getLongitude()) * 15.0,
+                        SiderealTime.getLocalSiderealTime(t, geoPos.getLongitude()) * 15.0,
                         90 - geoPos.getLatitude(),
                         0.0
                 )
         );
         StateVectors sezState = new StateVectors(
-                Tracker.getSEZPosition(state.Position(), t, geoPos),
-                Rotation.RotateTo(rotationMatrix, state.Velocity().exclude(state.Position()))
+                Tracker.getSEZPosition(state.position(), t, geoPos),
+                Rotation.rotateTo(rotationMatrix, state.velocity().exclude(state.position()))
         );
         AltAz altaz = Tracker.getAltAz(tle, t, geoPos);
         System.out.println("time: " + t.date(-6) + " alt: " + altaz.getAltitude());
         if (Math.abs(altaz.getAltitude()) < epsilon) return t;
         else {
-            double angVelocity = sezState.Velocity().mag() / sezState.Position().mag(); // radians / s
+            double angVelocity = sezState.velocity().mag() / sezState.position().mag(); // radians / s
             double timeToHorizon = Math.toRadians(altaz.getAltitude()) / angVelocity;
             return getRiseTime(
                     tle,
-                    t.Future(-timeToHorizon / 86400.0),
+                    t.future(-timeToHorizon / 86400.0),
                     geoPos
             );
         }
@@ -174,7 +174,7 @@ public class Main {
 
     static void getPassesHandler() {
         JD now = new JD(new Date());
-        Vector<SatellitePass> passList = Tracker.getPasses(satTle, now, now.Future(duration), geoPos);
+        Vector<SatellitePass> passList = Tracker.getPasses(satTle, now, now.future(duration), geoPos);
         if (passList.isEmpty()) System.out.println("No passes for this period");
         else {
             for (int i = 1; i <= passList.size(); i++) {

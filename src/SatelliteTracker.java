@@ -189,7 +189,7 @@ public class SatelliteTracker extends JFrame {
         generatePassesButton.addActionListener(e -> {
             var now = new JD(new Date());
             Vector<SatellitePass> passList = Tracker.getPasses(
-                    tle, now, now.Future(duration), geoPos
+                    tle, now, now.future(duration), geoPos
             );
 
             DefaultTableModel model = new DefaultTableModel(tableHeader, 0);

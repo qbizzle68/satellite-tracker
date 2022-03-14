@@ -15,8 +15,8 @@ public class SiderealTime {
      * @param julianDay The time to convert.
      * @return The local sidereal time of Greenwich, England.
      */
-    public static double ST(JD julianDay) {
-        double dt = julianDay.Value() - JD.J2000;
+    public static double getSiderealTime(JD julianDay) {
+        double dt = julianDay.value() - JD.J2000;
         return (18.697_374_558 + 24.065_709_824_419_08 * dt) % 24.0;
     }
 
@@ -27,10 +27,10 @@ public class SiderealTime {
      * @param longitude The local longitude.
      * @return The local sidereal time.
      */
-    public static double LST(JD julianDay, double longitude) {
+    public static double getLocalSiderealTime(JD julianDay, double longitude) {
         if (longitude < 0) longitude += 360.0;
         double lng2RA = longitude / 360.0 * 24.0;
-        double LST = ST(julianDay) + lng2RA;
+        double LST = getSiderealTime(julianDay) + lng2RA;
         return LST % 24.0;
     }
 
@@ -39,8 +39,8 @@ public class SiderealTime {
      * @param julianDay The time to compute.
      * @return The offset angle in @em degrees.
      */
-    public static double EarthOffsetAngle(JD julianDay) {
-        return ST(julianDay) / 24.0 * 360.0;
+    public static double earthOffsetAngle(JD julianDay) {
+        return getSiderealTime(julianDay) / 24.0 * 360.0;
     }
 
 }

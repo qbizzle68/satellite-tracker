@@ -48,14 +48,14 @@ public class SatellitePass {
         this.maxTime = max.getEpoch();
         this.visibleTime = visible.getEpoch();
         this.disappearTime = disappear.getEpoch();
-        if (riseTime.Value() <= visibleTime.Value()) {
+        if (riseTime.value() <= visibleTime.value()) {
             visibleHeight = visible.getAltitude();
             visibleDirection = setDirections(visible.getAzimuth());
         } else {
             visibleHeight = rise.getAltitude();
             visibleDirection = setDirections(rise.getAzimuth());
         }
-        if (disappearTime.Value() <= setTime.Value()) {
+        if (disappearTime.value() <= setTime.value()) {
             disappearHeight = disappear.getAltitude();
             disappearDirection = setDirections(disappear.getAzimuth());
         } else{
@@ -95,7 +95,7 @@ public class SatellitePass {
      * @return The time in Julian Days.
      */
     public JD getRiseTime() {
-        return new JD(riseTime.Value());
+        return new JD(riseTime.value());
     }
 
     /**
@@ -103,7 +103,7 @@ public class SatellitePass {
      * @return The time in Julian Days.
      */
     public JD getSetTime() {
-        return new JD(setTime.Value());
+        return new JD(setTime.value());
     }
 
     /**
@@ -111,7 +111,7 @@ public class SatellitePass {
      * @return The time in Julian Days.
      */
     public JD getVisibleTime() {
-        return new JD(visibleTime.Value());
+        return new JD(visibleTime.value());
     }
 
     /**
@@ -119,7 +119,7 @@ public class SatellitePass {
      * @return The time in Julian Days.
      */
     public JD getDisappearTime() {
-        return new JD(disappearTime.Value());
+        return new JD(disappearTime.value());
     }
 
     /**
@@ -127,7 +127,7 @@ public class SatellitePass {
      * @return The time in Julian Days.
      */
     public JD getMaxTime() {
-        return new JD(maxTime.Value());
+        return new JD(maxTime.value());
     }
 
     /**

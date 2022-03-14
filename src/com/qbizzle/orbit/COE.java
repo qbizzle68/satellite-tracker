@@ -87,7 +87,7 @@ public class COE {
                 + tle.meanMotionDot() * dt * dt
                 + tle.meanMotionDDot() * dt * dt * dt) * 2 * Math.PI;
         double M1 = (2 * Math.PI * (tle.meanAnomaly() / 360.0) + dM) % (2 * Math.PI);// mean anomaly at t1 in rad
-        ta = Math.toDegrees( OrbitalMath.Mean2True(M1, tle.eccentricity()) ); // true anomaly at t1 in deg
+        ta = Math.toDegrees( OrbitalMath.mean2True(M1, tle.eccentricity()) ); // true anomaly at t1 in deg
         double n0 = tle.meanMotion();
         double n0dot = tle.meanMotionDot() * 2;
         @SuppressWarnings("SpellCheckingInspection")

@@ -306,7 +306,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate to another reference frame")
     public void rotateToAnotherReferenceFrame() {
-        Vector rotated = Rotation.RotateTo(xyz, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotateTo(xyz, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(1.228397839, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(0.503652968, rotated.get(1), epsilon, "y"),
@@ -317,7 +317,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate from another reference frame")
     public void rotateFromAnotherReferenceFrame() {
-        Vector rotated = Rotation.RotateFrom(zxy, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotateFrom(zxy, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(1.141881536, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(1.202541909, rotated.get(1), epsilon, "y"),
@@ -337,7 +337,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate to with axis")
     public void rotateToWithAxis() {
-        Vector rotated = Rotation.RotateTo(Axis.Direction.X, 45, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotateTo(Axis.Direction.X, 45, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(1, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(cos45 + sin45, rotated.get(1), epsilon, "y"),
@@ -348,7 +348,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate from with axis")
     public void rotateFromWithAxis() {
-        Vector rotated = Rotation.RotateTo(Axis.Direction.Y, 45, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotateTo(Axis.Direction.Y, 45, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(cos45 - sin45, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(1, rotated.get(1), epsilon, "y"),
@@ -359,7 +359,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate intrinsic to with axis")
     public void rotateIntrinsicToWithAxis() {
-        Vector rotated = Rotation.RotateIntrinsicTo(util.e3, 45, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotateIntrinsicTo(util.e3, 45, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(cos45 + sin45, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(cos45 - sin45, rotated.get(1), epsilon, "y"),
@@ -370,7 +370,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate intrinsic from with axis")
     public void rotateIntrinsicFromWithAxis() {
-        Vector rotated = Rotation.RotateIntrinsicTo(util.e3, 45, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotateIntrinsicTo(util.e3, 45, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(cos45 + sin45, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(cos45 - sin45, rotated.get(1), epsilon, "y"),
@@ -381,7 +381,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate to Euler order")
     public void rotateToEulerOrder() {
-        Vector rotated = Rotation.RotateTo(
+        Vector rotated = Rotation.rotateTo(
                 EulerOrderList.XYZ,
                 new EulerAngles(15, 30, 45),
                 new Vector(1, 1, 1)
@@ -396,7 +396,7 @@ class RotationTest {
     @Test
     @DisplayName("Rotate from Euler order")
     public void rotateFromEulerOrder() {
-        Vector rotated = Rotation.RotateFrom(
+        Vector rotated = Rotation.rotateFrom(
                 EulerOrderList.XYZ,
                 new EulerAngles(15, 30, 45),
                 new Vector(1, 1, 1)
@@ -417,7 +417,7 @@ class RotationTest {
     public void rotateBetweenReferenceFrames() {
         ReferenceFrame refZYX = new ReferenceFrame(EulerOrderList.ZYX, new EulerAngles(15, 30, 45));
         ReferenceFrame refYZX = new ReferenceFrame(EulerOrderList.YZX, new EulerAngles(15, 30, 45));
-        Vector rotated = Rotation.Rotate(refZYX, refYZX, new Vector(1, 1, 1));
+        Vector rotated = Rotation.rotate(refZYX, refYZX, new Vector(1, 1, 1));
         assertAll(
                 () -> assertEquals(1.312241953, rotated.get(0), epsilon, "x"),
                 () -> assertEquals(0.5698244748, rotated.get(1), epsilon, "y"),

@@ -56,7 +56,7 @@ public class OrbitalMath {
      * @param sma Semi-major axis of the orbit in meters.
      * @return The mean motion in radians/s.
      */
-    public static double SMA2MMotion(double sma) {
+    public static double sma2MMotion(double sma) {
         return Math.sqrt(MU / Math.pow(sma, 3));
     }
 
@@ -71,9 +71,9 @@ public class OrbitalMath {
      * @param eccentricity The orbits eccentricity.
      * @return True anomaly in @em radians.
      */
-    public static double Mean2True(double meanAnomaly, double eccentricity) {
-        return Eccentric2True(
-                Mean2Eccentric(meanAnomaly, eccentricity),
+    public static double mean2True(double meanAnomaly, double eccentricity) {
+        return eccentric2True(
+                mean2Eccentric(meanAnomaly, eccentricity),
                 eccentricity
         );
     }
@@ -85,8 +85,8 @@ public class OrbitalMath {
      * @param eccentricity Eccentricity of the orbit.
      * @return The eccentric anomaly in @em radians.
      */
-    public static double Mean2Eccentric(double meanAnomaly, double eccentricity) {
-        return M2ENewtonRaphson(meanAnomaly, meanAnomaly, eccentricity);
+    public static double mean2Eccentric(double meanAnomaly, double eccentricity) {
+        return m2ENewtonRaphson(meanAnomaly, meanAnomaly, eccentricity);
     }
 
     /** Converts eccentric anomaly to true anomaly.
@@ -94,7 +94,7 @@ public class OrbitalMath {
      * @param eccentricity Eccentricity of the orbit.
      * @return The true anomaly in @em radians.
      */
-    public static double Eccentric2True(double eccentricAnomaly, double eccentricity) {
+    public static double eccentric2True(double eccentricAnomaly, double eccentricity) {
         return atan2(
                 Math.sqrt(1 - Math.pow(eccentricity,2)) * Math.sin(eccentricAnomaly),
                 Math.cos(eccentricAnomaly) - eccentricity
@@ -107,9 +107,9 @@ public class OrbitalMath {
      * @param eccentricity Eccentricity of the orbit.
      * @return The mean anomaly in @em radians.
      */
-    public static double True2Mean(double trueAnomaly, double eccentricity) {
-        return Eccentric2Mean(
-                True2Eccentric(trueAnomaly, eccentricity),
+    public static double true2Mean(double trueAnomaly, double eccentricity) {
+        return eccentric2Mean(
+                true2Eccentric(trueAnomaly, eccentricity),
                 eccentricity
         );
     }
@@ -119,7 +119,7 @@ public class OrbitalMath {
      * @param eccentricity Eccentricity of the orbit.
      * @return The eccentric anomaly in @em radians.
      */
-    public static double True2Eccentric(double trueAnomaly, double eccentricity) {
+    public static double true2Eccentric(double trueAnomaly, double eccentricity) {
         return atan2(
                 Math.sqrt(1 - Math.pow(eccentricity, 2)) * Math.sin(trueAnomaly),
                 Math.cos(trueAnomaly) + eccentricity
@@ -131,7 +131,7 @@ public class OrbitalMath {
      * @param eccentricity Eccentricity of the orbit.
      * @return The mean anomaly in @em radians.
      */
-    public static double Eccentric2Mean(double eccentricAnomaly, double eccentricity) {
+    public static double eccentric2Mean(double eccentricAnomaly, double eccentricity) {
         return eccentricAnomaly - eccentricity * Math.sin(eccentricAnomaly);
     }
 
@@ -145,9 +145,9 @@ public class OrbitalMath {
      * @param ecc The eccentricity of the orbit.
      * @return The eccentric anomaly in @em radians.
      */
-    private static double M2ENewtonRaphson(double M, double Ej, double ecc) {
+    private static double m2ENewtonRaphson(double M, double Ej, double ecc) {
         double Ej1 = Ej - ((Ej - ecc * Math.sin(Ej) - M) / (1 - ecc * Math.cos(Ej)));
         if (Math.abs(Ej1 - Ej) <= newtonEpsilon) return Ej1;
-        return M2ENewtonRaphson(M, Ej1, ecc);
+        return m2ENewtonRaphson(M, Ej1, ecc);
     }
 }
