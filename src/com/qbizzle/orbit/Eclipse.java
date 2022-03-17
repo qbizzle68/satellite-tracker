@@ -7,6 +7,9 @@ package com.qbizzle.orbit;
 
 import com.qbizzle.math.OrbitalMath;
 import com.qbizzle.math.Vector;
+import com.qbizzle.satellite.Satellite;
+import com.qbizzle.time.JD;
+import com.qbizzle.tracking.Sun;
 
 /**
  * Eclipse class is a static class with methods pertaining to objects in
@@ -48,4 +51,12 @@ public class Eclipse {
 //        annular eclipse
         return thetaS > thetaE && theta < (thetaS - thetaE);
     }
+
+    public static boolean isEclipsed(Satellite satellite, JD time) {
+        return isEclipsed(
+                satellite.getState(time).position(),
+                Sun.position(time)
+        );
+    }
+
 }

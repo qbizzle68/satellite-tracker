@@ -352,12 +352,12 @@ public class Tracker {
         JD riseTime = getRiseTime(satellite, passTime, geoPosition);
         JD setTime = getSetTime(satellite, passTime, geoPosition);
         JD visibleTime, disappearTime;
-//        boolean riseEclipsed = Eclipse.isEclipsed(satellite, riseTime);
-//        boolean setEclipsed = Eclipse.isEclipsed(satellite, setTime);
-//        boolean passEclipsed = Eclipse.isEclipsed(satellite, passTime);
-        boolean riseEclipsed = true;
-        boolean setEclipsed = true;
-        boolean passEclipsed = true;
+        boolean riseEclipsed = Eclipse.isEclipsed(satellite, riseTime);
+        boolean setEclipsed = Eclipse.isEclipsed(satellite, setTime);
+        boolean passEclipsed = Eclipse.isEclipsed(satellite, passTime);
+//        boolean riseEclipsed = true;
+//        boolean setEclipsed = true;
+//        boolean passEclipsed = true;
         if (riseEclipsed && setEclipsed)    //  never visible
             throw new DaylightPassException("Pass not visible due to sunlight.");
         else if (!riseEclipsed) {   //  visible when rising
@@ -442,12 +442,12 @@ public class Tracker {
     private static final double ECLIPSE_EPSILON = 1.0 / 86400.0;
     public static JD getFirstVisibleTime(Satellite satellite, JD lower, JD upper, GeoPosition geoPosition) {
         JD biTime = lower.future((upper.value() - lower.value()) / 2.0);    //  preserves precision
-//        boolean lowerEclipsed = Eclipse.isEclipsed(satellite, lower);
-//        boolean biEclipsed = Eclipse.isEclipsed(satellite, biTime);
-//        boolean upperEclipsed = Eclipse.isEclipsed(satellite, upper);
-        boolean lowerEclipsed = true;
-        boolean biEclipsed = true;
-        boolean upperEclipsed = true;
+        boolean lowerEclipsed = Eclipse.isEclipsed(satellite, lower);
+        boolean biEclipsed = Eclipse.isEclipsed(satellite, biTime);
+        boolean upperEclipsed = Eclipse.isEclipsed(satellite, upper);
+//        boolean lowerEclipsed = true;
+//        boolean biEclipsed = true;
+//        boolean upperEclipsed = true;
 
         if (upper.difference(lower) <= ECLIPSE_EPSILON) {
             if (!upperEclipsed) return biTime;
@@ -461,8 +461,8 @@ public class Tracker {
     public static JD getLastVisibleTime(Satellite satellite, JD lower, JD upper, GeoPosition geoPosition) {
         JD biTime = lower.future((upper.value() - lower.value()) / 2.0);    //  preserves precision
         if (upper.difference(lower) <= ECLIPSE_EPSILON) return biTime;
-//        if (!Eclipse.isEclipsed(satellite, biTime))
-        if (true)
+        if (!Eclipse.isEclipsed(satellite, biTime))
+//        if (true)
             return getLastVisibleTime(satellite, biTime, upper, geoPosition);
         else return getFirstVisibleTime(satellite, lower, biTime, geoPosition);
     }
