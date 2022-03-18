@@ -201,7 +201,8 @@ public class JD implements Cloneable {
         if (m > 2) y = D - 4716;
         else y = D - 4715;
 
-        StringBuilder str = new StringBuilder(m)
+        StringBuilder str = new StringBuilder()
+                .append(m)
                 .append("/");
         if (d < 10) str.append("0");
         str.append((int)d)
