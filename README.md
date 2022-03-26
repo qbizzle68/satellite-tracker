@@ -18,6 +18,6 @@ If running on a Unix like system (Mac, Linux) the user will need to understand h
 (this can also be done on Windows, without the batch files). The command will be like:
 Java -classpath CLASSPATH PROGRAM-NAME
 where CLASSPATH is equal to the string in classpath.txt (in quotes) which should be:
-"out\production\satellite-tracker;external\json-simple-1.1.1.jar"
+"out\production\satellite-tracker;external\json-simple\json-simple-1.1.1.jar"
 and PROGRAM-NAME is equal to SatelliteTracker for the GUI and com.qbizzle.Main for the console app.
 NOTE: don't forget to use the appropriate slash for your filesystem ('\' vs '/').

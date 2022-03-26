@@ -1,1 +1,1 @@
-"out\production\satellite-tracker;external\json-simple-1.1.1.jar"
+"out\production\satellite-tracker;external\json-simple\json-simple-1.1.1.jar"
