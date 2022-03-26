@@ -210,7 +210,6 @@ public class Main {
             switch (locationInput) {
                 case BY_ADDRESS -> {
                     System.out.print("Enter address\nInput>");
-                    scanner.next();
                     String address = scanner.nextLine();
                     try {
                         geoPos = Requests.getGeoPosition(address);
@@ -238,9 +237,12 @@ public class Main {
     static double getNumber(String message, double min, double max) {
         double input;
         System.out.print(message + "\nInput>");
-        if (scanner.hasNextDouble()) input = scanner.nextDouble();
+        if (scanner.hasNextDouble()) {
+            input = scanner.nextDouble();
+            scanner.nextLine();
+        }
         else {
-            scanner.next(); // why do i need this?
+            scanner.nextLine(); // why do i need this?
             System.out.println("Input must be a valid number.");
             return getNumber(message, min, max);
         }
@@ -260,7 +262,6 @@ public class Main {
                 case CELESTRAK -> {
 //                    todo: be able to choose how to query sats.
                     System.out.println("Enter satellite name\nInput>");
-                    scanner.next();
                     String satName = scanner.nextLine();
                     satName.replace("\n", "");
                     Vector<TLE> satList = null;
@@ -271,7 +272,6 @@ public class Main {
                     }
                     if (satList.isEmpty()) System.out.println("No satellites found");
                     else if (satList.size() > 1) {
-//                        System.out.println("Which TLE would you like to use?");
                         for (int i = 1; i <= satList.size(); i++) {
                             System.out.println(i + ". " + satList.get(i-1));
                         }
@@ -285,7 +285,7 @@ public class Main {
                 }
                 case MANUAL -> {
                     System.out.println("Enter TLE (Satellite name as first line)\nInput>");
-                    scanner.next();
+//                    scanner.next();
 //                    todo: this could easily fail, need to add checks
                     StringBuilder strTle = new StringBuilder(scanner.nextLine())
                             .append("\n" + scanner.nextLine())
@@ -332,9 +332,12 @@ public class Main {
         }
         System.out.print(strDisplay + "Input>");
         int input;
-        if (scanner.hasNextInt()) input = scanner.nextInt();
+        if (scanner.hasNextInt()) {
+            input = scanner.nextInt();
+            scanner.nextLine();
+        }
         else {
-            scanner.next();
+            scanner.nextLine();
             System.out.println("Invalid input, please enter a valid number.");
             return displayMenu(header, menuList);
         }
