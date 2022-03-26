@@ -2,38 +2,22 @@
 The satellite tracker project is an attempt at operating on data in order to track satellite movements and to
 predict future or past positions. The main purpose of finding future positions is to plan satellite passes over 
 a distinct area for viewing.
-Future versions could be capable of detecting satellite collisions with adequate computing power.
 
-The remaining of this document will explain how each class is designed to function and its intended uses.
+There are currently two programs built, one a console app where you type input into the console, and the other
+is a GUI, which is more front-end friendly. Probably 98% of the effort building the GUI is in the back-end, so
+although it is much prettier looking than the console version, it is not as fully functional as the console version.
+The biggest example here is when choosing a satellite to track. The HTTP request may return multiple satellites if
+the search matches multiple satellite names. Right now the GUI version only selects the first one automatically, whereas
+the console version allows the user to choose which one they wish to select. 
 
-Obviously, given the fundamentals of object-oriented programming, any methodology pertaining to the use of a
-class should be contained to the implementation of that class. Any other class that would like to utilize the 
-implementation of another should do so through the latter class. For example, if we wish to instantiate a 
-StateVectors object using a TLE instance, the StateVectors constructor should use the COE constructor with 
-TLE parameter to then create a set of state vectors from the orbital elements. This separates the code that
-pertains to a specific object and keeps the project tidy.
-
-====================================================================================================
-============================================= JD Class =============================================
-====================================================================================================
-The Julian Day class is used to represent time, and easily compute difference in time. It can also easily
-determine a date and time given a previous date and the time in which to advance (or go back). The solar 
-day is the largest interval of time that remains consistent in length as well as being ideal in magnitude 
-for most computations. Months are of different lengths and years also are inconsistent due to leap years.
-Fractions of a solar day are also very easy to compute, with easy to remember ratios of the smaller elements
-(24 hours, 1440 minutes and 86400 seconds) we can convert from a UTC timestamp to a fractional day and back.
-Therefore, most if not all of the instances we want to use a deltaT term (except for small integration steps)
-we should aim to use solar days. This is the reason for the JD class, which greatly simplifies the calculations
-needed to handle differences in time.
-
-====================================================================================================
-=========================================== Vector Class ===========================================
-====================================================================================================
-The Vector class is self explanatory. The vector is used to represent a 3 dimensional physical quantity
-with a direction and a magnitude. In essence, the entire point of this project is to compute as accurate
-as position vectors as we can. From there it's up to our imagination as to what we can do with that 
-information! The Vector class methods will be the basic operations that can be done with a vector: vector 
-addition and subtraction, scalar multiplication, vector dot and cross products and computing the magnitude 
-and a normalized version of a vector. A vector can also use methods like addition assign and subtraction 
-assign to manipulate a vector with creating a new instance.
-
+# to run
+If running on Windows, two batch files have been created to run as is (as long as Java is installed on the machine).
+To run the console app, double-click satellite-tracker-console.bat. To run the GUI app, double-click satellite-tracker-gui.bat.
+Either of these files can also be run directly from the command line as well.
+If running on a Unix like system (Mac, Linux) the user will need to understand how to run the Java command from the console
+(this can also be done on Windows, without the batch files). The command will be like:
+Java -classpath CLASSPATH PROGRAM-NAME
+where CLASSPATH is equal to the string in classpath.txt (in quotes) which should be:
+"out\production\satellite-tracker;external\json-simple-1.1.1.jar"
+and PROGRAM-NAME is equal to SatelliteTracker for the GUI and com.qbizzle.Main for the console app.
+NOTE: don't forget to use the appropriate slash for your filesystem ('\' vs '/').
